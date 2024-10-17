@@ -1,0 +1,30 @@
+.gradient-custom {
+  background: #6a11cb;
+
+  background: -webkit-linear-gradient(
+    to right,
+    rgba(106, 17, 203, 1),
+    rgba(37, 117, 252, 1)
+  );
+  background: linear-gradient(
+    to right,
+    rgba(106, 17, 203, 1),
+    rgba(37, 117, 252, 1)
+  );
+}
+
+.button_login {
+  background-color: #6a11cb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.button_login:hover {
+  transform: scale(1.1); /* Sửa lỗi ở đây */
+  color: white;
+  background: linear-gradient(to right, white, #7449be);
+}

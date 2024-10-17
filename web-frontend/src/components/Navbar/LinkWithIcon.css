@@ -1,0 +1,42 @@
+.link-with-icon {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+  font-size: 18px;
+  margin-right: 15px;
+  transition: color 0.3s ease;
+}
+
+.link-with-icon i {
+  margin-right: 8px;
+  padding: 10px;
+  border: 2px solid #6457f9;
+  border-radius: 50%;
+  transition: color 0.3s ease, border-color 0.3s ease;
+  border-width: 3px;
+}
+
+.link-with-icon:hover {
+  color: #6457f9;
+}
+
+.link-with-icon:hover i {
+  color: #6457f9;
+  border-color: #5140d3;
+}
+
+@media (max-width: 768px) {
+  .link-with-icon {
+    font-size: 14px;
+    margin-right: 8px;
+  }
+  .link-with-icon i {
+    padding: 8px;
+    font-size: 16px;
+  }
+}
+
+.link-with-icon.active {
+  border-bottom: 2px solid #6457f9;
+}

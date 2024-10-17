@@ -1,0 +1,66 @@
+/* Container */
+.my_orders_container {
+  margin-top: 20px;
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.my_orders_title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Table Styles */
+.my_orders_table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.my_orders_table th,
+.my_orders_table td {
+  padding: 15px;
+  text-align: left;
+  font-size: 1.1rem;
+}
+
+.my_orders_table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  color: #333;
+}
+
+.my_orders_table td {
+  border-bottom: 1px solid #ddd;
+}
+
+.my_orders_table td div {
+  margin-bottom: 5px;
+}
+
+.my_orders_table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Status colors */
+.my_orders_table td:nth-child(4) {
+  font-weight: bold;
+}
+
+.my_orders_table td:nth-child(4).status-shipped {
+  color: #ff8c00;
+}
+
+.my_orders_table td:nth-child(4).status-delivered {
+  color: #28a745;
+}
+
+.my_orders_table td:nth-child(4).status-pending {
+  color: #ffc107;
+}
