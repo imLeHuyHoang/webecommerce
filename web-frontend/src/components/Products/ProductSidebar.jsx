@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./ProductSidebar.css"; // Giữ nguyên CSS tùy chỉnh
-import apiClient from "../../src/utils/api-client";
+import apiClient from "../../../src/utils/api-client";
 import ProductSidebarSkeleton from "./Skeleton/ProductSidebarSkeleton";
 
 function ProductSidebar() {

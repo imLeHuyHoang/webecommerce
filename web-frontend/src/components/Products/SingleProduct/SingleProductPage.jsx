@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import apiClient from "../../../src/utils/api-client";
+import apiClient from "../../../utils/api-client";
 import "./SingleProductPage.css";
 
 const SingleProductPage = () => {

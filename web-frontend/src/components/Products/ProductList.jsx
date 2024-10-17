@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import ProductSkeleton from "./Skeleton/ProductSkeleton";
 import "./ProductList.css";
-import apiClient from "../../src/utils/api-client";
+import apiClient from "../../../src/utils/api-client";
 import { NavLink } from "react-router-dom";
 
 const ProductList = ({ selectedCategoryName }) => {
