@@ -1,30 +1,52 @@
-.gradient-custom {
-  background: #6a11cb;
+/* SignupPage.css */
 
-  background: -webkit-linear-gradient(
-    to right,
-    rgba(106, 17, 203, 1),
-    rgba(37, 117, 252, 1)
-  );
-  background: linear-gradient(
-    to right,
-    rgba(106, 17, 203, 1),
-    rgba(37, 117, 252, 1)
-  );
+.signup-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
 }
 
-.button_login {
-  background-color: #6a11cb;
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+}
+
+.message {
+  margin-top: 15px;
+  color: red;
+  font-size: 14px;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4caf50;
   color: white;
-  padding: 10px 20px;
+  border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: all 0.5s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  font-size: 16px;
 }
 
-.button_login:hover {
-  transform: scale(1.1); /* Sửa lỗi ở đây */
-  color: white;
-  background: linear-gradient(to right, white, #7449be);
+.submit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }

@@ -99,6 +99,7 @@ router.get("/", async (req, res) => {
       images: 1,
       reviews: 1,
       stock: 1,
+      category: 1,
     })
       .skip(startIndex)
       .limit(perPage);
@@ -117,6 +118,11 @@ router.get("/", async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
+});
+
+router.get("/images", (req, res) => {
+  const image = req.query.image;
+  res.sendFile(__dirname + "/upload/products/" + image);
 });
 
 // post products

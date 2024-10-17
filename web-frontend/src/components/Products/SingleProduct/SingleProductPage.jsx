@@ -31,17 +31,17 @@ const SingleProductPage = () => {
   const images = product?.images?.slice(0, 4) || [];
   const mainImage =
     product?.images && product.images.length > 0
-      ? `http://localhost:5000/images/${product.images[0]}`
+      ? `http://localhost:5000/products/${product.images[0]}`
       : "default-image.png";
-
+  console.log(product);
   return product ? (
     <div className="single-product">
       <div className="image-container">
         <div className="small-images">
-          {images.map((img, index) => (
+          {product.images.map((img, index) => (
             <img
               key={index}
-              src={`http://localhost:5000/images/${img}`}
+              src={`http://localhost:5000/products/${img}`}
               alt={`Product ${index}`}
               className="small-image"
             />

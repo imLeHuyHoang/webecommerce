@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/category", express.static(__dirname + "/upload/category"));
 app.use("/profile", express.static(__dirname + "/upload/profiles"));
 app.use("/products", express.static(__dirname + "/upload/products"));
+app.use("/images", express.static(__dirname + "upload/products"));
 
 // adding routes
 app.use("/api/user", userRoutes);
@@ -30,5 +31,5 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on PORT: ${PORT}`);
+  console.log(`Server is running on PORT: ${PORT}`);
 });

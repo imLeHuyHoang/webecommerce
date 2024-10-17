@@ -1,23 +1,17 @@
 import React, { useState } from "react";
-import axios from "axios"; // Thêm axios để gọi API
-import { z } from "zod";
+import axios from "axios"; // Thư viện để gọi API
+import { z } from "zod"; // Thư viện để xác thực dữ liệu
 import "./SignupPage.css"; // CSS tùy chỉnh
 
-// Schema Zod để xác thực form
+// Định nghĩa schema với Zod để xác thực dữ liệu
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .refine(
-      (val, ctx) => val === ctx.parent.password,
-      "Passwords do not match"
-    ),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-function SignUpPage() {
+const SignUp = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,186 +20,144 @@ function SignUpPage() {
   });
 
   const [errors, setErrors] = useState({});
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false); // Quản lý trạng thái loading
+  const [loading, setLoading] = useState(false); // Trạng thái loading
+  const [message, setMessage] = useState(""); // Thông báo trạng thái
 
-  // Xử lý thay đổi input
+  // Xử lý khi có thay đổi trong các input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Xử lý gửi form
+  // Xử lý khi submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setLoading(true); // Kích hoạt trạng thái loading
 
-    // Xác thực form bằng Zod
-    const result = signupSchema.safeParse(formData);
-    if (!result.success) {
+    // Xác thực dữ liệu bằng Zod
+    const validationResult = signupSchema.safeParse(formData);
+    if (!validationResult.success) {
       const newErrors = {};
-      result.error.errors.forEach((err) => {
+      validationResult.error.errors.forEach((err) => {
         newErrors[err.path[0]] = err.message;
       });
       setErrors(newErrors);
-      setLoading(false);
+      setLoading(false); // Tắt trạng thái loading
       return;
     }
 
-    // Gửi yêu cầu đăng ký đến backend
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
-        formData,
+    // Kiểm tra xem mật khẩu và xác nhận mật khẩu có khớp nhau không
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: "Passwords do not match" });
+      setLoading(false); // Tắt trạng thái loading
+      return;
+    }
+
+    // Đóng gói dữ liệu với các trường cần thiết
+    const fullFormData = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      phone: "",
+      gender: "other",
+      roles: ["user"],
+      isActive: true,
+      addresses: [
         {
-          headers: { "Content-Type": "application/json" },
-        }
+          province: "",
+          district: "",
+          ward: "",
+          street: "",
+          default: false,
+        },
+      ],
+      lastLogin: new Date(),
+    };
+
+    try {
+      // Gửi dữ liệu đến API server
+      const response = await axios.post(
+        "http://localhost:5000/api/user/signup",
+        fullFormData,
+        { headers: { "Content-Type": "application/json" } }
       );
-      setMessage("Sign Up Successful!");
-      console.log("User signed up:", response.data);
-      setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+      alert("Sign Up Successful!");
+      setFormData({ name: "", email: "", password: "", confirmPassword: "" }); // Reset form
       setErrors({});
     } catch (error) {
       const errMessage = error.response?.data?.message || "Sign Up Failed!";
       setMessage(errMessage);
     } finally {
-      setLoading(false);
+      setLoading(false); // Tắt trạng thái loading
     }
   };
 
   return (
-    <section className="vh-100 gradient-custom">
-      <div className="container py-5 h-100">
-        <div className="row d-flex justify-content-center align-items-center h-100">
-          <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div
-              className="card bg-dark text-white"
-              style={{ borderRadius: "1rem" }}
-            >
-              <div className="card-body p-5 text-center">
-                <div className="mb-md-5 mt-md-4 pb-5">
-                  <h2 className="fw-bold mb-2 text-uppercase">Sign Up</h2>
-                  <p className="text-white-50 mb-5">
-                    Please enter your information to sign up!
-                  </p>
-
-                  <form onSubmit={handleSubmit}>
-                    <div className="form-outline form-white mb-4">
-                      <input
-                        type="text"
-                        id="typeName"
-                        name="name"
-                        className="form-control form-control-lg"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                      />
-                      <label className="form-label" htmlFor="typeName">
-                        Name
-                      </label>
-                      {errors.name && (
-                        <span className="text-danger">{errors.name}</span>
-                      )}
-                    </div>
-
-                    <div className="form-outline form-white mb-4">
-                      <input
-                        type="email"
-                        id="typeEmail"
-                        name="email"
-                        className="form-control form-control-lg"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                      <label className="form-label" htmlFor="typeEmail">
-                        Email
-                      </label>
-                      {errors.email && (
-                        <span className="text-danger">{errors.email}</span>
-                      )}
-                    </div>
-
-                    <div className="form-outline form-white mb-4">
-                      <input
-                        type="password"
-                        id="typePassword"
-                        name="password"
-                        className="form-control form-control-lg"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                      />
-                      <label className="form-label" htmlFor="typePassword">
-                        Password
-                      </label>
-                      {errors.password && (
-                        <span className="text-danger">{errors.password}</span>
-                      )}
-                    </div>
-
-                    <div className="form-outline form-white mb-4">
-                      <input
-                        type="password"
-                        id="typeConfirmPassword"
-                        name="confirmPassword"
-                        className="form-control form-control-lg"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        required
-                      />
-                      <label
-                        className="form-label"
-                        htmlFor="typeConfirmPassword"
-                      >
-                        Confirm Password
-                      </label>
-                      {errors.confirmPassword && (
-                        <span className="text-danger">
-                          {errors.confirmPassword}
-                        </span>
-                      )}
-                    </div>
-
-                    <button
-                      className="btn btn-outline-light btn-lg px-5"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      {loading ? "Signing Up..." : "Sign Up"}
-                    </button>
-                  </form>
-
-                  {message && <p className="mt-3 text-warning">{message}</p>}
-
-                  <div className="d-flex justify-content-center text-center mt-4 pt-1">
-                    <a href="#!" className="text-white">
-                      <i className="fab fa-facebook-f fa-lg"></i>
-                    </a>
-                    <a href="#!" className="text-white">
-                      <i className="fab fa-twitter fa-lg mx-4 px-2"></i>
-                    </a>
-                    <a href="#!" className="text-white">
-                      <i className="fab fa-google fa-lg"></i>
-                    </a>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-0">
-                    Already have an account?{" "}
-                    <a href="#!" className="text-white-50 fw-bold">
-                      Login
-                    </a>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="signup-container">
+      <h2>Sign Up</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+          {errors.name && <p className="error">{errors.name}</p>}
         </div>
-      </div>
-    </section>
-  );
-}
 
-export default SignUpPage;
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          {errors.email && <p className="error">{errors.email}</p>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          {errors.password && <p className="error">{errors.password}</p>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+          {errors.confirmPassword && (
+            <p className="error">{errors.confirmPassword}</p>
+          )}
+        </div>
+
+        <button type="submit" className="submit-button" disabled={loading}>
+          {loading ? "Signing Up..." : "Sign Up"}
+        </button>
+      </form>
+
+      {message && <p className="message">{message}</p>}
+    </div>
+  );
+};
+
+export default SignUp;

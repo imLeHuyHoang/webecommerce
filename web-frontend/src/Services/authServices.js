@@ -1,12 +1,32 @@
-import apiClient from "../utils/api-client";
+import React, { createContext, useState, useEffect } from "react";
 
-function signup(user, profile) {
-  const body = new FormData();
-  body.append("name", user.name);
-  body.append("email", user.email);
-  body.append("password", user.password);
-  body.append("delivery_address", profile.delivery_address);
-  body.append("phone_number", profile.phone_number);
-  body.append("profile_picture", profile.profile_picture);
-  return apiClient.post("/signup", body);
-}
+export const AuthContext = createContext();
+
+const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+
+  // Update token in localStorage when it changes
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  }, [token]);
+
+  const login = (token) => {
+    setToken(token);
+  };
+
+  const logout = () => {
+    setToken(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ token, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export default AuthProvider;
