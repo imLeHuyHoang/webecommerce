@@ -15,8 +15,10 @@ const JWTSECRET = process.env.JWTSECRET;
 // LoggedIN user profile
 router.get("/me", auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
-    return res.send(user);
+    const user = await User.findById(req.user._id).select(
+      "-password -refreshToken"
+    );
+    res.json(user);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Server error" });
@@ -120,51 +122,100 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials." });
     }
 
-    // Create a JWT token
-    const token = jwt.sign({ _id: user._id }, JWTSECRET, { expiresIn: "60d" });
+    // Generate tokens
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWTSECRET, {
+      expiresIn: "15m",
+    });
+    const refreshToken = jwt.sign(
+      { _id: user._id },
+      process.env.JWTREFRESHSECRET,
+      { expiresIn: "60d" }
+    );
 
-    // Send the token in response
-    res.json({ token });
+    // Save the refresh token in the database
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Set refresh token as HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false, // Đổi thành true nếu dùng HTTPS
+      sameSite: "Lax",
+      maxAge: 60 * 24 * 60 * 60 * 1000, // 60 ngày
+    });
+
+    // Send access token to client
+    res.json({ accessToken });
   } catch (error) {
     console.error("Error during user login:", error);
-    res.status(500).json({ message: "Login Failed!" });
+    res.status(500).json({ message: "Login Failed123!" });
   }
-});
-
-router.get("/api/user/dashboard", authMiddleware, (req, res) => {
-  // User-specific dashboard logic
-  res.json({ message: "Welcome to your dashboard!", user: req.user });
 });
 
 router.post("/logout", async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
+  const refreshToken = req.cookies.refreshToken; // Now this should work
 
   if (!refreshToken) {
-    return res.status(400).json({ message: "Không tìm thấy refresh token." });
+    return res.status(400).json({ message: "Refresh token not found." });
   }
 
   try {
-    // Xác thực Refresh Token
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    // Verify and invalidate refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWTREFRESHSECRET);
+    const user = await User.findById(decoded._id);
 
-    // Tìm người dùng và xóa Refresh Token trong cơ sở dữ liệu
-    const user = await User.findById(decoded.userId);
-    if (user) {
+    if (user && user.refreshToken === refreshToken) {
       user.refreshToken = null;
       await user.save();
     }
 
-    // Xóa cookie Refresh Token
+    // Clear refresh token cookie
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: true, // Đặt thành true nếu sử dụng HTTPS
-      sameSite: "Strict",
+      secure: false, // Set to true in production
+      sameSite: "Lax",
     });
 
-    res.status(200).json({ message: "Đăng xuất thành công." });
+    res.status(200).json({ message: "Logout successful." });
   } catch (error) {
-    console.error("Lỗi khi đăng xuất:", error);
-    res.status(500).json({ message: "Đăng xuất thất bại." });
+    console.error("Error during logout:", error);
+    res.status(500).json({ message: "Logout failed." });
+  }
+});
+
+router.post("/refresh_token", async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    return res
+      .status(401)
+      .json({ message: "Refresh token not found, please login again." });
+  }
+
+  try {
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWTREFRESHSECRET);
+
+    // Find the user
+    const user = await User.findById(decoded._id);
+
+    if (!user || user.refreshToken !== refreshToken) {
+      return res
+        .status(403)
+        .json({ message: "Invalid refresh token, please login again." });
+    }
+
+    // Generate new access token
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWTSECRET, {
+      expiresIn: "15m",
+    });
+
+    res.json({ accessToken });
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    res
+      .status(403)
+      .json({ message: "Invalid refresh token, please login again." });
   }
 });
 

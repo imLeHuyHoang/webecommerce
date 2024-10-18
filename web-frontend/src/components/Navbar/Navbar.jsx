@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
+import LinkWithIcon from "./LinkWithIcon";
+import { useAuth } from "../../Services/authContext"; // Import useAuth hook
 
 function Navbar() {
-  const [cartCount, setCartCount] = useState(0); // Số lượng giỏ hàng mặc định là 0
+  const { auth, logout } = useAuth(); // Access auth state and logout function
+  const { user } = auth;
+  const [cartCount, setCartCount] = useState(0);
 
   return (
     <nav className="align_center navbar">
@@ -20,71 +24,47 @@ function Navbar() {
           </button>
         </form>
       </div>
-      <div className="navbar_links">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fa-solid fa-house"></i>
-          Home
-        </NavLink>
-        <NavLink
-          to="/products"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fa-solid fa-box-open"></i>
-          Products
-        </NavLink>
-        <NavLink
-          to="/login"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fa-solid fa-sign-in-alt"></i>
-          Login
-        </NavLink>
-        <NavLink
-          to="/signup"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fa-solid fa-user-plus"></i>
-          Signup
-        </NavLink>
-        <NavLink
-          to="/my-order"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fa-solid fa-shopping-bag"></i>
-          My Order
-        </NavLink>
-        <NavLink
-          to="/logout"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fa-solid fa-sign-out-alt"></i>
-          Logout
-        </NavLink>
-        {/* Icon giỏ hàng tùy chỉnh với số lượng */}
-        <NavLink
-          to="/cart"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fa-solid fa-shopping-cart"></i>
-          Cart ({cartCount})
-        </NavLink>
+      <div className="navbar_links align_center">
+        <LinkWithIcon title="Home" link="/" icon="fas fa-home" />
+        <LinkWithIcon title="Products" link="/products" icon="fas fa-box" />
+        {!user ? (
+          <>
+            <LinkWithIcon
+              title="Login"
+              link="/login"
+              icon="fas fa-sign-in-alt"
+            />
+            <LinkWithIcon
+              title="SignUp"
+              link="/signup"
+              icon="fas fa-user-plus"
+            />
+          </>
+        ) : (
+          <>
+            <LinkWithIcon
+              title="My Orders"
+              link="/orders"
+              icon="fas fa-shopping-bag"
+            />
+            <LinkWithIcon
+              title="Logout"
+              link="/logout"
+              icon="fas fa-sign-out-alt"
+              onClick={logout}
+            />
+            <NavLink
+              to="/cart"
+              className={({ isActive }) =>
+                isActive ? "link-with-icon active" : "link-with-icon"
+              }
+            >
+              <i className="fas fa-shopping-cart"></i>
+              Cart ({cartCount})
+            </NavLink>
+          </>
+        )}
+        <LinkWithIcon title="Profile" link="/profile" icon="fas fa-user" />
       </div>
     </nav>
   );

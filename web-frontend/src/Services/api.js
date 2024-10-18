@@ -1,53 +1,58 @@
-// api.js
-
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-  withCredentials: true, // Để gửi cookie
+  baseURL: "http://localhost:5000",
+  withCredentials: true, // Needed to send cookies
 });
 
-// Interceptor để đính kèm Access Token vào các yêu cầu
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// ... existing request interceptor
 
-// Interceptor để xử lý lỗi và làm mới token
+// Flag to prevent infinite loops
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
     if (
-      error.response.status === 401 &&
+      error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/user/login") &&
-      !originalRequest.url.includes("/user/refresh-token")
+      !originalRequest.url.includes("/login") &&
+      !originalRequest.url.includes("/refresh_token")
     ) {
       originalRequest._retry = true;
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/user/refresh-token",
-          {},
-          { withCredentials: true }
-        );
-        localStorage.setItem("accessToken", response.data.accessToken);
-        originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+        const { data } = await api.post("/api/user/refresh_token");
+        localStorage.setItem("accessToken", data.accessToken);
+        api.defaults.headers.common["Authorization"] =
+          "Bearer " + data.accessToken;
+        originalRequest.headers["Authorization"] = "Bearer " + data.accessToken;
         return api(originalRequest);
-      } catch (err) {
-        // Nếu không thể làm mới token, chuyển hướng đến trang đăng nhập
-        window.location.href = "/login";
-        return Promise.reject(err);
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
       }
     }
-
     return Promise.reject(error);
   }
 );

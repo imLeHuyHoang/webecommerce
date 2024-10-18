@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   addresses: [addressSchema],
   lastLogin: { type: Date, default: Date.now },
+  refreshToken: { type: String, default: null },
 });
 
 module.exports = mongoose.model("User", userSchema);

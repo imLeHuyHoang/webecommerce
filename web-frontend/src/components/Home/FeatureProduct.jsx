@@ -16,8 +16,6 @@ function FeatureProduct() {
       });
   }, []);
 
-  console.log(randomProducts);
-
   return (
     <section className="featured_product">
       <h2 className="section_title">Featured Products</h2>

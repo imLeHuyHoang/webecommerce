@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 require("./db/connectDB");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,13 +16,19 @@ const cartRoutes = require("./routes/cart");
 const orderRoutes = require("./routes/order");
 
 // middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Cụ thể hóa origin frontend
+    credentials: true, // Cho phép gửi cookie và credentials
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/category", express.static(__dirname + "/upload/category"));
 app.use("/profile", express.static(__dirname + "/upload/profiles"));
 app.use("/products", express.static(__dirname + "/upload/products"));
 app.use("/images", express.static(__dirname + "upload/products"));
+app.use(cookieParser());
 
 // adding routes
 app.use("/api/user", userRoutes);
