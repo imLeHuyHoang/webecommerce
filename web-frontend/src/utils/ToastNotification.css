@@ -1,0 +1,38 @@
+/* Đặt toast ở giữa phía trên của trang web */
+/* ToastContainer ở vị trí cố định */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050; /* Cao hơn các phần tử khác */
+  pointer-events: none; /* Không ảnh hưởng đến sự kiện chuột */
+}
+
+/* Toast header và body style */
+.toast {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 8px;
+}
+
+.toast-header {
+  background-color: #343a40;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toast-body {
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Hiệu ứng fade cho toast */
+.toast.fade {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.toast.show {
+  opacity: 1;
+}

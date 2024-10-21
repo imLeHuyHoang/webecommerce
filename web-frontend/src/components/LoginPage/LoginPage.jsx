@@ -1,106 +1,82 @@
-import React, { useState, useEffect, useContext } from "react";
-import api from "../../Services/api";
-import "./LoginPage.css";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../Services/authContext"; // Import đúng context
+import { useAuth } from "../../context/AuthContext";
+import apiClient from "../../utils/api-client";
 
-const LoginPage = () => {
-  const { auth, setAuth } = useContext(AuthContext); // Đảm bảo setAuth tồn tại
-  const navigate = useNavigate();
+const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-      verifyUser();
-    }
-  }, []);
-
-  const verifyUser = async () => {
-    try {
-      const response = await api.get("/api/user/me");
-      setAuth({
-        isAuthenticated: true,
-        user: response.data,
-      });
-      navigate("/dashboard", { replace: true });
-    } catch (error) {
-      console.error("User verification failed:", error);
-      localStorage.removeItem("accessToken");
-      setAuth({ isAuthenticated: false, user: null });
-    }
-  };
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth(); // Lấy hàm login từ AuthContext
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setErrors("");
-
     try {
-      const response = await api.post("/api/user/login", formData);
-      localStorage.setItem("accessToken", response.data.accessToken);
-      api.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.accessToken}`;
+      const response = await apiClient.post("/user/login", formData);
+      const { accessToken, id } = response.data;
 
-      setAuth({
-        isAuthenticated: true,
-        user: response.data.user,
-      });
+      // Lưu accessToken và userId vào localStorage
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("userId", id);
 
-      navigate("/", { replace: true });
+      login(accessToken); // Cập nhật AuthContext
+      navigate("/");
       window.location.reload();
+      console.log("User logged in:", response.data);
     } catch (error) {
-      const errMsg = error.response?.data?.message || "Login Failed!";
-      setErrors(errMsg);
-    } finally {
-      setLoading(false);
+      setError("Email hoặc mật khẩu không đúng!");
     }
   };
 
+  // Tự động refresh access token khi hết hạn
+  const refreshToken = async () => {
+    try {
+      const response = await apiClient.get("/user/refreshToken", {
+        withCredentials: true, // Đảm bảo gửi cookie refreshToken
+      });
+
+      const { accessToken } = response.data;
+      localStorage.setItem("accessToken", accessToken);
+      login(accessToken);
+    } catch (error) {
+      console.error("Lỗi làm mới token:", error);
+      localStorage.removeItem("accessToken");
+      navigate("/login");
+    }
+  };
+
+  // Refresh token sau mỗi 10 phút (600000ms)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshToken();
+    }, 600000); // 10 phút
+
+    return () => clearInterval(interval); // Dọn dẹp khi component unmount
+  }, []);
+
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      {errors && <p className="error">{errors}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button type="submit" className="submit-button" disabled={loading}>
-          {loading ? "Logging In..." : "Login"}
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <h1>Login</h1>
+      {error && <p className="error">{error}</p>}
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        onChange={handleChange}
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        onChange={handleChange}
+      />
+      <button type="submit">Login</button>
+    </form>
   );
 };
 
-export default LoginPage;
+export default Login;

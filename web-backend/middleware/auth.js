@@ -1,22 +1,19 @@
 const jwt = require("jsonwebtoken");
 
-const auth = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
+exports.verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1]; // Lấy token từ header
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized: No token provided." });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWTSECRET);
-    req.user = { _id: decoded._id };
-    next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Gắn thông tin người dùng vào req.user
+    next(); // Chuyển tiếp đến route handler tiếp theo
   } catch (error) {
-    console.error("Auth middleware error:", error);
-    res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Invalid or expired token." });
   }
 };
-
-module.exports = auth;

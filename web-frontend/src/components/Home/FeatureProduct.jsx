@@ -1,37 +1,45 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./featureProduct.css";
 import ProductCard from "../Products/ProductCard";
 
 function FeatureProduct() {
-  const [randomProducts, setRandomProducts] = React.useState([]);
+  const [randomProducts, setRandomProducts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/product");
+        const data = await response.json();
         if (data && data.products) {
-          const randomProducts = data.products.slice(0, 5); // Lấy 5 sản phẩm từ mảng products
+          const randomProducts = data.products.slice(0, 4); // Lấy 5 sản phẩm
           setRandomProducts(randomProducts);
         }
-      });
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm:", error);
+      }
+    };
+    fetchProducts();
   }, []);
 
   return (
-    <section className="featured_product">
-      <h2 className="section_title">Featured Products</h2>
-      <div className="product_container">
-        {randomProducts.map((product) => (
-          <ProductCard
-            key={product._id}
-            id={product._id}
-            stock={product.stock}
-            rating={product.reviews?.rate || 0}
-            ratingCount={product.reviews?.counts || 0}
-            title={product.title}
-            price={product.price}
-            image={product.images?.[0]}
-          />
-        ))}
+    <section className="featured-product my-5">
+      <div className="container">
+        <h2 className="section-title text-center mb-5">Featured Products</h2>
+        <div className="product-container">
+          {randomProducts.map((product) => (
+            <div key={product._id}>
+              <ProductCard
+                id={product._id}
+                stock={product.stock}
+                rating={product.reviews?.rate || 0}
+                ratingCount={product.reviews?.counts || 0}
+                title={product.title}
+                price={product.price}
+                image={product.images?.[0]}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

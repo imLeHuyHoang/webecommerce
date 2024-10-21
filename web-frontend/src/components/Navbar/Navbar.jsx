@@ -2,31 +2,38 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 import LinkWithIcon from "./LinkWithIcon";
-import { useAuth } from "../../Services/authContext"; // Import useAuth hook
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 function Navbar() {
-  const { auth, logout } = useAuth(); // Access auth state and logout function
+  const { auth, logout } = useAuth();
   const { user } = auth;
-  const [cartCount, setCartCount] = useState(0);
+  const { cartCount, fetchCartCount } = useCart(); // Nhận cartCount từ context
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="align_center navbar">
-      <div className="align_center search_name">
+    <nav className="navbar">
+      <div className="navbar_header">
         <h1 className="navbar_heading">TECH STORE</h1>
-        <form className="navbar_form align_center">
-          <input
-            type="text"
-            className="navbar_search"
-            placeholder="Search Products"
-          />
-          <button type="submit" className="search_button">
-            Search
-          </button>
-        </form>
+        <button className="menu-toggle" onClick={toggleMenu}>
+          ☰
+        </button>
       </div>
-      <div className="navbar_links align_center">
+
+      <div className={`navbar_links ${isOpen ? "open" : ""}`}>
         <LinkWithIcon title="Home" link="/" icon="fas fa-home" />
-        <LinkWithIcon title="Products" link="/products" icon="fas fa-box" />
+        <NavLink
+          to="/cart"
+          className={({ isActive }) =>
+            isActive ? "link-with-icon active" : "link-with-icon"
+          }
+        >
+          <i className="fas fa-shopping-cart"></i> Cart ({cartCount})
+        </NavLink>
+        <LinkWithIcon title="Products" link="/product" icon="fas fa-box" />
+
         {!user ? (
           <>
             <LinkWithIcon
@@ -44,27 +51,17 @@ function Navbar() {
           <>
             <LinkWithIcon
               title="My Orders"
-              link="/orders"
+              link="/order"
               icon="fas fa-shopping-bag"
             />
             <LinkWithIcon
               title="Logout"
               link="/logout"
               icon="fas fa-sign-out-alt"
-              onClick={logout}
             />
-            <NavLink
-              to="/cart"
-              className={({ isActive }) =>
-                isActive ? "link-with-icon active" : "link-with-icon"
-              }
-            >
-              <i className="fas fa-shopping-cart"></i>
-              Cart ({cartCount})
-            </NavLink>
+            <LinkWithIcon title="Profile" link="/profile" icon="fas fa-user" />
           </>
         )}
-        <LinkWithIcon title="Profile" link="/profile" icon="fas fa-user" />
       </div>
     </nav>
   );

@@ -34,6 +34,13 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true); // Kích hoạt trạng thái loading
 
+    // Kiểm tra xem mật khẩu và xác nhận mật khẩu có khớp nhau không
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: "Passwords do not match" });
+      setLoading(false); // Tắt trạng thái loading
+      return;
+    }
+
     // Xác thực dữ liệu bằng Zod
     const validationResult = signupSchema.safeParse(formData);
     if (!validationResult.success) {
@@ -42,13 +49,6 @@ const SignUp = () => {
         newErrors[err.path[0]] = err.message;
       });
       setErrors(newErrors);
-      setLoading(false); // Tắt trạng thái loading
-      return;
-    }
-
-    // Kiểm tra xem mật khẩu và xác nhận mật khẩu có khớp nhau không
-    if (formData.password !== formData.confirmPassword) {
-      setErrors({ confirmPassword: "Passwords do not match" });
       setLoading(false); // Tắt trạng thái loading
       return;
     }
@@ -77,11 +77,11 @@ const SignUp = () => {
     try {
       // Gửi dữ liệu đến API server
       const response = await axios.post(
-        "http://localhost:5000/api/user/signup",
+        "http://localhost:5000/api/user/register",
         fullFormData,
         { headers: { "Content-Type": "application/json" } }
       );
-      alert("Sign Up Successful!");
+      setMessage("Sign Up Successful!");
       setFormData({ name: "", email: "", password: "", confirmPassword: "" }); // Reset form
       setErrors({});
     } catch (error) {

@@ -5,25 +5,25 @@
   color: black;
   font-size: 18px;
   margin-right: 15px;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, transform 0.3s ease; /* Thêm transition cho transform */
 }
 
 .link-with-icon i {
   margin-right: 8px;
   padding: 10px;
-  border: 2px solid #6457f9;
-  border-radius: 50%;
-  transition: color 0.3s ease, border-color 0.3s ease;
+  transition: color 0.3s ease, border-color 0.3s ease, transform 0.3s ease; /* Thêm transition cho transform */
   border-width: 3px;
 }
 
 .link-with-icon:hover {
   color: #6457f9;
+  transform: scale(1.05); /* Phóng to khi hover */
 }
 
 .link-with-icon:hover i {
   color: #6457f9;
   border-color: #5140d3;
+  transform: scale(1.2); /* Phóng to icon khi hover */
 }
 
 @media (max-width: 768px) {
@@ -38,5 +38,11 @@
 }
 
 .link-with-icon.active {
-  border-bottom: 2px solid #6457f9;
+  color: #6457f9;
+  transform: scale(1.1); /* Phóng to khi active */
+}
+
+.link-with-icon.active i {
+  color: #6457f9;
+  border-color: #5140d3;
 }

@@ -11,13 +11,12 @@ const ProductList = ({ selectedCategoryName }) => {
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await apiClient.get("/products", {
+        const response = await apiClient.get("/product", {
           params: {
             category: selectedCategoryName || undefined,
             page: page,
@@ -26,7 +25,6 @@ const ProductList = ({ selectedCategoryName }) => {
         });
         setProducts(response.data.products);
         setTotalPages(response.data.totalPages);
-        setCurrentPage(response.data.currentPage);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -35,10 +33,10 @@ const ProductList = ({ selectedCategoryName }) => {
     };
 
     fetchProducts();
-  }, [page, selectedCategoryName]);
+  }, [page, selectedCategoryName]); // Theo dõi sự thay đổi của page và category
 
   const handlePageClick = (pageNumber) => {
-    if (pageNumber !== currentPage) {
+    if (pageNumber !== page) {
       setPage(pageNumber);
     }
   };
@@ -53,14 +51,8 @@ const ProductList = ({ selectedCategoryName }) => {
         <h2 className="product_list_heading">
           {selectedCategoryName || "Products"}
         </h2>
-        <select name="sort" className="product_sorting">
-          <option value="relevance">Relevance</option>
-          <option value="high_to_low">Price HIGH to LOW</option>
-          <option value="low_to_high">Price LOW to HIGH</option>
-          <option value="rate_high_to_low">Rate HIGH to LOW</option>
-          <option value="rate_low_to_high">Rate LOW to HIGH</option>
-        </select>
       </header>
+
       <div className="product_list">
         {error && <em className="error">{error}</em>}
         {products.length > 0 ? (
@@ -91,7 +83,7 @@ const ProductList = ({ selectedCategoryName }) => {
             <button
               key={pageNumber}
               className={`pagination_button ${
-                pageNumber === currentPage ? "active" : ""
+                pageNumber === page ? "active" : ""
               }`}
               onClick={() => handlePageClick(pageNumber)}
             >
