@@ -1,5 +1,5 @@
+// ProductPage.js
 import React from "react";
-import "./ProductPage.css";
 import ProductSidebar from "./ProductSidebar";
 import ProductList from "./ProductList";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -12,15 +12,17 @@ const ProductPage = () => {
   const selectedCategoryName = searchParams.get("category");
 
   const handleCategoryChange = (category) => {
-    searchParams.set("category", category); // Cập nhật query param
-    navigate({ search: searchParams.toString() }); // Điều hướng tới URL mới
+    searchParams.set("category", category);
+    navigate({ search: searchParams.toString() });
   };
 
   return (
-    <section className="product_page">
-      <ProductSidebar onCategoryChange={handleCategoryChange} />
-      <ProductList selectedCategoryName={selectedCategoryName} />
-    </section>
+    <div className="container-fluid mt-4">
+      <div className="row">
+        <ProductSidebar onCategoryChange={handleCategoryChange} />
+        <ProductList selectedCategoryName={selectedCategoryName} />
+      </div>
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "./featureProduct.css";
 import ProductCard from "../Products/ProductCard";
+import "./FeatureProduct.css"; // Import CSS
 
 function FeatureProduct() {
   const [randomProducts, setRandomProducts] = useState([]);
@@ -11,11 +11,11 @@ function FeatureProduct() {
         const response = await fetch("http://localhost:5000/api/product");
         const data = await response.json();
         if (data && data.products) {
-          const randomProducts = data.products.slice(0, 4); // Lấy 5 sản phẩm
+          const randomProducts = data.products.slice(0, 4);
           setRandomProducts(randomProducts);
         }
       } catch (error) {
-        console.error("Lỗi khi lấy sản phẩm:", error);
+        console.error("Error fetching products:", error);
       }
     };
     fetchProducts();
@@ -24,10 +24,10 @@ function FeatureProduct() {
   return (
     <section className="featured-product my-5">
       <div className="container">
-        <h2 className="section-title text-center mb-5">Featured Products</h2>
-        <div className="product-container">
+        <h2 className="text-center mb-5">Featured Products</h2>
+        <div className="row">
           {randomProducts.map((product) => (
-            <div key={product._id}>
+            <div key={product._id} className="items_in_row col-md-3 mb-4 ">
               <ProductCard
                 id={product._id}
                 stock={product.stock}

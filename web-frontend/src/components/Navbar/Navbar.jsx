@@ -1,67 +1,186 @@
+// Navbar.js
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthAdmin } from "../../context/AuthAdminContext";
+import { useCart } from "../../context/CartContext";
 import "./Navbar.css";
 import LinkWithIcon from "./LinkWithIcon";
-import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../context/CartContext";
 
 function Navbar() {
   const { auth, logout } = useAuth();
-  const { user } = auth;
-  const { cartCount, fetchCartCount } = useCart(); // Nhận cartCount từ context
+  const user = auth.user;
+
+  const { authAdmin, logoutAdmin } = useAuthAdmin();
+  const { admin, isLoading } = authAdmin;
+  const { cartCount } = useCart();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
+  const closeMenu = () => setIsOpen(false);
+
+  if (isLoading) {
+    // Bạn có thể hiển thị một thanh navbar trống hoặc spinner trong lúc chờ
+    return null; // Hoặc <LoadingNavbar />
+  }
 
   return (
-    <nav className="navbar">
-      <div className="navbar_header">
-        <h1 className="navbar_heading">TECH STORE</h1>
-        <button className="menu-toggle" onClick={toggleMenu}>
-          ☰
-        </button>
-      </div>
-
-      <div className={`navbar_links ${isOpen ? "open" : ""}`}>
-        <LinkWithIcon title="Home" link="/" icon="fas fa-home" />
-        <NavLink
-          to="/cart"
-          className={({ isActive }) =>
-            isActive ? "link-with-icon active" : "link-with-icon"
-          }
-        >
-          <i className="fas fa-shopping-cart"></i> Cart ({cartCount})
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div className="container-fluid">
+        <NavLink to="/" className="navbar-brand">
+          TechStore
         </NavLink>
-        <LinkWithIcon title="Products" link="/product" icon="fas fa-box" />
+        <button
+          className="navbar-toggler"
+          type="button"
+          onClick={toggleMenu}
+          aria-controls="navbarNav"
+          aria-expanded={isOpen}
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-        {!user ? (
-          <>
-            <LinkWithIcon
-              title="Login"
-              link="/login"
-              icon="fas fa-sign-in-alt"
-            />
-            <LinkWithIcon
-              title="SignUp"
-              link="/signup"
-              icon="fas fa-user-plus"
-            />
-          </>
-        ) : (
-          <>
-            <LinkWithIcon
-              title="My Orders"
-              link="/order"
-              icon="fas fa-shopping-bag"
-            />
-            <LinkWithIcon
-              title="Logout"
-              link="/logout"
-              icon="fas fa-sign-out-alt"
-            />
-            <LinkWithIcon title="Profile" link="/profile" icon="fas fa-user" />
-          </>
-        )}
+        <div
+          className={`collapse navbar-collapse ${isOpen ? "show" : ""}`}
+          id="navbarNav"
+        >
+          <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+            {/* Liên kết chung */}
+            {!admin && (
+              <>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="Home"
+                    link="/"
+                    icon="fas fa-home"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="Products"
+                    link="/product"
+                    icon="fas fa-box"
+                    onClick={closeMenu}
+                  />
+                </li>
+              </>
+            )}
+
+            {/* Liên kết cho người dùng chưa đăng nhập */}
+            {!user && !admin && (
+              <>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="Login"
+                    link="/login"
+                    icon="fas fa-sign-in-alt"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="Sign Up"
+                    link="/signup"
+                    icon="fas fa-user-plus"
+                    onClick={closeMenu}
+                  />
+                </li>
+              </>
+            )}
+
+            {/* Liên kết cho admin */}
+            {admin && (
+              <>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="Dashboard"
+                    link="/admin"
+                    icon="fas fa-tachometer-alt"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="User Management"
+                    link="/admin/usermanagement"
+                    icon="fas fa-users-cog"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="Product Management"
+                    link="/admin/productmanagement"
+                    icon="fas fa-boxes"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="Order Management"
+                    link="/admin/ordermanagement"
+                    icon="fas fa-shopping-cart"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="nav-link btn btn-link"
+                    onClick={() => {
+                      logoutAdmin();
+                      closeMenu();
+                      navigate("/admin-login", { replace: true });
+                    }}
+                  >
+                    <i className="fas fa-sign-out-alt"></i> Logout
+                  </button>
+                </li>
+              </>
+            )}
+
+            {/* Liên kết cho người dùng đã đăng nhập */}
+            {user && !admin && (
+              <>
+                <li className="nav-item">
+                  <NavLink to="/cart" className="nav-link" onClick={closeMenu}>
+                    <i className="fas fa-shopping-cart"></i> Cart ({cartCount})
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title="My Orders"
+                    link="/my-order"
+                    icon="fas fa-shopping-bag"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
+                    title={user.name}
+                    link="/profile"
+                    icon="fas fa-user"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="nav-link btn btn-link"
+                    onClick={() => {
+                      logout();
+                      closeMenu();
+                      navigate("/login", { replace: true });
+                    }}
+                  >
+                    <i className="fas fa-sign-out-alt"></i> Logout
+                  </button>
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
       </div>
     </nav>
   );

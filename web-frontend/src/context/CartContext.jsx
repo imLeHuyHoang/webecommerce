@@ -6,12 +6,10 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
 
-  // Lấy số lượng giỏ hàng khi ứng dụng khởi chạy
   useEffect(() => {
     fetchCartCount();
   }, []);
 
-  // Hàm lấy số lượng giỏ hàng từ server hoặc localStorage
   const fetchCartCount = async () => {
     let count = 0;
     const accessToken = localStorage.getItem("accessToken");
@@ -26,7 +24,7 @@ export const CartProvider = ({ children }) => {
           0
         );
       } catch (error) {
-        console.error("Lỗi lấy giỏ hàng:", error);
+        console.error("Error fetching cart:", error);
       }
     } else {
       const localCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -35,19 +33,16 @@ export const CartProvider = ({ children }) => {
     setCartCount(count);
   };
 
-  // Hàm tăng số lượng giỏ hàng
-  const incrementCartCount = (quantity) => {
+  const incrementCartCount = (quantity = 1) => {
     setCartCount((prevCount) => prevCount + quantity);
   };
 
-  // Hàm giảm số lượng giỏ hàng
   const decrementCartCount = (quantity) => {
     setCartCount((prevCount) => Math.max(prevCount - quantity, 0));
   };
 
-  // Hàm cập nhật lại số lượng giỏ hàng từ server hoặc localStorage
   const updateCart = async () => {
-    await fetchCartCount(); // Đồng bộ số lượng giỏ hàng sau mỗi thay đổi
+    await fetchCartCount();
   };
 
   return (

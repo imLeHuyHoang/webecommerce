@@ -1,3 +1,4 @@
+// App.js
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
@@ -6,20 +7,21 @@ import Navbar from "../src/components/Navbar/Navbar";
 import Footer from "../src/components/Footer/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { AuthAdminProvider } from "./context/AuthAdminContext";
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <div className="app">
+    <Router>
+      <AuthProvider>
+        <AuthAdminProvider>
+          <CartProvider>
             <Navbar />
             <Routing />
             <Footer />
-          </div>
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+          </CartProvider>
+        </AuthAdminProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

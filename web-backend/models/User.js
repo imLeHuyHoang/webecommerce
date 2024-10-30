@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     enum: ["male", "female", "other"],
     default: "other",
   },
-  roles: [{ type: String, default: "user" }],
+  roles: { type: [String], enum: ["user", "admin"], default: ["user"] },
   isActive: { type: Boolean, default: true },
   addresses: [addressSchema],
   lastLogin: { type: Date, default: Date.now },

@@ -1,0 +1,112 @@
+/* Main section */
+.profile-section {
+  background-color: #f4f5f7;
+}
+
+/* Profile card */
+.profile-card {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile image container */
+.profile-image-container {
+  background: linear-gradient(135deg, #352eed, #ffcccb, #352eed, #ffcccb);
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+}
+
+/* Profile image */
+.profile-image {
+  width: 80px;
+}
+
+/* Profile name */
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Profile gender */
+.profile-gender {
+  font-size: 1rem;
+  color: #000;
+}
+
+/* Profile edit icon */
+.profile-edit-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.profile-edit-icon:hover {
+  color: #007bff;
+}
+
+/* Profile info title */
+.profile-info-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Profile info label */
+.profile-info-label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Profile info value */
+.profile-info-value {
+  font-size: 1rem;
+  color: #000;
+}
+
+/* Profile back button */
+.profile-back-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+.profile-back-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Media query để giảm cỡ chữ và padding khi màn hình nhỏ */
+@media (max-width: 768px) {
+  .profile-image {
+    width: 60px;
+  }
+
+  .profile-name {
+    font-size: 1.25rem;
+  }
+
+  .profile-gender {
+    font-size: 0.875rem;
+  }
+
+  .profile-info-title {
+    font-size: 1rem;
+  }
+
+  .profile-info-label {
+    font-size: 0.875rem;
+  }
+
+  .profile-info-value {
+    font-size: 0.875rem;
+  }
+
+  .profile-back-button {
+    font-size: 0.875rem;
+  }
+}

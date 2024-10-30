@@ -1,27 +1,22 @@
+// Logout.jsx
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../../utils/api-client";
 import { useAuth } from "../../context/AuthContext";
+import { useAuthAdmin } from "../../context/AuthAdminContext";
+import apiClient from "../../utils/api-client"; // Import apiClient để sử dụng
 
 const Logout = () => {
-  const { logout } = useAuth(); // Sử dụng hàm logout từ AuthContext
-  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { logoutAdmin } = useAuthAdmin();
 
   useEffect(() => {
     const handleLogout = async () => {
-      try {
-        logout(); // Xóa thông tin người dùng trong AuthContext
-        navigate("/login");
-        console.log("Đăng xuất thành công!");
-        localStorage.removeItem("cart"); // Xóa token
-        window.location.reload();
-      } catch (error) {
-        console.error("Lỗi đăng xuất:", error);
-      }
+      await logout(); // Gọi hàm logout từ AuthContext
+      logoutAdmin(); // Gọi hàm logoutAdmin nếu cần
     };
 
     handleLogout();
-  }, [logout, navigate]);
+  }, [logout, logoutAdmin]);
 
   return <p>Đang đăng xuất...</p>;
 };

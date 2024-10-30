@@ -1,7 +1,7 @@
+// ProductSidebar.js
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import "./ProductSidebar.css"; // Giữ nguyên CSS tùy chỉnh
-import apiClient from "../../../src/utils/api-client";
+import "./ProductSidebar.css";
+import apiClient from "../../utils/api-client";
 import ProductSidebarSkeleton from "./Skeleton/ProductSidebarSkeleton";
 
 function ProductSidebar({ onCategoryChange }) {
@@ -23,14 +23,14 @@ function ProductSidebar({ onCategoryChange }) {
   }, []);
 
   const handleCategoryClick = (categoryName) => {
-    onCategoryChange(categoryName); // Gọi hàm callback để cập nhật URL
+    onCategoryChange(categoryName);
   };
 
   return (
-    <aside className="product_sidebar col-md-4 col-lg-3">
-      <h2 className="category">Category</h2>
-      <div className="category_links">
-        {error && <em className="error">{error}</em>}
+    <div className="col-md-4 col-lg-3 mb-4">
+      <h2 className="category mb-4">Category</h2>
+      <div className="list-group">
+        {error && <em className="text-danger">{error}</em>}
         {loading ? (
           Array(5)
             .fill(0)
@@ -40,9 +40,9 @@ function ProductSidebar({ onCategoryChange }) {
             <button
               key={cat._id}
               onClick={() => handleCategoryClick(cat.name)}
-              className="align_center sidebar_link"
+              className="list-group-item list-group-item-action sidebar_link mb-2"
             >
-              {cat.name}
+              <span>{cat.name}</span>
               <img
                 src={`http://localhost:5000/category/${cat.image}`}
                 alt={cat.name}
@@ -54,7 +54,7 @@ function ProductSidebar({ onCategoryChange }) {
           <p>No categories available.</p>
         )}
       </div>
-    </aside>
+    </div>
   );
 }
 

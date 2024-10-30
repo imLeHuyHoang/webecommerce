@@ -3,7 +3,14 @@
   width: 300px;
   border-radius: 15px;
   overflow: hidden;
-  background-color: white;
+  background: linear-gradient(
+    45deg,
+    #ffffff,
+    #ffcccb,
+    #ffffff
+  ); /* Gradient từ trắng đến màu nổi bật và lại trắng */
+  background-size: 200% 200%; /* Để gradient di chuyển */
+  animation: gradientMove 5s linear infinite; /* Áp dụng animation */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Bóng đổ cho card */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
@@ -12,14 +19,35 @@
   z-index: 1;
 }
 
+/* Animation gradient di chuyển */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
 /* Phần hình ảnh sản phẩm */
-.product_image img {
+.product_image {
   width: 150px;
   height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
   margin: 20px auto;
   display: block;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ cho div chứa ảnh */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product_image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -30,6 +58,10 @@
 }
 
 /* Hiệu ứng hover cho hình ảnh */
+.product_card:hover .product_image {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bóng đổ mạnh hơn khi hover */
+}
+
 .product_card:hover .product_image img {
   transform: scale(1.2); /* Phóng to hình ảnh một chút */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ cho hình ảnh khi hover */
@@ -51,8 +83,9 @@
 
 .product_description {
   font-size: 14px;
-  color: #777;
+  color: #777777;
   margin-bottom: 10px;
+  background-color: #ffa500;
 }
 
 .product_price {
@@ -64,16 +97,18 @@
 
 /* Footer card (thông tin thêm) */
 .product_infor_footer {
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 5px;
   margin-bottom: 15px;
+  border-radius: 5px;
 }
 
-.product_review_stars i {
-  color: #ffa500; /* Màu vàng cho sao */
-  font-size: 20px;
+.product_rating {
+  color: #0c0cea; /* Màu vàng cho sao */
+  font-size: 16px;
 }
 
 /* Nút Buy Now */

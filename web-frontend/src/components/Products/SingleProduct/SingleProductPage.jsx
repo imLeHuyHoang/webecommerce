@@ -13,6 +13,8 @@ const SingleProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [mainImage, setMainImage] = useState(""); // Thêm state cho ảnh chính
+  const [selectedImage, setSelectedImage] = useState(null); // State cho việc chọn ảnh con
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
@@ -21,6 +23,7 @@ const SingleProductPage = () => {
       try {
         const response = await apiClient.get(`/product/${id}`);
         setProduct(response.data);
+        setMainImage(response.data.images[0]); // Đặt ảnh chính ban đầu
       } catch (err) {
         setError("Không thể tải sản phẩm.");
       } finally {
@@ -47,22 +50,11 @@ const SingleProductPage = () => {
         await apiClient.post("/cart", cartItem, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        incrementCartCount(quantity);
+        setToastMessage("Sản phẩm đã được thêm vào giỏ hàng!");
       } else {
-        const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-        const existingItem = localCart.find(
-          (item) => item.productId === productId
-        );
-
-        if (existingItem) {
-          existingItem.quantity += quantity;
-        } else {
-          localCart.push(cartItem);
-        }
-        localStorage.setItem("cart", JSON.stringify(localCart));
+        setToastMessage("Vui lòng đăng nhập để thêm vào giỏ hàng!");
       }
-
-      incrementCartCount(quantity);
-      setToastMessage("Sản phẩm đã được thêm vào giỏ hàng!");
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
       setToastMessage("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!");
@@ -76,78 +68,93 @@ const SingleProductPage = () => {
     if (product) addToCart(product._id, quantity);
   };
 
+  const handleImageClick = (img) => {
+    setMainImage(img); // Cập nhật ảnh chính khi bấm vào ảnh nhỏ
+    setSelectedImage(img === selectedImage ? null : img); // Đổi trạng thái khi click vào ảnh nhỏ
+  };
+
   if (loading) return <p className="text-center my-5">Loading...</p>;
   if (error) return <p className="text-center text-danger my-5">{error}</p>;
 
-  const mainImage = product?.images?.[0]
-    ? `http://localhost:5000/products/${product.images[0]}`
+  const mainImageUrl = mainImage
+    ? `http://localhost:5000/products/${mainImage}`
     : "/images/default-image.png";
 
   return (
-    <div className="container single-product-page">
-      <ToastNotification
-        message={toastMessage}
-        show={showToast}
-        onClose={() => setShowToast(false)}
-      />
-      <div className="row">
-        <div className="col-md-6">
-          <div className="image-container mb-4">
-            <div className="small-images d-flex">
-              {product.images.map((img, index) => (
+    <div className="main-page">
+      <div className="container single-product-page">
+        <ToastNotification
+          message={toastMessage}
+          show={showToast}
+          onClose={() => setShowToast(false)}
+        />
+        <div className="row">
+          <div className="col-md-6">
+            <div className="image-container mb-4">
+              <div className="small-images d-flex justify-content-center">
+                {product.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={`http://localhost:5000/products/${img}`}
+                    alt={`Product ${index}`}
+                    className={`small-image img-thumbnail ${
+                      selectedImage === img ? "selected" : ""
+                    }`}
+                    onClick={() => handleImageClick(img)}
+                  />
+                ))}
+              </div>
+              <div className="main-image-container">
                 <img
-                  key={index}
-                  src={`http://localhost:5000/products/${img}`}
-                  alt={`Product ${index}`}
-                  className="small-image img-thumbnail"
+                  src={mainImageUrl}
+                  alt={product.title}
+                  className="img-fluid main-image"
                 />
-              ))}
-            </div>
-            <div className="main-image-container">
-              <img src={mainImage} alt={product.title} className="img-fluid" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="col-md-6">
-          <div className="product-details">
-            <h2>{product.title}</h2>
-            <p>
-              Price: <strong>${product.price.toFixed(2)}</strong>
-            </p>
-            <p>Stock: {product.stock}</p>
-            <p>
-              Rating: {product.reviews?.rate || 0} (
-              {product.reviews?.counts || 0} reviews)
-            </p>
-            <div className="product-description">
-              <p>{product.description}</p>
+          <div className="col-md-6">
+            <div className="product-details">
+              <h2>{product.title}</h2>
+              <p>
+                Price: <strong>${product.price.toFixed(2)}</strong>
+              </p>
+              <p>Stock: {product.stock}</p>
+              <p>
+                Rating: {product.reviews?.rate || 0} (
+                {product.reviews?.counts || 0} reviews)
+              </p>
+              <div className="product-description">
+                <p>{product.description}</p>
+              </div>
+
+              <div className="quantity-controls my-3">
+                <button
+                  className="btn btn-outline-secondary justify-content-center"
+                  onClick={handleDecrease}
+                  disabled={quantity <= 1}
+                >
+                  -
+                </button>
+                <span className="mx-3 quantity">{quantity}</span>
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={handleIncrease}
+                  disabled={quantity >= product.stock}
+                >
+                  +
+                </button>
+              </div>
+              <div className="d-flex justify-content-center ">
+                <button
+                  className="btn btn-primary btn-block mt-4"
+                  onClick={handleBuyNow}
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
-
-            <div className="quantity-controls my-3">
-              <button
-                className="btn btn-outline-secondary"
-                onClick={handleDecrease}
-                disabled={quantity <= 1}
-              >
-                -
-              </button>
-              <span className="mx-3 quantity">{quantity}</span>
-              <button
-                className="btn btn-outline-secondary"
-                onClick={handleIncrease}
-                disabled={quantity >= product.stock}
-              >
-                +
-              </button>
-            </div>
-
-            <button
-              className="btn btn-primary btn-block mt-4"
-              onClick={handleBuyNow}
-            >
-              Buy Now
-            </button>
           </div>
         </div>
       </div>

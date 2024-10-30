@@ -1,166 +1,43 @@
-.product_list_section {
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
-  max-width: 1500px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-.product_list_header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-/* CSS cho NavLink */
-.back_button {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none; /* Bỏ gạch chân */
-  color: #333; /* Màu chữ đen xám */
-  font-size: 16px;
-  padding: 10px 15px;
-  border: 1px solid #333; /* Viền đen xám */
-  border-radius: 5px;
-  background-color: #fff; /* Nền trắng */
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.back_button i {
-  margin-right: 8px; /* Khoảng cách giữa icon và chữ */
-}
-
-.back_button:hover {
-  background-color: #333; /* Nền đen xám khi hover */
-  color: #fff; /* Màu chữ trắng khi hover */
-}
-
-.back_button:hover i {
-  color: #fff; /* Màu icon trắng khi hover */
-}
-
-.product_list_header h2 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 30px;
-}
-
-.product_sorting {
-  width: 20%;
-  padding: 10px;
-  font-size: 16px;
-  color: #333; /* Màu chữ đen xám */
-  background-color: rgb(219, 217, 217); /* Nền trắng */
-  border: 1px solid #333; /* Viền đen xám */
-  border-radius: 5px;
-  appearance: none; /* Bỏ kiểu mặc định của trình duyệt */
-  -webkit-appearance: none; /* Bỏ kiểu mặc định của trình duyệt trên WebKit */
-  -moz-appearance: none; /* Bỏ kiểu mặc định của trình duyệt trên Firefox */
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.product_sorting:hover {
-  background-color: #333; /* Nền đen xám khi hover */
-  color: #fff; /* Màu chữ trắng khi hover */
-}
-
-.product_sorting option {
-  color: #333; /* Màu chữ đen xám */
-  background-color: #fff; /* Nền trắng */
-}
-
-/* Để đảm bảo rằng các thẻ option cũng có hiệu ứng hover */
-.product_sorting option:hover {
-  background-color: #333; /* Nền đen xám khi hover */
-  color: #fff; /* Màu chữ trắng khi hover */
-}
-
-.product_list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: left;
-  gap: 20px;
-}
-
+/* Pagination */
 .pagination {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.pagination button {
-  align-items: center;
-  margin-left: 10px;
-  margin-right: 10px;
-  appearance: none;
-  background-color: #fcfcfd;
-  border-radius: 4px;
-  border-width: 0;
-  box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,
-    rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
-  box-sizing: border-box;
-  color: #36395a;
-  cursor: pointer;
-  display: inline-flex;
-  font-family: "JetBrains Mono", monospace;
-  height: 48px;
-  justify-content: center;
-  line-height: 1;
-  list-style: none;
-  padding-left: 16px;
-  padding-right: 16px;
-  position: relative;
-  text-align: left;
-  text-decoration: none;
-  transition: box-shadow 0.15s, transform 0.15s;
-  user-select: none;
-  white-space: nowrap;
-  font-size: 18px;
-}
-
-.pagination button.active {
-  box-shadow: #d6d6e7 0 3px 7px inset;
-  transform: translateY(-4px);
-  border-bottom: 2px solid gray;
-}
-
-.pagination button:hover {
-  box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px,
-    rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
-  transform: translateY(-2px);
-}
-
-.pagination button:focus {
-  box-shadow: #d6d6e7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px,
-    rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
   margin-top: 20px;
 }
 
-.pagination_button {
+.page-item {
   margin: 0 5px;
-  padding: 10px 15px;
-  border: 1px solid #ccc;
-  background-color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.pagination_button.active {
-  background-color: gray;
-  color: white;
+.page-link {
+  color: #000; /* Màu đen cho chữ */
+  background-color: rgba(255, 230, 235, 1); /* Màu hồng nhạt */
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.pagination_button:hover {
-  background-color: gray;
-  color: white;
+.page-link:hover {
+  background-color: rgba(255, 204, 220, 1); /* Màu hồng đậm hơn khi hover */
+  transform: scale(1.1);
+}
+
+.page-item.active .page-link {
+  background-color: rgba(
+    255,
+    204,
+    220,
+    1
+  ); /* Màu hồng đậm hơn cho trang hiện tại */
+  color: black; /* Màu trắng cho chữ */
+  font-weight: bold;
+  scale: 1.1;
+}
+
+.page-link:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(255, 204, 220, 0.5);
 }

@@ -1,35 +1,87 @@
+/* Main container */
+.main-page {
+  background-color: #f4f4f4;
+  padding-bottom: 5%;
+  overflow: visible;
+}
+
 .single-product-page {
-  margin-top: 50px;
+  padding: 20px;
 }
 
-.image-container {
+/* Hiệu ứng gradient cho ảnh chính */
+.main-image-container {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  border-radius: 5px;
+  padding: 10px;
+  background: linear-gradient(135deg, #ffcccb, #352eed, #ffcccb);
+  animation: gradientMove 5s linear infinite;
+  border: 2px solid #ddd; /* Thêm viền */
 }
 
-.small-images {
-  margin-bottom: 10px;
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
 }
 
+/* Hiệu ứng hover cho các ảnh nhỏ */
 .small-image {
-  width: 60px;
-  height: 60px;
+  margin-bottom: 30px;
+  width: 80px;
+  height: 80px;
   margin-right: 10px;
   cursor: pointer;
-  object-fit: cover;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 2px solid #ddd; /* Thêm viền */
 }
 
-.main-image-container img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
+.small-image:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+.selected {
+  transform: scale(1.2);
+  border: 3px solid #ffcccb;
+}
+
+/* Hiệu ứng hover cho các nút */
+.btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Hiệu ứng cho nút tăng/giảm */
 .quantity-controls {
   display: flex;
   align-items: center;
-  justify-content: start;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.quantity-controls button {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  border: 2px solid #ddd; /* Thêm viền */
+}
+
+.quantity-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .quantity {
@@ -37,8 +89,40 @@
   font-weight: bold;
 }
 
+/* Thêm viền giữa các div */
+.single-product-page .row > div {
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Media query để giảm cỡ chữ và kích thước ảnh khi màn hình nhỏ */
 @media (max-width: 768px) {
-  .quantity-controls {
-    justify-content: center;
+  .small-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .quantity-controls button {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+
+  .quantity {
+    font-size: 16px;
+  }
+
+  .product-title {
+    font-size: 24px;
+  }
+
+  .product-price {
+    font-size: 20px;
+  }
+
+  .product-description {
+    font-size: 16px;
   }
 }

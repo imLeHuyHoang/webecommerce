@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import ProductSkeleton from "./Skeleton/ProductSkeleton";
-import "./ProductList.css";
-import apiClient from "../../../src/utils/api-client";
+import apiClient from "../../utils/api-client";
 import { NavLink } from "react-router-dom";
+import "./ProductList.css"; // Import CSS
 
 const ProductList = ({ selectedCategoryName }) => {
   const [products, setProducts] = useState([]);
@@ -20,7 +20,7 @@ const ProductList = ({ selectedCategoryName }) => {
           params: {
             category: selectedCategoryName || undefined,
             page: page,
-            perPage: 8,
+            perPage: 9,
           },
         });
         setProducts(response.data.products);
@@ -33,7 +33,7 @@ const ProductList = ({ selectedCategoryName }) => {
     };
 
     fetchProducts();
-  }, [page, selectedCategoryName]); // Theo dõi sự thay đổi của page và category
+  }, [page, selectedCategoryName]);
 
   const handlePageClick = (pageNumber) => {
     if (pageNumber !== page) {
@@ -42,57 +42,66 @@ const ProductList = ({ selectedCategoryName }) => {
   };
 
   return (
-    <section className="product_list_section">
-      <header className="align_center product_list_header">
-        <NavLink to="/products" className="back_button">
-          <i className="fa-solid fa-arrow-left back-to-products"></i>
-          Back to Products
-        </NavLink>
+    <div className="col-md-8 col-lg-9">
+      <header className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="product_list_heading">
           {selectedCategoryName || "Products"}
         </h2>
+        <NavLink to="/product" className="btn btn-secondary">
+          <i className="fas fa-arrow-left"></i> Back to Products
+        </NavLink>
       </header>
 
-      <div className="product_list">
-        {error && <em className="error">{error}</em>}
-        {products.length > 0 ? (
-          products.map((product, index) => (
-            <ProductCard
-              key={`${product._id}-${index}`}
-              id={product._id}
-              title={product.title}
-              price={product.price}
-              stock={product.stock}
-              rating={product.reviews?.rate || 0}
-              ratingCount={product.reviews?.counts || 0}
-              image={product.images?.[0]}
-            />
-          ))
-        ) : (
-          <p>No products available.</p>
-        )}
+      <div className="row">
+        {error && <em className="text-danger">{error}</em>}
+        {products.length > 0
+          ? products.map((product, index) => (
+              <div
+                key={`${product._id}-${index}`}
+                className="col-md-6 col-lg-4 mb-4"
+              >
+                <ProductCard
+                  id={product._id}
+                  title={product.title}
+                  price={product.price}
+                  stock={product.stock}
+                  rating={product.reviews?.rate || 0}
+                  ratingCount={product.reviews?.counts || 0}
+                  image={product.images?.[0]}
+                />
+              </div>
+            ))
+          : !loading && <p>No products available.</p>}
         {loading &&
-          Array(8)
+          Array(9)
             .fill(0)
-            .map((_, index) => <ProductSkeleton key={index} />)}
+            .map((_, index) => (
+              <div key={index} className="col-md-6 col-lg-4 mb-4">
+                <ProductSkeleton />
+              </div>
+            ))}
       </div>
 
-      <div className="pagination">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-          (pageNumber) => (
-            <button
-              key={pageNumber}
-              className={`pagination_button ${
-                pageNumber === page ? "active" : ""
-              }`}
-              onClick={() => handlePageClick(pageNumber)}
-            >
-              {pageNumber}
-            </button>
-          )
-        )}
-      </div>
-    </section>
+      <nav aria-label="Page navigation">
+        <ul className="pagination justify-content-center">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+            (pageNumber) => (
+              <li
+                key={pageNumber}
+                className={`page-item ${pageNumber === page ? "active" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageClick(pageNumber)}
+                >
+                  {pageNumber}
+                </button>
+              </li>
+            )
+          )}
+        </ul>
+      </nav>
+    </div>
   );
 };
 

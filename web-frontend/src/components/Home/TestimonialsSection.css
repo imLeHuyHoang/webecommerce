@@ -1,0 +1,19 @@
+/* TestimonialsSection.css */
+.testimonials-section {
+  background-color: #343a40;
+  color: white;
+}
+
+.testimonial-card {
+  background-color: #495057;
+  border: none;
+  margin-bottom: 20px;
+}
+
+.testimonial-card .card-body {
+  position: relative;
+}
+
+.testimonial-card .card-text {
+  font-style: italic;
+}

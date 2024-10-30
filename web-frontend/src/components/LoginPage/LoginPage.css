@@ -1,48 +1,36 @@
-.login-container {
-  width: 400px;
-  margin: 50px auto;
-  padding: 30px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #fff;
+.vh-100 {
+  height: 100vh !important;
 }
 
-.login-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
+.gradient-custom {
+  background: linear-gradient(
+    to right,
+    rgba(106, 17, 203, 1),
+    rgba(37, 117, 252, 1)
+  );
 }
 
-.login-container .error {
+.error {
   color: red;
-  text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
-.login-container .form-group {
-  margin-bottom: 15px;
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.login-container label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.login-container input {
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-.login-container .submit-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #5cb85c;
-  color: #fff;
+.form-control {
+  background-color: rgba(255, 255, 255, 0.1);
   border: none;
-  cursor: pointer;
+  color: #fff;
 }
 
-.login-container .submit-button:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.form-control:focus {
+  box-shadow: none;
+  background-color: rgba(255, 255, 255, 0.2);
 }

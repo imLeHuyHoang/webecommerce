@@ -1,134 +1,88 @@
-/* Global Styles */
-body {
-  font-family: "Roboto", sans-serif;
-  background-color: #f8f9fa;
+/* Loading spinner */
+.loading-spinner {
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 20px;
 }
 
-/* Navbar */
-.navbar {
-  border-bottom: 1px solid #e0e0e0;
+/* Animation khi cập nhật */
+.loading-animation {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.navbar a {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  text-decoration: none;
-  color: #333;
+/* Các điều khiển số lượng */
+.quantity-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
-.navbar a:hover {
+.quantity-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Nút biểu tượng */
+.btn-icon {
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.3s ease, transform 0.2s;
+}
+
+.btn-icon:hover {
   color: #007bff;
+  transform: scale(1.2);
 }
 
-/* Header Steps */
-.step {
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
+/* Giá cả */
+.price-text {
+  font-size: 1.2rem;
 }
 
-.step.active {
-  color: #28a745;
+/* Tên sản phẩm */
+.product-title {
+  text-align: center;
+  margin-top: 10px;
 }
 
-/* Cart Container */
-.bg-white {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+/* Ảnh sản phẩm */
+.product-image {
+  width: 80px;
+  height: 80px;
 }
 
-.shadow-sm {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Lighter shadow */
-}
-
-.img-thumbnail {
-  border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-}
-
-/* Buttons */
-.btn {
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-}
-
-.btn-dark {
-  background-color: #343a40;
-  color: #fff;
-}
-
-.btn-dark:hover {
-  background-color: #23272b;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.btn-light {
-  background-color: #f8f9fa;
-  color: #343a40;
-  border: 1px solid #e0e0e0;
-}
-
-.btn-light:hover {
-  background-color: #e2e6ea;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Cart Item Layout */
-.d-flex .align-items-center {
-  gap: 0.5rem;
-}
-
-.badge {
-  font-size: 1.1rem;
-  background-color: #6c757d;
-}
-
-.text-center {
-  font-family: "Roboto", sans-serif;
-}
-
-h5 {
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-}
-
-/* Order Summary */
-.order-summary .display-5 {
-  font-weight: 600;
-}
-
-/* Progress Bar */
-.progress-bar {
-  transition: width 0.4s ease-in-out;
-}
-
-/* Add subtle hover effect to rows */
-.border-bottom {
-  transition: box-shadow 0.2s;
-}
-
-.border-bottom:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.name_logo {
-  color: black; /* Đổi màu chữ thành màu đen */
-  font-size: 1.5rem; /* Đổi kích thước chữ */
-  font-weight: 600; /* Đổi độ đậm của chữ */
-}
-/* Mobile Styles */
+/* Media query để giảm cỡ chữ và kích thước ảnh khi màn hình nhỏ */
 @media (max-width: 768px) {
-  .step {
-    font-size: 0.9rem;
+  .loading-spinner {
+    font-size: 1.2rem;
   }
 
-  .badge {
+  .quantity-text {
     font-size: 1rem;
   }
 
-  .img-thumbnail {
+  .btn-icon {
+    font-size: 1rem;
+  }
+
+  .price-text {
+    font-size: 1rem;
+  }
+
+  .product-title h5 {
+    font-size: 1rem;
+  }
+
+  .product-image {
     width: 60px;
     height: 60px;
+  }
+
+  .d-flex.justify-content-between.align-items-center {
+    flex-direction: column;
+    gap: 10px;
   }
 }

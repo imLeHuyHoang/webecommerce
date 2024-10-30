@@ -8,17 +8,23 @@ const {
   logoutUser,
   updateUser,
   deleteUser,
-} = require("../controllers/userController"); // Kiểm tra import hàm
+  googleLogin,
+  loginUserAdmin, // Admin login function
+} = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/auth");
 
-// Định nghĩa các route
+// Define user routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/profile", verifyToken, getProfile);
-router.get("/refreshToken", refreshToken); // Route để refresh token
+router.get("/refreshToken", refreshToken);
 router.post("/logout", logoutUser);
-router.put("/:id", updateUser);
+router.put("/update/:id", updateUser);
 router.delete("/:id", deleteUser);
+router.post("/google-login", googleLogin);
+
+// Admin login route
+router.post("/loginadmin", loginUserAdmin);
 
 module.exports = router;

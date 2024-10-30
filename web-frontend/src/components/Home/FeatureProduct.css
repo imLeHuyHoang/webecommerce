@@ -1,49 +1,77 @@
 .featured-product {
-  padding: 40px 0;
-  background-color: #f9f9f9;
+  padding: 50px 0;
+  background-color: #f8f9fa; /* Màu nền nhẹ nhàng */
 }
 
-.container {
-  max-width: 70%;
-  margin: 0 auto;
-  padding: 0 15px;
-}
-
-.section-title {
-  font-size: 2rem;
+.featured-product h2 {
+  font-size: 2.5rem;
   font-weight: bold;
+  color: #343a40; /* Màu chữ đậm */
   margin-bottom: 30px;
-  text-transform: uppercase;
-  color: #333;
 }
 
-.product-container {
+.featured-product .container {
   display: flex;
-  justify-content: space-between; /* Giãn đều các thẻ */
-  flex-wrap: wrap; /* Cho phép xuống dòng khi thiếu không gian */
-  gap: 30px; /* Khoảng cách giữa các thẻ */
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.items_in_row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.featured-product .row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .product-card {
-  transition: transform 0.3s ease-in-out;
-  width: calc(20% - 30px); /* Đảm bảo 5 thẻ trên cùng 1 dòng */
-  min-width: 200px; /* Đặt chiều rộng tối thiểu cho thẻ */
-  margin-bottom: 20px;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-card h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #343a40;
+  margin: 15px 0;
+}
+
+.product-card p {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.product-card button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.product-card button:hover {
+  background-color: #0056b3;
 }
 
 .product-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 768px) {
-  .product-card {
-    width: calc(50% - 30px); /* 2 thẻ trên mỗi dòng cho màn hình nhỏ */
-  }
-}
-
-@media (max-width: 576px) {
-  .product-card {
-    width: 100%; /* 1 thẻ trên mỗi dòng cho màn hình rất nhỏ */
-  }
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }

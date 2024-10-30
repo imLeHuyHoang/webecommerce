@@ -2,9 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const morgan = require("morgan"); // Ghi log cho request
+const morgan = require("morgan"); // Logging
 require("dotenv").config();
-require("./db/connectDB"); // Kết nối tới MongoDB
+require("./db/connectDB"); // Connect to MongoDB
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,32 +16,32 @@ const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 
-// Middleware - Ghi log và xử lý JSON request
-app.use(morgan("dev")); // Ghi log cho request HTTP
+// Middleware setup
+app.use(morgan("dev"));
 app.use(
   cors({
-    origin: "http://localhost:5173", // Chỉ cho phép frontend gọi API từ địa chỉ này
-    credentials: true, // Cho phép gửi cookie
+    origin: "http://localhost:5173",
+    credentials: true,
   })
 );
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Serve static files (Hình ảnh, danh mục)
+// Static file serving
 app.use("/category", express.static(__dirname + "/upload/category"));
 app.use("/profile", express.static(__dirname + "/upload/profiles"));
 app.use("/products", express.static(__dirname + "/upload/products"));
 app.use("/images", express.static(__dirname + "/upload/products"));
 
-// Định tuyến cho các API
+// Route registration
 app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 
-// Middleware xử lý lỗi (Error Handler)
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res
@@ -49,7 +49,7 @@ app.use((err, req, res, next) => {
     .json({ message: "Something went wrong!", error: err.message });
 });
 
-// Khởi chạy server
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
 });

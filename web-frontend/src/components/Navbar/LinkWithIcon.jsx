@@ -1,17 +1,15 @@
 import React from "react";
-import "./LinkWithIcon.css";
 import { NavLink } from "react-router-dom";
+import "./LinkWithIcon.css";
 
-function LinkWithIcon({ title, link, icon }) {
+function LinkWithIcon({ title, link, icon, onClick }) {
   return (
     <NavLink
       to={link}
-      className={({ isActive }) =>
-        isActive ? "link-with-icon active" : "link-with-icon"
-      }
+      className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+      onClick={onClick}
     >
-      <i className={icon}></i>
-      {title}
+      <i className={icon}></i> {title}
     </NavLink>
   );
 }

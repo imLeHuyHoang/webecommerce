@@ -19,26 +19,15 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
         await apiClient.post("/cart", product, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        incrementCartCount();
+        setToastMessage("Added to cart");
       } else {
-        const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-        const existingProduct = localCart.find((item) => item.productId === id);
-
-        if (existingProduct) {
-          existingProduct.quantity += 1;
-        } else {
-          localCart.push(product);
-        }
-        localStorage.setItem("cart", JSON.stringify(localCart));
+        setToastMessage("Please login to add to cart");
       }
-
-      incrementCartCount(1);
-      setToastMessage("Sản phẩm đã được thêm vào giỏ hàng!");
     } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
-      setToastMessage("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!");
+      setToastMessage("Error adding to cart");
     } finally {
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
     }
   };
 

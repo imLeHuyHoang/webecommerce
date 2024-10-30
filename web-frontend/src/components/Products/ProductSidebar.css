@@ -9,10 +9,38 @@
 
 /* Tiêu đề Category */
 .category {
-  color: white; /* Chữ trắng */
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 20px;
+  color: #343a40;
+}
+
+.list-group {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Thêm box-shadow để nổi lên */
+  border-radius: 10px; /* Bo tròn các góc */
+  overflow: hidden;
+  padding: 20px;
+}
+
+.list-group-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.list-group-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar_link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.link_emoji {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* Links trong sidebar */

@@ -1,0 +1,10 @@
+.carousel-image {
+  object-fit: cover; /* Đảm bảo ảnh vừa với khung */
+  height: 400px; /* Chiều cao cố định cho ảnh */
+}
+
+@media (max-width: 768px) {
+  .carousel-image {
+    height: 150px; /* Chiều cao cho màn hình nhỏ hơn */
+  }
+}

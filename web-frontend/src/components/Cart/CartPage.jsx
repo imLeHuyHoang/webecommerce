@@ -2,63 +2,68 @@ import React, { useEffect, useState } from "react";
 import apiClient from "../../utils/api-client";
 import "./CartPage.css";
 import { FaTrashAlt, FaPlus, FaMinus } from "react-icons/fa";
-import { useCart } from "../../context/CartContext"; // Import useCart
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 
 const CartPage = () => {
   const [cart, setCart] = useState([]);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Loading state
-  const { updateCart, incrementCartCount, decrementCartCount } = useCart(); // Sử dụng CartContext
+  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const { updateCart } = useCart();
+  const { auth } = useAuth();
 
-  // Lấy dữ liệu giỏ hàng từ API hoặc localStorage
   useEffect(() => {
+    const fetchCart = async () => {
+      setLoading(true);
+      if (auth.user) {
+        // Người dùng đã đăng nhập, lấy giỏ hàng từ server
+        try {
+          const response = await apiClient.get("/cart");
+          setCart(response.data.products);
+          updateCart();
+        } catch (error) {
+          setError("Error fetching cart.");
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // Người dùng chưa đăng nhập, lấy giỏ hàng từ localStorage
+        const localCart = JSON.parse(localStorage.getItem("cart")) || [];
+        setCart(localCart);
+        setLoading(false);
+      }
+    };
     fetchCart();
-  }, []);
-
-  const fetchCart = async () => {
-    const token = localStorage.getItem("accessToken");
-    setLoading(true);
-    try {
-      const response = token
-        ? await apiClient.get("/cart", {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-        : JSON.parse(localStorage.getItem("cart")) || [];
-      setCart(response.data ? response.data.products : response);
-    } catch (error) {
-      setError("Error loading cart.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [updateCart, auth.user]);
 
   const updateQuantity = async (productId, increment) => {
-    const token = localStorage.getItem("accessToken");
+    setActionLoading(true);
     try {
       const response = await apiClient.patch(
-        `/cart/${productId}/${increment > 0 ? "increase" : "decrease"}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/cart/${productId}/${increment > 0 ? "increase" : "decrease"}`
       );
       setCart(response.data.products);
-      updateCart(); // Cập nhật số lượng giỏ hàng
+      updateCart();
     } catch (error) {
       setError("Error updating quantity.");
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const removeItem = async (productId) => {
-    const token = localStorage.getItem("accessToken");
+    setActionLoading(true);
     try {
-      await apiClient.delete(`/cart/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await apiClient.delete(`/cart/${productId}`);
       setCart((prevCart) =>
         prevCart.filter((item) => item.product._id !== productId)
       );
-      updateCart(); // Cập nhật số lượng giỏ hàng
+      updateCart();
     } catch (error) {
       setError("Error removing item.");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -67,22 +72,6 @@ const CartPage = () => {
 
   return (
     <div className="container mt-4">
-      <nav className="navbar bg-white mb-4">
-        <div className="d-flex justify-content-between w-100 align-items-center">
-          <div className="logo">
-            <div className="text-uppercase font-weight-bold name_logo">
-              {" "}
-              Tech Store{" "}
-            </div>
-          </div>
-          <div>
-            <a href="/" className="text-uppercase">
-              Back to shopping
-            </a>
-          </div>
-        </div>
-      </nav>
-
       <header className="mb-4">
         <div className="d-flex justify-content-center align-items-center pb-3">
           <div className="px-4 step active">
@@ -100,89 +89,75 @@ const CartPage = () => {
       </header>
 
       {loading ? (
-        <p className="text-center">Loading cart...</p>
+        <div className="loading-spinner">Loading cart...</div>
       ) : (
         <div className="row">
           <div className="col-lg-8">
             <div className="bg-white rounded shadow-sm p-4">
               <h4 className="mb-4">Cart Items</h4>
-
-              <div className="d-flex justify-content-between border-bottom pb-2">
-                <div style={{ width: "30%" }} className="text-center">
-                  Product
-                </div>
-                <div style={{ width: "15%" }} className="text-center">
-                  Quantity
-                </div>
-                <div style={{ width: "15%" }} className="text-center">
-                  Unit Price
-                </div>
-                <div style={{ width: "20%" }} className="text-center">
-                  Total
-                </div>
-                <div style={{ width: "10%" }} className="text-center">
-                  Remove
-                </div>
-              </div>
-
               {cart.length === 0 ? (
                 <p className="text-muted mt-3">Your cart is empty.</p>
               ) : (
-                cart.map((item) => (
-                  <div
-                    className="d-flex justify-content-between align-items-center border-bottom py-3"
-                    key={item.product._id}
-                  >
+                <>
+                  <div className="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div className="col-4">Product</div>
+                    <div className="col-2 text-center">Quantity</div>
+                    <div className="col-2 text-center">Price</div>
+                    <div className="col-2 text-center">Total</div>
+                    <div className="col-2 text-center">Remove</div>
+                  </div>
+                  {cart.map((item) => (
                     <div
-                      style={{ width: "30%", height: "80%" }}
-                      className="d-flex align-items-center"
+                      className={`d-flex justify-content-between align-items-center border-bottom py-3 ${
+                        actionLoading ? "loading-animation" : ""
+                      }`}
+                      key={item.product._id}
                     >
-                      <img
-                        src={`http://localhost:5000/products/${item.product.images[0]}`}
-                        alt={item.product.title}
-                        className="img-thumbnail mr-2"
-                        width="80"
-                        height="80"
-                      />
-                      <div>
-                        <h5 className="mb-0">{item.product.title}</h5>
+                      <div className="d-flex flex-column align-items-center col-4">
+                        <img
+                          src={`http://localhost:5000/products/${item.product.images[0]}`}
+                          alt={item.product.title}
+                          className="img-thumbnail product-image"
+                          width="80"
+                          height="80"
+                        />
+                        <div className="product-title">
+                          <h5>{item.product.title}</h5>
+                        </div>
+                      </div>
+
+                      <div className="quantity-controls col-2 text-center">
+                        <FaMinus
+                          className="btn-icon"
+                          onClick={() =>
+                            item.quantity > 1 &&
+                            updateQuantity(item.product._id, -1)
+                          }
+                        />
+                        <span className="quantity-text">{item.quantity}</span>
+                        <FaPlus
+                          className="btn-icon"
+                          onClick={() => updateQuantity(item.product._id, 1)}
+                        />
+                      </div>
+
+                      <div className="price-text col-2 text-center">
+                        ${item.product.price.toFixed(1)}
+                      </div>
+
+                      <div className="price-text col-2 text-center">
+                        ${(item.product.price * item.quantity).toFixed(1)}
+                      </div>
+
+                      <div className="col-2 text-center">
+                        <FaTrashAlt
+                          className="btn-icon text-danger"
+                          onClick={() => removeItem(item.product._id)}
+                        />
                       </div>
                     </div>
-
-                    <div
-                      style={{ width: "15%" }}
-                      className="text-center d-flex align-items-center justify-content-center"
-                    >
-                      <FaMinus
-                        className="btn-icon"
-                        onClick={() =>
-                          item.quantity > 1 &&
-                          updateQuantity(item.product._id, -1)
-                        }
-                      />
-                      <span className="mx-2">{item.quantity}</span>
-                      <FaPlus
-                        className="btn-icon"
-                        onClick={() => updateQuantity(item.product._id, 1)}
-                      />
-                    </div>
-
-                    <div style={{ width: "15%" }} className="text-center">
-                      ${item.product.price.toFixed(2)}
-                    </div>
-
-                    <div style={{ width: "20%" }} className="text-center">
-                      ${(item.product.price * item.quantity).toFixed(2)}
-                    </div>
-
-                    <div style={{ width: "10%" }} className="text-center">
-                      <FaTrashAlt
-                        className="btn-icon text-danger"
-                        onClick={() => removeItem(item.product._id)}
-                      />
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </>
               )}
             </div>
           </div>
@@ -192,25 +167,27 @@ const CartPage = () => {
               <h4 className="mb-4">Order Summary</h4>
               <div className="d-flex justify-content-between">
                 <span>Subtotal</span>
-                <span>${getTotalPrice().toFixed(2)}</span>
+                <span className="price-text">
+                  ${getTotalPrice().toFixed(1)}
+                </span>
               </div>
               <div className="d-flex justify-content-between my-2">
                 <span>Shipping</span>
-                <span>$12.90</span>
+                <span className="price-text">$12.90</span>
               </div>
               <div className="d-flex justify-content-between border-top pt-3">
                 <strong>Total</strong>
-                <strong>${(getTotalPrice() + 12.9).toFixed(2)}</strong>
+                <strong className="price-text">
+                  ${(getTotalPrice() + 12.9).toFixed(2)}
+                </strong>
               </div>
 
-              <div className="mt-4">
-                <button className="btn btn-dark btn-block">
-                  Proceed to Checkout
-                </button>
-                <button className="btn btn-light btn-block mt-2">
-                  Continue Shopping
-                </button>
-              </div>
+              <button className="btn btn-dark btn-block mt-4">
+                Proceed to Checkout
+              </button>
+              <button className="btn btn-light btn-block mt-2">
+                Continue Shopping
+              </button>
             </div>
           </div>
         </div>
