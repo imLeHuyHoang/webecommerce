@@ -10,6 +10,7 @@ const {
   deleteUser,
   googleLogin,
   loginUserAdmin, // Admin login function
+  updateUserProfile,
 } = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/auth");
@@ -23,6 +24,7 @@ router.post("/logout", logoutUser);
 router.put("/update/:id", updateUser);
 router.delete("/:id", deleteUser);
 router.post("/google-login", googleLogin);
+router.put("/profile", verifyToken, updateUserProfile);
 
 // Admin login route
 router.post("/loginadmin", loginUserAdmin);

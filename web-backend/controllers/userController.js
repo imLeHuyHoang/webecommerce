@@ -291,3 +291,31 @@ exports.loginUserAdmin = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const { name, phone, gender, addresses } = req.body;
+
+    const updates = {};
+
+    // Thêm vào các trường cần cập nhật nếu chúng tồn tại trong request body
+    if (name) updates.name = name;
+    if (phone) updates.phone = phone;
+    if (gender) updates.gender = gender;
+    if (addresses) updates.addresses = addresses;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id, // ID lấy từ token đã giải mã
+      { $set: updates },
+      { new: true }
+    ).select("-password -refreshToken");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Người dùng không tồn tại." });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

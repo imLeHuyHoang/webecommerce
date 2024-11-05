@@ -31,6 +31,13 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
     }
   };
 
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
+
   return (
     <>
       <ToastNotification
@@ -53,7 +60,7 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
         </div>
         <div className="product_details">
           <h3 className="product_title">{title}</h3>
-          <p className="product_price">${price.toFixed(2)}</p>
+          <p className="product_price">{formatPrice(price)}</p>
           <footer className="align_center product_infor_footer">
             <div className="product_rating">{"★" + rating.toFixed(1)}</div>
             <span className="rating_count">({ratingCount} reviews)</span>

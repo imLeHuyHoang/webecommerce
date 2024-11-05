@@ -7,6 +7,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    shippingAddress: {
+      name: { type: String, required: true },
+      phone: { type: String, required: true },
+      address: { type: String, required: true },
+    },
     products: [
       {
         product: {
@@ -14,55 +19,28 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        quantity: {
-          type: Number,
-          required: true,
-          min: 1,
-        },
+        quantity: { type: Number, required: true, min: 1 },
+        price: { type: Number, required: true },
       },
     ],
-    total: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
+    total: { type: Number, required: true, min: 0 },
     status: {
       type: String,
-      enum: ["pending", "paid", "shipped", "delivered"],
+      enum: ["pending", "paid", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
     payment: {
       method: {
         type: String,
-        enum: ["credit card", "debit card", "paypal"],
+        enum: ["cod", "zalopay"],
+        required: true,
       },
-      transactionId: {
-        type: String,
-      },
-      isVerified: {
-        type: Boolean, // Xác thực thanh toán thành công hay chưa
-        default: false,
-      },
+      transactionId: { type: String },
+      appTransId: { type: String }, // Thêm trường này
+      isVerified: { type: Boolean, default: false }, // trường này để xác nhận thanh toán đã được xác minh hay chưa
     },
-    coupon: {
-      code: {
-        type: String, // Mã giảm giá
-        default: null,
-      },
-      discount: {
-        type: Number, // Phần trăm hoặc số tiền giảm
-        min: 0,
-        default: 0,
-      },
-    },
-    note: {
-      type: String, // Ghi chú thêm từ người dùng
-      trim: true,
-    },
-    date: {
-      type: Date,
-      default: Date.now,
-    },
+
+    note: { type: String, trim: true },
   },
   { timestamps: true }
 );

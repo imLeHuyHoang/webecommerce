@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthAdmin } from "../../context/AuthAdminContext";
 import apiClient from "../../utils/api-client";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./AdminLogin.css";
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -25,7 +27,6 @@ const AdminLogin = () => {
 
       console.log("Admin logged in:", admin);
       navigate("/admin"); // Điều hướng đến trang admin
-      // Không cần thiết phải reload trang
     } catch (error) {
       console.error("Admin login failed:", error);
       setError("Đăng nhập không thành công.");
@@ -33,26 +34,49 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="admin-login-container">
-      <h2>Admin Login</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          name="email"
-          placeholder="Admin Email"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Login as Admin</button>
-      </form>
+    <div className="container d-flex justify-content-center align-items-center vh-100">
+      <div
+        className="card p-4 shadow-lg"
+        style={{ maxWidth: "400px", width: "100%" }}
+      >
+        <h2 className="text-center mb-4">Đăng Nhập Admin</h2>
+        {error && <div className="alert alert-danger text-center">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email Admin
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Email Admin"
+              value={formData.email}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">
+              Mật khẩu
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Mật khẩu"
+              value={formData.password}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-100">
+            Đăng Nhập
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
