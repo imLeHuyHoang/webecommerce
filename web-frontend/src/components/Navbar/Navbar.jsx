@@ -1,6 +1,5 @@
-// Navbar.js
 import React, { useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useAuthAdmin } from "../../context/AuthAdminContext";
 import { useCart } from "../../context/CartContext";
@@ -21,12 +20,11 @@ function Navbar() {
   const closeMenu = () => setIsOpen(false);
 
   if (isLoading) {
-    // Bạn có thể hiển thị một thanh navbar trống hoặc spinner trong lúc chờ
-    return null; // Hoặc <LoadingNavbar />
+    return null;
   }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark mar">
       <div className="container-fluid">
         <NavLink to="/" className="navbar-brand">
           TechStore
@@ -47,7 +45,6 @@ function Navbar() {
           id="navbarNav"
         >
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-            {/* Liên kết chung */}
             {!admin && (
               <>
                 <li className="nav-item">
@@ -69,7 +66,6 @@ function Navbar() {
               </>
             )}
 
-            {/* Liên kết cho người dùng chưa đăng nhập */}
             {!user && !admin && (
               <>
                 <li className="nav-item">
@@ -91,7 +87,6 @@ function Navbar() {
               </>
             )}
 
-            {/* Liên kết cho admin */}
             {admin && (
               <>
                 <li className="nav-item">
@@ -141,7 +136,6 @@ function Navbar() {
               </>
             )}
 
-            {/* Liên kết cho người dùng đã đăng nhập */}
             {user && !admin && (
               <>
                 <li className="nav-item">

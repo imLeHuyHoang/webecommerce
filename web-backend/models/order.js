@@ -1,3 +1,5 @@
+// models/Order.js
+
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
@@ -24,11 +26,18 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     total: { type: Number, required: true, min: 0 },
-    status: {
+
+    paymentStatus: {
       type: String,
-      enum: ["pending", "paid", "shipped", "delivered", "cancelled"],
+      enum: ["pending", "paid", "cancelled"],
       default: "pending",
     },
+    shippingStatus: {
+      type: String,
+      enum: ["processing", "shipped", "delivered", "returned", "cancelled"],
+      default: "processing",
+    },
+
     payment: {
       method: {
         type: String,
@@ -36,10 +45,9 @@ const orderSchema = new mongoose.Schema(
         required: true,
       },
       transactionId: { type: String },
-      appTransId: { type: String }, // Thêm trường này
-      isVerified: { type: Boolean, default: false }, // trường này để xác nhận thanh toán đã được xác minh hay chưa
+      appTransId: { type: String },
+      isVerified: { type: Boolean, default: false },
     },
-
     note: { type: String, trim: true },
   },
   { timestamps: true }

@@ -1,4 +1,3 @@
-// App.js
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
@@ -15,9 +14,13 @@ function App() {
       <AuthProvider>
         <AuthAdminProvider>
           <CartProvider>
-            <Navbar />
-            <Routing />
-            <Footer />
+            <div className="app-container">
+              <Navbar />
+              <div className="content">
+                <Routing />
+              </div>
+              <Footer />
+            </div>
           </CartProvider>
         </AuthAdminProvider>
       </AuthProvider>

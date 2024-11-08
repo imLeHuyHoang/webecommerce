@@ -1,6 +1,7 @@
 .featured-product {
   padding: 50px 0;
   background-color: #f8f9fa; /* Màu nền nhẹ nhàng */
+  margin: 0 !important  ;
 }
 
 .featured-product h2 {

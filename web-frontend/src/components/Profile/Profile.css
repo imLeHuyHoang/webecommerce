@@ -1,97 +1,174 @@
+/* Profile Page Styles */
+
 .profile-section {
-  position: relative;
+  padding: 50px 0;
+  background-color: #f8f9fa;
 }
 
 .profile-card {
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image-section {
+  text-align: center;
+  background: #e9ecef;
+  padding: 30px 15px;
+}
+
+.profile-image-wrapper {
   position: relative;
-  z-index: 1;
-}
-
-.edit-profile-card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  width: 80%;
-  max-width: 500px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.profile-image-container {
-  background: linear-gradient(45deg, #6a11cb, #2575fc);
+  display: inline-block;
 }
 
 .profile-image {
   border-radius: 50%;
-}
-
-.profile-info-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.profile-info-label {
-  font-weight: bold;
-  color: #555;
-}
-
-.profile-info-value {
-  color: #777;
-}
-
-.profile-back-button {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.profile-back-button:hover {
-  background-color: #0056b3;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .profile-edit-icon {
+  position: absolute;
+  bottom: -15px;
+  right: -15px;
+  background: #007bff;
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 1.5rem;
-  color: #fff;
+  transition: background 0.3s ease;
 }
 
 .profile-edit-icon:hover {
-  color: #ddd;
+  background: #0056b3;
+}
+
+.profile-name {
+  margin-top: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.badge-primary {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.badge-pink {
+  background-color: #e83e8c;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.profile-details {
+  padding: 30px;
+}
+
+.loading-text {
+  font-size: 1.2em;
+  color: #888;
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* Buttons */
+.button-primary,
+.button-danger,
+.button-success {
+  padding: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.button-primary:hover,
+.button-danger:hover,
+.button-success:hover {
+  transform: translateY(-3px);
+}
+
+.button-primary:active,
+.button-danger:active,
+.button-success:active {
+  transform: translateY(0);
+}
+
+/* Modal Forms */
+.modal-body {
+  padding: 20px;
 }
 
 .form-label {
   font-weight: bold;
-  color: #555;
+  color: #333;
 }
 
 .form-control {
-  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
 }
 
-.form-control::placeholder {
-  color: #000; /* Màu đen cho placeholder */
-}
-
-.btn-primary {
-  background-color: #007bff;
+.form-control:focus {
   border-color: #007bff;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.25);
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+/* Address Accordion */
+.accordion-item {
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
 }
 
-.btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
+.accordion-header {
+  background-color: #f8f9fa;
+  padding: 10px;
+  font-weight: 500;
+  transition: background 0.3s ease;
 }
 
-.btn-secondary:hover {
-  background-color: #5a6268;
-  border-color: #545b62;
+.accordion-header:hover {
+  background-color: #e9ecef;
+}
+
+.accordion-body {
+  padding: 20px;
+}
+
+.accordion-body .form-group {
+  margin-bottom: 15px;
+  border: 1px solid #e9ecef;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #333;
+  color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  opacity: 0.95;
+  z-index: 9999;
+  transition: transform 0.3s ease-in-out;
+}
+
+.toast-notification.show {
+  transform: translateY(0);
+}
+
+.toast-notification.hide {
+  transform: translateY(-100%);
 }

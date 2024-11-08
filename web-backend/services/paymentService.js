@@ -2,22 +2,22 @@
 
 const axios = require("axios");
 const CryptoJS = require("crypto-js");
-const qs = require("qs"); // Thêm thư viện này để sử dụng qs.stringify
+const qs = require("qs");
 const zalopayConfig = require("../utils/zalopayConfig");
 
 exports.createOrder = async (orderInfo) => {
   const order = {
     app_id: zalopayConfig.appid,
     app_trans_id: orderInfo.appTransId,
-    app_user: "ZaloPayDemo", // Sử dụng 'ZaloPayDemo' cho môi trường Sandbox
+    app_user: "ZaloPayDemo",
     app_time: Date.now(),
     amount: orderInfo.amount,
     item: JSON.stringify(orderInfo.items || []),
     embed_data: JSON.stringify(orderInfo.embedData || {}),
-    description: `ZaloPayDemo - Thanh toán cho đơn hàng #${orderInfo.appTransId}`,
-    bank_code: "", // Theo tài liệu, cần truyền 'zalopayapp' cho bank_code
+    description: `Thanh toán cho đơn hàng #${orderInfo.appTransId}`,
+    bank_code: "",
     callback_url: zalopayConfig.callbackUrl,
-    mac: "", // Sẽ tính sau
+    redirect_url: zalopayConfig.redirectUrl, // Thêm dòng này
   };
 
   // Tạo chuỗi hmac_input để tính MAC
@@ -39,24 +39,17 @@ exports.createOrder = async (orderInfo) => {
   // Tính MAC
   order.mac = CryptoJS.HmacSHA256(hmacInput, zalopayConfig.key1).toString();
 
-  // In ra dữ liệu để kiểm tra
-  console.log("Order data sent to ZaloPay:", order);
-  console.log("HMAC Input:", hmacInput);
-  console.log("Calculated MAC:", order.mac);
-
   try {
     // Gửi yêu cầu tạo đơn hàng đến ZaloPay
     const response = await axios.post(
       zalopayConfig.createOrderUrl,
-      qs.stringify(order), // Sử dụng qs.stringify để chuyển đổi dữ liệu
+      qs.stringify(order),
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
-
-    console.log("ZaloPay response:", response.data);
 
     return response.data;
   } catch (error) {

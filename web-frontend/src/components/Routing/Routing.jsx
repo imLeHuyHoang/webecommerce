@@ -19,6 +19,7 @@ import OrderManagement from "../Admin/OrderManagement.jsx";
 import AdminLogin from "../Admin/AdminLogin.jsx";
 import AdminRoute from "../Admin/AdminRoute.jsx";
 import CheckoutPage from "../Cart/checkoutPage.jsx";
+import PaymentResult from "../PaymentResult.jsx";
 
 function Routing() {
   return (
@@ -34,6 +35,7 @@ function Routing() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/payment-result" element={<PaymentResult />} />
 
       {/* Các route cho admin */}
       <Route path="/admin" element={<AdminRoute />}>

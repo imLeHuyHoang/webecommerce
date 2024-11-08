@@ -20,13 +20,9 @@ const CartPage = () => {
       setLoading(true);
       try {
         if (auth.user) {
-          // Người dùng đã đăng nhập, lấy giỏ hàng từ server
           const response = await apiClient.get("/cart");
           setCartItems(response.data.products);
         } else {
-          // Người dùng chưa đăng nhập, lấy giỏ hàng từ localStorage
-          const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-          setCartItems(localCart);
         }
       } catch (error) {
         console.error("Error fetching cart:", error);
@@ -40,12 +36,10 @@ const CartPage = () => {
   const updateQuantity = async (productId, increment) => {
     try {
       if (auth.user) {
-        // Cập nhật giỏ hàng trên server
         await apiClient.patch(
           `/cart/${productId}/${increment > 0 ? "increase" : "decrease"}`
         );
       } else {
-        // Cập nhật giỏ hàng trong localStorage
         const updatedCart = cartItems.map((item) =>
           item.product._id === productId
             ? { ...item, quantity: item.quantity + increment }
@@ -53,7 +47,6 @@ const CartPage = () => {
         );
         localStorage.setItem("cart", JSON.stringify(updatedCart));
       }
-      // Cập nhật lại giỏ hàng
       updateCart();
       setCartItems((prevItems) =>
         prevItems.map((item) =>
@@ -70,16 +63,13 @@ const CartPage = () => {
   const removeItem = async (productId) => {
     try {
       if (auth.user) {
-        // Xóa sản phẩm khỏi giỏ hàng trên server
         await apiClient.delete(`/cart/${productId}`);
       } else {
-        // Xóa sản phẩm khỏi giỏ hàng trong localStorage
         const updatedCart = cartItems.filter(
           (item) => item.product._id !== productId
         );
         localStorage.setItem("cart", JSON.stringify(updatedCart));
       }
-      // Cập nhật lại giỏ hàng
       updateCart();
       setCartItems((prevItems) =>
         prevItems.filter((item) => item.product._id !== productId)
@@ -94,6 +84,9 @@ const CartPage = () => {
       (total, item) => total + item.product.price * item.quantity,
       0
     );
+
+  const getTotalQuantity = () =>
+    cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN", {
@@ -111,62 +104,154 @@ const CartPage = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Shopping Cart</h2>
-      {loading ? (
-        <div>Loading cart...</div>
-      ) : cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <>
-          <div className="cart-items">
-            {cartItems.map((item) => (
-              <div className="cart-item" key={item.product._id}>
-                <div className="cart-item-image">
-                  <img
-                    src={`http://localhost:5000/products/${item.product.images[0]}`}
-                    alt={item.product.title}
-                  />
-                </div>
-                <div className="cart-item-info">
-                  <h5>{item.product.title}</h5>
-                  <p>{formatPrice(item.product.price)}</p>
-                  <div className="quantity-controls">
-                    <button
-                      onClick={() =>
-                        item.quantity > 1 &&
-                        updateQuantity(item.product._id, -1)
-                      }
-                    >
-                      <FaMinus />
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.product._id, 1)}>
-                      <FaPlus />
-                    </button>
+    <div className="container my-5">
+      <div className="row">
+        {/* Cart Items List */}
+        <div className="col-xl-8">
+          {loading ? (
+            <div className="text-center">Đang tải giỏ hàng...</div>
+          ) : cartItems.length === 0 ? (
+            <p className="text-center">Giỏ hàng của bạn đang trống.</p>
+          ) : (
+            cartItems.map((item) => (
+              <div
+                className="card border shadow-none mb-4"
+                key={item.product._id}
+              >
+                <div className="card-body">
+                  <div className="d-flex align-items-start border-bottom pb-3">
+                    <div className="me-4">
+                      <img
+                        src={`http://localhost:5000/products/${item.product.images[0]}`}
+                        alt=""
+                        className="avatar-lg rounded"
+                      />
+                    </div>
+                    <div className="flex-grow-1 align-self-center overflow-hidden">
+                      <h5 className="text-truncate font-size-18">
+                        <a href="#" className="text-dark">
+                          {item.product.title}
+                        </a>
+                      </h5>
+                      <p className="text-muted mb-0">
+                        {Array.from({ length: 5 }, (_, i) =>
+                          i < item.product.rating ? (
+                            <i key={i} className="bx bxs-star text-warning"></i>
+                          ) : (
+                            <i key={i} className="bx bx-star text-muted"></i>
+                          )
+                        )}
+                      </p>
+                      <p className="mb-0 mt-1">
+                        <span className="fw-medium">{item.product.color}</span>
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0 ms-2">
+                      <ul className="list-inline mb-0 font-size-16">
+                        <li className="list-inline-item">
+                          <button
+                            className="btn btn-link text-muted px-1"
+                            onClick={() => removeItem(item.product._id)}
+                          >
+                            <FaTrashAlt />
+                          </button>
+                        </li>
+                        <li className="list-inline-item">
+                          <a href="#" className="text-muted px-1">
+                            <i className="mdi mdi-heart-outline"></i>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => removeItem(item.product._id)}
-                    className="remove-item-button"
-                  >
-                    <FaTrashAlt />
-                  </button>
+
+                  <div className="row mt-3">
+                    <div className="col-md-4">
+                      <p className="text-muted mb-2">Giá</p>
+                      <h5 className="mb-0">
+                        {formatPrice(item.product.price)}
+                      </h5>
+                    </div>
+                    <div className="col-md-5">
+                      <p className="text-muted mb-2">Số lượng</p>
+                      <div className="d-flex align-items-center">
+                        <button
+                          className="btn btn-outline-primary btn-sm"
+                          onClick={() =>
+                            item.quantity > 1 &&
+                            updateQuantity(item.product._id, -1)
+                          }
+                        >
+                          <FaMinus />
+                        </button>
+                        <span className="mx-2">{item.quantity}</span>
+                        <button
+                          className="btn btn-outline-primary btn-sm"
+                          onClick={() => updateQuantity(item.product._id, 1)}
+                        >
+                          <FaPlus />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <p className="text-muted mb-2">Tổng</p>
+                      <h5>{formatPrice(item.product.price * item.quantity)}</h5>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            ))
+          )}
+
+          <div className="row my-4">
+            <div className="col-sm-6">
+              <button
+                onClick={() => navigate("/products")}
+                className="btn btn-link text-muted"
+              >
+                <i className="mdi mdi-arrow-left me-1"></i> Tiếp tục mua sắm
+              </button>
+            </div>
+            <div className="col-sm-6 text-sm-end">
+              <button
+                onClick={handleProceedToCheckout}
+                className="btn btn-success"
+              >
+                <i className="mdi mdi-cart-outline me-1"></i> Thanh toán
+              </button>
+            </div>
           </div>
-          <div className="cart-summary">
-            <h4>Tổng kết đơn hàng</h4>
-            <p>Tổng tiền: {formatPrice(getTotalPrice())}</p>
-            <button
-              className="btn btn-primary"
-              onClick={handleProceedToCheckout}
-            >
-              Tiến hành thanh toán
-            </button>
+        </div>
+
+        {/* Order Summary */}
+        <div className="col-xl-4">
+          <div className="card border shadow-none">
+            <div className="card-header bg-transparent border-bottom py-3 px-4">
+              <h5 className="font-size-16 mb-0">Tóm tắt đơn hàng</h5>
+            </div>
+            <div className="card-body p-4 pt-2">
+              <table className="table mb-0">
+                <tbody>
+                  <tr>
+                    <td>Tổng Tiền :</td>
+                    <td className="text-end">{formatPrice(getTotalPrice())}</td>
+                  </tr>
+                  <tr>
+                    <td>Tổng số sản phẩm :</td>
+                    <td className="text-end">{getTotalQuantity()}</td>
+                  </tr>
+                  <tr className="bg-light">
+                    <th>Tổng cộng :</th>
+                    <td className="text-end fw-bold">
+                      {formatPrice(getTotalPrice() + 25)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

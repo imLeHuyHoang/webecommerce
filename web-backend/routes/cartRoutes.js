@@ -7,6 +7,7 @@ const {
   removeFromCart,
   decreaseQuantity,
   increaseQuantity,
+  clearCart,
 } = require("../controllers/cartController");
 
 // Lấy giỏ hàng
@@ -26,4 +27,8 @@ router.patch("/:productId/increase", verifyToken, increaseQuantity);
 
 // xóa giỏ hàng
 router.delete("/", verifyToken, removeFromCart);
+
+// Xóa giỏ hàng
+router.delete("/", verifyToken, clearCart);
+
 module.exports = router;

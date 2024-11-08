@@ -169,3 +169,17 @@ exports.increaseQuantity = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Xóa toàn bộ giỏ hàng
+exports.clearCart = async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ user: req.user.id });
+    cart.products = [];
+    cart.total = 0;
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error in clearCart:", error); // Log lỗi chi tiết
+    res.status(500).json({ error: error.message });
+  }
+};

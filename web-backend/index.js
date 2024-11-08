@@ -9,6 +9,8 @@ require("./db/connectDB"); // Connect to MongoDB
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 // Import routes
 const userRoutes = require("./routes/userRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -25,8 +27,6 @@ app.use(
     credentials: true,
   })
 );
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Static file serving

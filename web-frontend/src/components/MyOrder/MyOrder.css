@@ -1,66 +1,126 @@
-/* Container */
-.my_orders_container {
-  margin-top: 20px;
+/* src/pages/MyOrder/MyOrder.css */
+
+/* General Styles */
+body {
+  background: linear-gradient(90deg, #f0f4f8, #d9e2ec);
+  animation: gradientAnimation 10s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.container {
   max-width: 1200px;
-  margin: 30px auto;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  background-color: #ffffff;
+  margin: 0 auto;
 }
 
-.my_orders_title {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  text-align: center;
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
   color: #333;
 }
 
-/* Table Styles */
-.my_orders_table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
+.navbar {
+  margin-bottom: 2rem;
 }
 
-.my_orders_table th,
-.my_orders_table td {
-  padding: 15px;
-  text-align: left;
-  font-size: 1.1rem;
+.order-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.my_orders_table th {
-  background-color: #f0f0f0;
-  font-weight: bold;
-  color: #333;
+.order-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.my_orders_table td {
-  border-bottom: 1px solid #ddd;
-}
-
-.my_orders_table td div {
-  margin-bottom: 5px;
-}
-
-.my_orders_table tr:hover {
-  background-color: #f9f9f9;
-}
-
-/* Status colors */
-.my_orders_table td:nth-child(4) {
+.card-title {
+  font-size: 1.25rem;
   font-weight: bold;
 }
 
-.my_orders_table td:nth-child(4).status-shipped {
-  color: #ff8c00;
+.card-subtitle {
+  font-size: 0.875rem;
+  color: #6c757d;
 }
 
-.my_orders_table td:nth-child(4).status-delivered {
-  color: #28a745;
+.card-text {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-.my_orders_table td:nth-child(4).status-pending {
-  color: #ffc107;
+.badge {
+  font-size: 0.875rem;
+}
+
+.btn-primary,
+.btn-danger {
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-danger:hover {
+  transform: scale(1.05);
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.table {
+  margin-top: 1rem;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.modal-body p {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal-footer .btn {
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.modal-footer .btn:hover {
+  transform: scale(1.05);
+}
+
+.input-group .form-control {
+  border-radius: 0.25rem 0 0 0.25rem;
+  height: calc(2.25rem + 2px); /* Ensure the height matches the button */
+}
+
+.input-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-group .btn {
+  border-radius: 0 0.25rem 0.25rem 0;
+  height: calc(2.25rem + 2px); /* Ensure the height matches the form control */
+  margin-left: 0.5rem; /* Add a small margin between the form control and the button */
+}
+
+.form-select {
+  border-radius: 0.25rem;
 }
