@@ -1,5 +1,3 @@
-// src/pages/CartPage/CartPage.jsx
-
 import React, { useEffect, useState } from "react";
 import apiClient from "../../utils/api-client";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +20,6 @@ const CartPage = () => {
         if (auth.user) {
           const response = await apiClient.get("/cart");
           setCartItems(response.data.products);
-        } else {
         }
       } catch (error) {
         console.error("Error fetching cart:", error);
@@ -122,7 +119,10 @@ const CartPage = () => {
                   <div className="d-flex align-items-start border-bottom pb-3">
                     <div className="me-4">
                       <img
-                        src={`http://localhost:5000/products/${item.product.images[0]}`}
+                        src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                          "/api",
+                          ""
+                        )}/products/${item.product.images[0]}`}
                         alt=""
                         className="avatar-lg rounded"
                       />
@@ -155,11 +155,6 @@ const CartPage = () => {
                           >
                             <FaTrashAlt />
                           </button>
-                        </li>
-                        <li className="list-inline-item">
-                          <a href="#" className="text-muted px-1">
-                            <i className="mdi mdi-heart-outline"></i>
-                          </a>
                         </li>
                       </ul>
                     </div>

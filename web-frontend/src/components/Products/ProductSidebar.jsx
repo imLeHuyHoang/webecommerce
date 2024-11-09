@@ -13,11 +13,13 @@ function ProductSidebar({ onCategoryChange }) {
     apiClient
       .get("/category")
       .then((res) => {
-        setCategories(res.data);
+        console.log("API Response:", res.data); // Kiểm tra dữ liệu trả về
+        setCategories(Array.isArray(res.data) ? res.data : []); // Đảm bảo categories là mảng
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
+        setCategories([]); // Gán giá trị mặc định nếu có lỗi
         setLoading(false);
       });
   }, []);
