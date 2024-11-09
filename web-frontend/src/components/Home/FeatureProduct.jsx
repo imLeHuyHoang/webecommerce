@@ -8,7 +8,9 @@ function FeatureProduct() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/product");
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/product`
+        );
         const data = await response.json();
         if (data && data.products) {
           const randomProducts = data.products.slice(0, 4);
@@ -18,6 +20,7 @@ function FeatureProduct() {
         console.error("Error fetching products:", error);
       }
     };
+
     fetchProducts();
   }, []);
 

@@ -49,7 +49,10 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
         <div className="product_image">
           <NavLink to={`/product/${id}`}>
             <img
-              src={`http://localhost:5000/products/${image}`}
+              src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                "/api",
+                ""
+              )}/products/${image}`} // Sử dụng biến môi trường
               alt={title}
               onError={(e) => {
                 e.target.onerror = null;

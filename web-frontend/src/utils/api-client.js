@@ -1,8 +1,12 @@
 // api-client.js
 import axios from "axios";
 
+// api-client.js
+
+console.log("API Base URL:", import.meta.env.VITE_API_BASE_URL);
+
 const apiClient = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL, // Sử dụng import.meta.env cho biến Vite
   withCredentials: true,
 });
 
@@ -72,9 +76,10 @@ apiClient.interceptors.response.use(
 
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/user/refreshToken",
+          `${process.env.REACT_APP_API_BASE_URL}/user/refreshToken`, // Sử dụng biến môi trường
           { withCredentials: true }
         );
+
         const { accessToken } = response.data;
 
         localStorage.setItem("accessToken", accessToken);

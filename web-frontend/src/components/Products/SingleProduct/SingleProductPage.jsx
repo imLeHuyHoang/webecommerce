@@ -77,7 +77,10 @@ const SingleProductPage = () => {
   if (error) return <p className="text-center text-danger my-5">{error}</p>;
 
   const mainImageUrl = mainImage
-    ? `http://localhost:5000/products/${mainImage}`
+    ? `${import.meta.env.VITE_API_BASE_URL.replace(
+        "/api",
+        ""
+      )}/products/${mainImage}`
     : "/images/default-image.png";
 
   return (
@@ -95,7 +98,10 @@ const SingleProductPage = () => {
                 {product.images.map((img, index) => (
                   <img
                     key={index}
-                    src={`http://localhost:5000/products/${img}`}
+                    src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                      "/api",
+                      ""
+                    )}/products/${img}`}
                     alt={`Product ${index}`}
                     className={`small-image img-thumbnail ${
                       selectedImage === img ? "selected" : ""

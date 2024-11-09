@@ -44,7 +44,10 @@ function ProductSidebar({ onCategoryChange }) {
             >
               <span>{cat.name}</span>
               <img
-                src={`http://localhost:5000/category/${cat.image}`}
+                src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                  "/api",
+                  ""
+                )}/category/${cat.image}`}
                 alt={cat.name}
                 className="link_emoji"
               />
