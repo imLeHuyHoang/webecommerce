@@ -23,7 +23,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://54.255.237.58",
     credentials: true,
   })
 );
