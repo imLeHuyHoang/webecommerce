@@ -23,7 +23,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: "http://54.255.237.58",
+    origin: process.env.CorsOrigin,
     credentials: true,
   })
 );

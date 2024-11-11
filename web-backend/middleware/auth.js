@@ -1,19 +1,29 @@
+// auth.js (middleware)
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-exports.verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Lấy token từ header
-
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: No token provided." });
-  }
-
+exports.verifyToken = async (req, res, next) => {
   try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Không tìm thấy token." });
+    }
+
+    const token = authHeader.split(" ")[1];
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Gắn thông tin người dùng vào req.user
-    next(); // Chuyển tiếp đến route handler tiếp theo
+
+    // Find user and validate token version
+    const user = await User.findById(decoded.id);
+    if (!user || user.tokenVersion !== decoded.version) {
+      throw new Error("Invalid token version");
+    }
+
+    req.user = decoded;
+    next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid or expired token." });
+    console.error("Token verification error:", error);
+    res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn." });
   }
 };

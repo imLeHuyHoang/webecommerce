@@ -1,5 +1,11 @@
-// AuthContext.js
-import { createContext, useContext, useState, useEffect } from "react";
+// AuthContext.js (Frontend)
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../utils/api-client";
 
@@ -8,75 +14,110 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     user: null,
-    accessToken: localStorage.getItem("accessToken") || null,
+    accessToken: null,
+    isLoading: true,
   });
   const navigate = useNavigate();
 
+  // Initialize auth state
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const initializeAuth = async () => {
       try {
-        setAuth((prev) => ({
-          ...prev,
-          user: JSON.parse(storedUser),
-        }));
+        const storedUser = localStorage.getItem("user");
+        const storedToken = localStorage.getItem("accessToken");
+
+        if (storedUser && storedToken) {
+          setAuth({
+            user: JSON.parse(storedUser),
+            accessToken: storedToken,
+            isLoading: false,
+          });
+        } else {
+          setAuth((prev) => ({ ...prev, isLoading: false }));
+        }
       } catch (error) {
-        console.error("Lỗi khi phân tích dữ liệu người dùng:", error);
-        localStorage.removeItem("user");
+        console.error("Auth initialization error:", error);
+        clearAuthData();
       }
-    }
+    };
+
+    initializeAuth();
   }, []);
 
+  const clearAuthData = useCallback(() => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    setAuth({ user: null, accessToken: null, isLoading: false });
+  }, []);
+
+  // Token refresh mechanism
   useEffect(() => {
+    let refreshInterval;
+
     const refreshToken = async () => {
       try {
         const response = await apiClient.get("/user/refreshToken");
         const { accessToken } = response.data;
+
         localStorage.setItem("accessToken", accessToken);
         setAuth((prev) => ({
           ...prev,
           accessToken,
         }));
-      } catch {
-        localStorage.removeItem("accessToken");
-        setAuth((prev) => ({
-          ...prev,
-          accessToken: null,
-          user: null,
-        }));
+      } catch (error) {
+        console.error("Token refresh error:", error);
+        clearAuthData();
         navigate("/login");
       }
     };
 
-    const interval = setInterval(refreshToken, 600000); // Làm mới mỗi 10 phút
-    return () => clearInterval(interval);
-  }, []);
+    if (auth.accessToken) {
+      refreshInterval = setInterval(refreshToken, 10 * 60 * 1000); // 10 minutes
 
-  const login = (user, accessToken) => {
+      // Initial refresh
+      refreshToken();
+    }
+
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [auth.accessToken, clearAuthData, navigate]);
+
+  const login = useCallback((user, accessToken) => {
     if (user && accessToken) {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("accessToken", accessToken);
-      setAuth({ user, accessToken });
+      setAuth({
+        user,
+        accessToken,
+        isLoading: false,
+      });
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await apiClient.post("/user/logout");
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("Logout error:", error);
     } finally {
-      localStorage.removeItem("user");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("accessToken");
-      setAuth({ user: null, accessToken: null });
+      clearAuthData();
       navigate("/login");
     }
-  };
+  }, [clearAuthData, navigate]);
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
-      {children}
+    <AuthContext.Provider
+      value={{
+        auth,
+        login,
+        logout,
+        clearAuthData,
+      }}
+    >
+      {!auth.isLoading && children}
     </AuthContext.Provider>
   );
 };

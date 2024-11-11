@@ -1,12 +1,8 @@
 // api-client.js
 import axios from "axios";
 
-// api-client.js
-
-console.log("API Base URL:", import.meta.env.VITE_API_BASE_URL);
-
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // Sử dụng import.meta.env cho biến Vite
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
 });
 
@@ -21,23 +17,15 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-
   failedQueue = [];
 };
 
 apiClient.interceptors.request.use(
   (config) => {
-    const adminToken = localStorage.getItem("adminAccessToken");
-    const userToken = localStorage.getItem("accessToken");
-
-    const token = adminToken || userToken;
-
+    const token = localStorage.getItem("accessToken");
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    } else {
-      delete config.headers["Authorization"];
+      config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -48,54 +36,37 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    const isRefreshTokenEndpoint =
-      originalRequest.url.includes("/refreshToken");
-
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry &&
-      !isRefreshTokenEndpoint
-    ) {
-      originalRequest._retry = true;
-
+    if (error?.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers["Authorization"] = "Bearer " + token;
+            originalRequest.headers.Authorization = `Bearer ${token}`;
             return apiClient(originalRequest);
           })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
+          .catch((err) => Promise.reject(err));
       }
 
+      originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_BASE_URL}/user/refreshToken`, // Sử dụng biến môi trường
-          { withCredentials: true }
-        );
-
+        const response = await apiClient.get("/user/refreshToken");
         const { accessToken } = response.data;
 
         localStorage.setItem("accessToken", accessToken);
+        apiClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
-        apiClient.defaults.headers.common["Authorization"] =
-          "Bearer " + accessToken;
-
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         processQueue(null, accessToken);
 
-        originalRequest.headers["Authorization"] = "Bearer " + accessToken;
         return apiClient(originalRequest);
-      } catch (err) {
-        processQueue(err, null);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
         localStorage.removeItem("accessToken");
-        window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
-        return Promise.reject(err);
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }

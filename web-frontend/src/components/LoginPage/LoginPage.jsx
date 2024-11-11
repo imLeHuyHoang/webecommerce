@@ -22,7 +22,6 @@ const Login = () => {
       console.log("Response data:", response.data);
       const { accessToken, id, user } = response.data;
 
-      // Kiểm tra nếu user không tồn tại
       if (!user) {
         setError("Không nhận được thông tin người dùng từ máy chủ.");
         return;
@@ -32,6 +31,7 @@ const Login = () => {
       login(user, accessToken);
 
       navigate("/");
+      window.location.reload(); // Reload trang sau khi điều hướng
     } catch (error) {
       console.error("Login error:", error);
       setError("Email hoặc mật khẩu không đúng!");
@@ -46,12 +46,11 @@ const Login = () => {
       });
       const { accessToken, id, user } = response.data;
 
-      // Lưu thông tin người dùng và accessToken vào localStorage
       localStorage.setItem("userId", id);
       login(user, accessToken);
 
       navigate("/");
-      // Không cần thiết phải reload trang
+      window.location.reload(); // Reload trang sau khi điều hướng
     } catch (error) {
       setError("Đăng nhập với Google thất bại!");
     }

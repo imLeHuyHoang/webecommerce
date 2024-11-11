@@ -5,7 +5,8 @@ import Routing from "../src/components/Routing/Routing";
 import Navbar from "../src/components/Navbar/Navbar";
 import Footer from "../src/components/Footer/Footer";
 import { AuthProvider } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext";
+import CartProvider, { useCart } from "./context/CartContext";
+
 import { AuthAdminProvider } from "./context/AuthAdminContext";
 
 function App() {
