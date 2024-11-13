@@ -6,7 +6,7 @@ module.exports = {
   key2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf",
   createOrderUrl: "https://sb-openapi.zalopay.vn/v2/create",
   callbackUrl:
-    "https://e4ee-2001-ee0-41c1-992d-b10a-c83d-2342-e9c6.ngrok-free.app/api/payment/callback",
+    "https://790c-2001-ee0-41c1-992d-a190-6af3-7463-11be.ngrok-free.app/api/payment/callback",
   redirectUrl:
     "https://e4ee-2001-ee0-41c1-992d-b10a-c83d-2342-e9c6.ngrok-free.app/api/payment-result",
 };

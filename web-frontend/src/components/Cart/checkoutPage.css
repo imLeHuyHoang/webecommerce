@@ -1,0 +1,74 @@
+/* CheckoutPage.css */
+
+/* General container styling */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Heading styling */
+h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+h4 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+/* Form group styling */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-weight: bold;
+}
+
+.form-control {
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Button styling */
+.btn {
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.btn-link {
+  font-size: 0.9rem;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Order items styling */
+.order-items {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.order-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Order total styling */
+.order-total {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: right;
+}

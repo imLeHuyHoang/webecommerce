@@ -1,24 +1,26 @@
 // controllers/paymentController.js
 
-const axios = require("axios");
 const CryptoJS = require("crypto-js");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const zalopayConfig = require("../utils/zalopayConfig");
 const paymentService = require("../services/paymentService");
 
+/**
+ * Tạo đơn hàng mới
+ * @param {Object} req - Yêu cầu HTTP
+ * @param {Object} res - Phản hồi HTTP
+ */
 exports.createOrder = async (req, res) => {
   try {
     const { shippingAddress, products, paymentMethod } = req.body;
 
-    // Validate input
     if (!shippingAddress || !products || products.length === 0) {
       return res
         .status(400)
         .json({ message: "Thông tin đơn hàng không hợp lệ." });
     }
 
-    // Fetch product information and calculate total amount
     const productDetails = await Promise.all(
       products.map(async (item) => {
         const product = await Product.findById(item.product);
@@ -39,7 +41,6 @@ exports.createOrder = async (req, res) => {
       0
     );
 
-    // Create order in database
     const order = await Order.create({
       user: req.user.id,
       shippingAddress,
@@ -50,15 +51,15 @@ exports.createOrder = async (req, res) => {
       })),
       total: totalAmount,
       payment: { method: paymentMethod, isVerified: false },
-      paymentStatus: "pending", // Set initial payment status
-      shippingStatus: "processing", // Set initial shipping status
+      paymentStatus: "pending",
+      shippingStatus: "processing",
     });
 
-    // Integrate with ZaloPay if selected payment method is ZaloPay
     if (paymentMethod === "zalopay") {
       const appTransId = generateAppTransId();
+      order.paymentStatus = "pending";
+      order.paymentDate = new Date();
 
-      // Prepare data to send to ZaloPay
       const orderInfo = {
         appTransId,
         amount: totalAmount,
@@ -73,19 +74,13 @@ exports.createOrder = async (req, res) => {
         },
       };
 
-      console.log("Order Info:", orderInfo);
-
-      // Call ZaloPay service to create order
       const zaloPayResponse = await paymentService.createOrder(orderInfo);
-      console.log("ZaloPay Response:", zaloPayResponse);
 
       if (zaloPayResponse.return_code === 1) {
-        // Update order with ZaloPay transaction info
         order.payment.transactionId = zaloPayResponse.zp_trans_token;
         order.payment.appTransId = appTransId;
         await order.save();
 
-        // Return URL to redirect user to ZaloPay payment page
         return res.status(201).json({ orderUrl: zaloPayResponse.order_url });
       } else {
         console.error("ZaloPay Error:", zaloPayResponse);
@@ -95,7 +90,9 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // Handle other payment methods (e.g., COD)
+    order.paymentStatus = "unpaid";
+    order.shippingStatus = "processing";
+    await order.save();
     res.status(201).json({ message: "Đơn hàng đã được tạo thành công." });
   } catch (error) {
     console.error("Error creating order:", error);
@@ -103,40 +100,37 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+/**
+ * Xử lý callback thanh toán từ ZaloPay
+ * @param {Object} req - Yêu cầu HTTP
+ * @param {Object} res - Phản hồi HTTP
+ */
 exports.paymentCallback = async (req, res) => {
   try {
     console.log("Received callback from ZaloPay:", req.body);
 
     const { data: dataStr, mac: reqMac, type } = req.body;
 
-    // Check if data, mac, or type is missing
     if (!dataStr || !reqMac || type === undefined) {
       console.error("Thiếu data, mac hoặc type trong callback.");
       return res.sendStatus(400);
     }
 
-    // Calculate MAC to validate
     const mac = CryptoJS.HmacSHA256(dataStr, zalopayConfig.key2).toString();
 
-    // Compare MACs
     if (mac !== reqMac) {
       console.error("MAC không khớp.");
       return res.sendStatus(400);
     }
 
-    // Parse data from JSON string
     const data = JSON.parse(dataStr);
-
-    // Extract required fields from data
     const { app_id, app_trans_id } = data;
 
-    // Check if required fields are missing
     if (!app_id || !app_trans_id) {
       console.error("Thiếu thông tin cần thiết trong data.");
       return res.sendStatus(400);
     }
 
-    // Find order in database by app_trans_id
     const order = await Order.findOne({
       "payment.appTransId": app_trans_id,
     });
@@ -145,26 +139,22 @@ exports.paymentCallback = async (req, res) => {
       return res.sendStatus(404);
     }
 
-    // Update order based on type
     if (type === 1) {
-      // Payment successful
       order.payment.isVerified = true;
       order.paymentStatus = "paid";
       order.shippingStatus = "processing";
+      order.paymentDate = new Date();
     } else if (type === 2) {
-      // Transaction cancelled
       order.paymentStatus = "cancelled";
+      order.cancelledDate = new Date();
     } else if (type === 3) {
-      // Payment failed
-      order.paymentStatus = "failed";
+      order.paymentStatus = "pending";
     } else {
-      // Undefined type
       console.error(`Loại type không xác định: ${type}`);
       return res.sendStatus(400);
     }
 
     await order.save();
-
     res.sendStatus(200);
   } catch (error) {
     console.error("Error in payment callback:", error);
@@ -172,7 +162,10 @@ exports.paymentCallback = async (req, res) => {
   }
 };
 
-// Function to generate appTransId
+/**
+ * Hàm tạo appTransId
+ * @returns {string} - appTransId
+ */
 function generateAppTransId() {
   const date = new Date();
   const yy = date.getFullYear().toString().slice(-2);

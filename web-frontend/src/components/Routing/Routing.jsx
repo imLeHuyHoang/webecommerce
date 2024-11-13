@@ -9,7 +9,6 @@ import CartPage from "../Cart/CartPage";
 import MyOrders from "../MyOrder/MyOrder.jsx";
 import LoginPage from "../LoginPage/LoginPage.jsx";
 import SignUpPage from "../SignupPage/SignupPage.jsx";
-import AboutUs from "../AboutUs/AboutUs.jsx";
 import Logout from "../LogOut/LogOut.jsx";
 import Profile from "../Profile/Profile.jsx";
 import Dashboard from "../Admin/Dashboard.jsx";

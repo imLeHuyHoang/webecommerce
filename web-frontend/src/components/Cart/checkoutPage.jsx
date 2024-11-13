@@ -1,15 +1,19 @@
-// src/pages/CheckoutPage/CheckoutPage.jsx
-
 import React, { useState, useEffect } from "react";
 import apiClient from "../../utils/api-client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import "./CheckoutPage.css";
 
 const CheckoutPage = () => {
-  const [shippingInfo, setShippingInfo] = useState({
-    name: "",
-    phone: "",
-    address: "",
+  const [userInfo, setUserInfo] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({
+    province: "",
+    district: "",
+    ward: "",
+    street: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("zalopay");
   const { auth } = useAuth();
@@ -18,11 +22,29 @@ const CheckoutPage = () => {
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    // Kiểm tra xem location.state và location.state.cartItems có tồn tại không
+    // Lấy thông tin người dùng và địa chỉ mặc định
+    const fetchUserData = async () => {
+      try {
+        const response = await apiClient.get("/user/profile");
+        const user = response.data;
+        setUserInfo(user);
+
+        // Đặt địa chỉ mặc định (nếu có)
+        const defaultAddress =
+          user.addresses.find((addr) => addr.default) || user.addresses[0];
+        setSelectedAddress(defaultAddress);
+      } catch (error) {
+        console.error("Lỗi khi tải thông tin người dùng:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
     if (location.state && location.state.cartItems) {
       setCartItems(location.state.cartItems);
     } else {
-      // Nếu không có dữ liệu, có thể lấy từ localStorage hoặc chuyển hướng về trang giỏ hàng
       const localCart = JSON.parse(localStorage.getItem("cart")) || [];
       if (localCart.length > 0) {
         setCartItems(localCart);
@@ -35,42 +57,32 @@ const CheckoutPage = () => {
     }
   }, [location.state, navigate]);
 
-  const handleInputChange = (e) => {
-    setShippingInfo({
-      ...shippingInfo,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   const getTotalPrice = () =>
     cartItems.reduce(
       (total, item) => total + item.product.price * item.quantity,
       0
     );
 
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
+  const formatPrice = (price) =>
+    price.toLocaleString("vi-VN", {
       style: "currency",
       currency: "VND",
     });
-  };
 
   const handlePlaceOrder = async () => {
-    // Kiểm tra nếu giỏ hàng trống
-    if (cartItems.length === 0) {
-      alert("Giỏ hàng của bạn đang trống.");
+    if (!selectedAddress || cartItems.length === 0) {
+      alert("Vui lòng điền đầy đủ thông tin và giỏ hàng.");
       return;
     }
 
-    // Kiểm tra thông tin giao hàng
-    if (!shippingInfo.name || !shippingInfo.phone || !shippingInfo.address) {
-      alert("Vui lòng nhập đầy đủ thông tin giao hàng.");
-      return;
-    }
+    const shippingAddress = {
+      name: userInfo.name,
+      phone: userInfo.phone,
+      address: `${selectedAddress.street}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`,
+    };
 
-    // Chuẩn bị dữ liệu đơn hàng
     const orderData = {
-      shippingAddress: shippingInfo,
+      shippingAddress,
       paymentMethod,
       products: cartItems.map((item) => ({
         product: item.product._id,
@@ -78,19 +90,14 @@ const CheckoutPage = () => {
         price: item.product.price,
       })),
     };
+    console.log("Order data:", orderData);
 
     try {
-      // Gửi yêu cầu tạo đơn hàng tới backend
       const response = await apiClient.post("/order", orderData);
-
-      // Trong hàm handlePlaceOrder
-
       if (paymentMethod === "zalopay") {
-        // Nếu thanh toán qua ZaloPay, redirect tới trang thanh toán
         const { orderUrl } = response.data;
         window.location.href = orderUrl;
       } else {
-        // Xử lý cho phương thức thanh toán khác (COD)
         navigate("/order-success");
       }
     } catch (error) {
@@ -99,43 +106,143 @@ const CheckoutPage = () => {
     }
   };
 
+  const handleAddNewAddress = async () => {
+    try {
+      const updatedAddresses = [...userInfo.addresses, newAddress];
+      await apiClient.put("/user/profile", { addresses: updatedAddresses });
+      window.location.reload(); // Reload để cập nhật danh sách địa chỉ mới
+    } catch (error) {
+      console.error("Error adding new address:", error);
+      alert("Lỗi khi thêm địa chỉ mới. Vui lòng thử lại.");
+    }
+  };
+
   return (
     <div className="container mt-4">
       <h2>Thanh toán</h2>
       <div className="row">
-        {/* Form thông tin giao hàng */}
         <div className="col-md-6">
           <h4>Thông tin giao hàng</h4>
-          <div className="form-group">
-            <label>Họ và tên</label>
-            <input
-              name="name"
-              value={shippingInfo.name}
-              onChange={handleInputChange}
-              className="form-control"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Số điện thoại</label>
-            <input
-              name="phone"
-              value={shippingInfo.phone}
-              onChange={handleInputChange}
-              className="form-control"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Địa chỉ</label>
-            <input
-              name="address"
-              value={shippingInfo.address}
-              onChange={handleInputChange}
-              className="form-control"
-              required
-            />
-          </div>
+          {userInfo && selectedAddress && (
+            <>
+              <div className="form-group">
+                <label>Họ và tên</label>
+                <input
+                  name="name"
+                  value={userInfo.name}
+                  className="form-control"
+                  readOnly
+                />
+              </div>
+              <div className="form-group">
+                <label>Số điện thoại</label>
+                <input
+                  name="phone"
+                  value={userInfo.phone}
+                  className="form-control"
+                  readOnly
+                />
+              </div>
+              <div className="form-group">
+                <label>Địa chỉ giao hàng</label>
+                <input
+                  name="address"
+                  value={`${selectedAddress.street}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`}
+                  className="form-control"
+                  readOnly
+                />
+                <button
+                  onClick={() => setIsEditingAddress(!isEditingAddress)}
+                  className="btn btn-link"
+                >
+                  Thay đổi địa chỉ mặc định
+                </button>
+              </div>
+              {isEditingAddress && (
+                <div className="form-group">
+                  <label>Chọn địa chỉ khác</label>
+                  <select
+                    value={selectedAddress._id}
+                    onChange={(e) =>
+                      setSelectedAddress(
+                        userInfo.addresses.find(
+                          (addr) => addr._id === e.target.value
+                        )
+                      )
+                    }
+                    className="form-control"
+                  >
+                    {userInfo.addresses.map((address) => (
+                      <option key={address._id} value={address._id}>
+                        {`${address.street}, ${address.ward}, ${address.district}, ${address.province}`}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => setIsEditingAddress(false)}
+                    className="btn btn-link"
+                  >
+                    Xác nhận
+                  </button>
+                  <button
+                    onClick={() => setIsAddingNewAddress(true)}
+                    className="btn btn-link"
+                  >
+                    Thêm địa chỉ mới
+                  </button>
+                </div>
+              )}
+              {isAddingNewAddress && (
+                <div className="form-group mt-3">
+                  <label>Thêm địa chỉ mới</label>
+                  <input
+                    placeholder="Tỉnh/Thành phố"
+                    value={newAddress.province}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, province: e.target.value })
+                    }
+                    className="form-control mb-2"
+                  />
+                  <input
+                    placeholder="Quận/Huyện"
+                    value={newAddress.district}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, district: e.target.value })
+                    }
+                    className="form-control mb-2"
+                  />
+                  <input
+                    placeholder="Phường/Xã"
+                    value={newAddress.ward}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, ward: e.target.value })
+                    }
+                    className="form-control mb-2"
+                  />
+                  <input
+                    placeholder="Thông tin nhỏ hơn (số nhà, tên đường, ...)"
+                    value={newAddress.street}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, street: e.target.value })
+                    }
+                    className="form-control mb-2"
+                  />
+                  <button
+                    onClick={handleAddNewAddress}
+                    className="btn btn-primary"
+                  >
+                    Lưu địa chỉ mới
+                  </button>
+                  <button
+                    onClick={() => setIsAddingNewAddress(false)}
+                    className="btn btn-link"
+                  >
+                    Hủy
+                  </button>
+                </div>
+              )}
+            </>
+          )}
           <div className="form-group">
             <label>Phương thức thanh toán</label>
             <select
@@ -152,7 +259,6 @@ const CheckoutPage = () => {
           </button>
         </div>
 
-        {/* Hiển thị thông tin đơn hàng */}
         <div className="col-md-6">
           <h4>Thông tin đơn hàng</h4>
           <div className="order-items">

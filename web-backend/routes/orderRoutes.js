@@ -13,22 +13,22 @@ const {
 
 const router = express.Router();
 
-// Create a new order
+// Tạo đơn hàng mới
 router.post("/", verifyToken, createOrder);
 
-// List all orders for the authenticated user
+// Danh sách đơn hàng của người dùng
 router.get("/", verifyToken, getUserOrders);
 
-// Get details of a specific order
+// Chi tiết đơn hàng
 router.get("/:orderId", verifyToken, getOrderDetails);
 
-// Cancel an order
+// Hủy đơn hàng
 router.patch("/:orderId/cancel", verifyToken, cancelOrder);
 
-// Request support for an order
+// Yêu cầu hỗ trợ
 router.post("/:orderId/support", verifyToken, requestSupport);
 
-// Leave a review for a product in the order
+// Đánh giá sản phẩm
 router.post("/:orderId/review", verifyToken, leaveReview);
 
 module.exports = router;
