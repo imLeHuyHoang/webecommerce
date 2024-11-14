@@ -5,6 +5,9 @@ module.exports = {
   key1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn",
   key2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf",
   createOrderUrl: "https://sb-openapi.zalopay.vn/v2/create",
+  refundUrl: "https://sandbox.zalopay.com.vn/v001/tpe/partialrefund",
+  getRefundStatusUrl:
+    "https://sandbox.zalopay.com.vn/v001/tpe/getpartialrefundstatus",
   callbackUrl:
     "https://790c-2001-ee0-41c1-992d-a190-6af3-7463-11be.ngrok-free.app/api/payment/callback",
   redirectUrl:

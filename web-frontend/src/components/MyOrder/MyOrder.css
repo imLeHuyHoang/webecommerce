@@ -1,45 +1,28 @@
-/* src/pages/MyOrder/MyOrder.css */
+/* MyOrder.css */
 
 /* General Styles */
 body {
-  background: linear-gradient(90deg, #f0f4f8, #d9e2ec);
-  animation: gradientAnimation 10s ease infinite;
-}
-
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-  color: #333;
+h1,
+h2,
+h5 {
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 
-.navbar {
-  margin-bottom: 2rem;
-}
-
-.order-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.order-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .card-title {
@@ -49,35 +32,38 @@ h1 {
 
 .card-subtitle {
   font-size: 0.875rem;
-  color: #6c757d;
 }
 
 .card-text {
   font-size: 1rem;
-  margin-bottom: 0.5rem;
 }
 
-.badge {
-  font-size: 0.875rem;
+.input-group,
+.form-select,
+.form-control {
+  margin-bottom: 15px;
 }
 
-.btn-primary,
-.btn-danger {
-  transition: background-color 0.3s ease, transform 0.3s ease;
+.input-group .form-control {
+  border-radius: 0.25rem;
 }
 
-.btn-primary:hover,
-.btn-danger:hover {
-  transform: scale(1.05);
+.btn {
+  border-radius: 0.25rem;
 }
 
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header,
+.modal-footer {
+  border-bottom: none;
+  border-top: none;
 }
 
 .table {
-  margin-top: 1rem;
+  margin-bottom: 0;
 }
 
 .table th,
@@ -85,42 +71,35 @@ h1 {
   vertical-align: middle;
 }
 
-.modal-title {
-  font-size: 1.5rem;
-  font-weight: bold;
+.alert {
+  margin-top: 15px;
 }
 
-.modal-body p {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-}
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
 
-.modal-footer .btn {
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
+  .card-title {
+    font-size: 1rem;
+  }
 
-.modal-footer .btn:hover {
-  transform: scale(1.05);
-}
+  .card-subtitle,
+  .card-text {
+    font-size: 0.875rem;
+  }
 
-.input-group .form-control {
-  border-radius: 0.25rem 0 0 0.25rem;
-  height: calc(2.25rem + 2px); /* Ensure the height matches the button */
-}
+  .btn {
+    font-size: 0.875rem;
+  }
 
-.input-group {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
+  .modal-content {
+    padding: 10px;
+  }
 
-.input-group .btn {
-  border-radius: 0 0.25rem 0.25rem 0;
-  height: calc(2.25rem + 2px); /* Ensure the height matches the form control */
-  margin-left: 0.5rem; /* Add a small margin between the form control and the button */
-}
-
-.form-select {
-  border-radius: 0.25rem;
+  .modal-header,
+  .modal-footer {
+    padding: 10px;
+  }
 }

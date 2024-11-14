@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import apiClient from "../../utils/api-client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./CheckoutPage.css";
 
 const CheckoutPage = () => {
@@ -93,16 +95,22 @@ const CheckoutPage = () => {
     console.log("Order data:", orderData);
 
     try {
-      const response = await apiClient.post("/order", orderData);
+      const response = await apiClient.post("/order/create", orderData);
       if (paymentMethod === "zalopay") {
         const { orderUrl } = response.data;
         window.location.href = orderUrl;
       } else {
-        navigate("/order-success");
+        toast.success("Đặt hàng thành công!", {
+          onClose: () => {
+            navigate("/my-order");
+            window.location.reload();
+          },
+          autoClose: 3000,
+        });
       }
     } catch (error) {
       console.error("Error during checkout:", error);
-      alert("Có lỗi xảy ra trong quá trình đặt hàng. Vui lòng thử lại.");
+      toast.error("Có lỗi xảy ra trong quá trình đặt hàng. Vui lòng thử lại.");
     }
   };
 
@@ -119,6 +127,7 @@ const CheckoutPage = () => {
 
   return (
     <div className="container mt-4">
+      <ToastContainer />
       <h2>Thanh toán</h2>
       <div className="row">
         <div className="col-md-6">

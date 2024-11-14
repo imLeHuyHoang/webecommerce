@@ -1,4 +1,3 @@
-// auth.js (middleware)
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
@@ -20,7 +19,7 @@ exports.verifyToken = async (req, res, next) => {
       throw new Error("Invalid token version");
     }
 
-    req.user = decoded;
+    req.user = user; // Set req.user to the full user object
     next();
   } catch (error) {
     console.error("Token verification error:", error);

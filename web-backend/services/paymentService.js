@@ -1,26 +1,33 @@
-// services/paymentService.js
-
 const axios = require("axios");
 const CryptoJS = require("crypto-js");
 const qs = require("qs");
+const moment = require("moment");
 const zalopayConfig = require("../utils/zalopayConfig");
+
+function generateAppTransId() {
+  const date = new Date();
+  const yy = date.getFullYear().toString().slice(-2);
+  const mm = (date.getMonth() + 1).toString().padStart(2, "0");
+  const dd = date.getDate().toString().padStart(2, "0");
+  const random = date.getTime().toString().slice(-6);
+  return `${yy}${mm}${dd}_${random}`;
+}
 
 exports.createOrder = async (orderInfo) => {
   const order = {
-    app_id: zalopayConfig.appid,
+    app_id: parseInt(zalopayConfig.appid, 10),
     app_trans_id: orderInfo.appTransId,
-    app_user: "ZaloPayDemo",
+    app_user: orderInfo.appUserId,
     app_time: Date.now(),
-    amount: orderInfo.amount,
+    amount: parseInt(orderInfo.amount, 10),
     item: JSON.stringify(orderInfo.items || []),
     embed_data: JSON.stringify(orderInfo.embedData || {}),
-    description: `Thanh toán cho đơn hàng #${orderInfo.appTransId}`,
+    description: `Payment for order #${orderInfo.appTransId}`,
     bank_code: "",
     callback_url: zalopayConfig.callbackUrl,
-    redirect_url: zalopayConfig.redirectUrl, // Thêm dòng này
+    redirect_url: zalopayConfig.redirectUrl,
   };
 
-  // Tạo chuỗi hmac_input để tính MAC
   const hmacInput =
     order.app_id +
     "|" +
@@ -36,11 +43,9 @@ exports.createOrder = async (orderInfo) => {
     "|" +
     order.item;
 
-  // Tính MAC
   order.mac = CryptoJS.HmacSHA256(hmacInput, zalopayConfig.key1).toString();
 
   try {
-    // Gửi yêu cầu tạo đơn hàng đến ZaloPay
     const response = await axios.post(
       zalopayConfig.createOrderUrl,
       qs.stringify(order),
@@ -59,6 +64,151 @@ exports.createOrder = async (orderInfo) => {
     );
     throw new Error(
       error.response ? error.response.data.return_message : error.message
+    );
+  }
+};
+
+exports.processZaloPayPayment = async (order, productDetails) => {
+  const appTransId = generateAppTransId();
+  const orderInfo = {
+    appUserId: order.user.toString(),
+    appTransId,
+    amount: parseInt(order.total, 10),
+    items: productDetails.map((item) => ({
+      itemid: item.product.toString(),
+      itemname: item.title,
+      itemprice: parseInt(item.price, 10),
+      itemquantity: parseInt(item.quantity, 10),
+    })),
+    embedData: {
+      orderId: order._id.toString(),
+    },
+  };
+
+  try {
+    const zaloPayResponse = await this.createOrder(orderInfo);
+
+    if (zaloPayResponse.return_code === 1) {
+      order.payment.transactionId = zaloPayResponse.zp_trans_token;
+      order.payment.appTransId = appTransId;
+      await order.save();
+
+      return { success: true, orderUrl: zaloPayResponse.order_url };
+    } else {
+      console.error("ZaloPay Error:", zaloPayResponse);
+      return { success: false, message: zaloPayResponse.sub_return_message };
+    }
+  } catch (error) {
+    console.error("Error processing ZaloPay payment:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+exports.refundZaloPayOrder = async (order) => {
+  try {
+    console.log("Using zptransid for refund:", order.payment.transactionId);
+
+    const { refundResult, mRefundId } = await this.refundOrder(
+      order.payment.transactionId,
+      parseInt(order.total, 10),
+      "Order Cancellation Refund",
+      order
+    );
+
+    order.mRefundId = mRefundId; // Đảm bảo mRefundId được cập nhật
+    order.refundId = refundResult.refundid;
+    order.refundStatus =
+      refundResult.returncode === 1 ? "success" : "processing";
+    return { success: true, message: "Refund initiated", order };
+  } catch (error) {
+    console.error("Error refunding ZaloPay order:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+exports.refundOrder = async (
+  zpTransId,
+  amount,
+  description = "Customer Refund",
+  order
+) => {
+  const timestamp = Date.now();
+
+  const uid = `${timestamp}${Math.floor(111 + Math.random() * 999)}`; // unique id
+  const mRefundId = `${moment().format("YYMMDD")}_${
+    zalopayConfig.appid
+  }_${uid}`;
+
+  const data = {
+    appid: parseInt(zalopayConfig.appid, 10),
+    mrefundid: mRefundId,
+    zptransid: zpTransId,
+    amount: parseInt(amount, 10),
+    timestamp: parseInt(timestamp, 10),
+    description: description,
+  };
+
+  const dataString = `${data.appid}|${data.zptransid}|${data.amount}|${data.description}|${data.timestamp}`;
+  data.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
+
+  console.log("Refund data:", data); // Log the refund data
+
+  try {
+    const response = await axios.post(
+      zalopayConfig.refundUrl,
+      qs.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    // Lưu mrefundid vào đơn hàng
+    order.mRefundId = mRefundId;
+
+    // Trả về mRefundId cùng với refundResult
+    return { refundResult: response.data, mRefundId };
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error refunding ZaloPay order:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error(
+      error.response ? error.response.data.returnmessage : error.message
+    );
+  }
+};
+
+exports.getRefundStatus = async (mRefundId) => {
+  const timestamp = Date.now();
+
+  const params = {
+    appid: parseInt(zalopayConfig.appid, 10),
+    mrefundid: mRefundId,
+    timestamp: timestamp,
+  };
+
+  const dataString = `${params.appid}|${params.mrefundid}|${params.timestamp}`;
+
+  // Sử dụng key1 để tính toán MAC
+  params.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
+
+  try {
+    const response = await axios.get(zalopayConfig.getRefundStatusUrl, {
+      params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error getting refund status:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error(
+      error.response ? error.response.data.returnmessage : error.message
     );
   }
 };

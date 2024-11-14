@@ -1,5 +1,3 @@
-// models/Order.js
-
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
@@ -49,6 +47,9 @@ const orderSchema = new mongoose.Schema(
       isVerified: { type: Boolean, default: false },
     },
     note: { type: String, trim: true },
+    refundId: { type: String },
+    mRefundId: { type: String }, // Đảm bảo trường này có mặt trong schema
+    refundStatus: { type: String, enum: ["processing", "success", "failed"] },
   },
   { timestamps: true }
 );

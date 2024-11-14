@@ -1,34 +1,35 @@
-// routes/orderRouter.js
-
 const express = require("express");
-const { verifyToken } = require("../middleware/auth");
-const {
-  createOrder,
-  getUserOrders,
-  getOrderDetails,
-  cancelOrder,
-  requestSupport,
-  leaveReview,
-} = require("../controllers/orderController");
-
 const router = express.Router();
+const orderController = require("../controllers/orderController");
+const authMiddleware = require("../middleware/auth");
 
-// Tạo đơn hàng mới
-router.post("/", verifyToken, createOrder);
+router.post("/create", authMiddleware.verifyToken, orderController.createOrder);
+router.get("/", authMiddleware.verifyToken, orderController.getUserOrders);
+router.get(
+  "/:orderId",
+  authMiddleware.verifyToken,
+  orderController.getOrderDetails
+);
+router.patch(
+  "/:orderId/cancel",
+  authMiddleware.verifyToken,
+  orderController.cancelOrder
+);
+router.post(
+  "/:orderId/support",
+  authMiddleware.verifyToken,
+  orderController.requestSupport
+);
+router.post(
+  "/:orderId/review",
+  authMiddleware.verifyToken,
+  orderController.leaveReview
+);
 
-// Danh sách đơn hàng của người dùng
-router.get("/", verifyToken, getUserOrders);
-
-// Chi tiết đơn hàng
-router.get("/:orderId", verifyToken, getOrderDetails);
-
-// Hủy đơn hàng
-router.patch("/:orderId/cancel", verifyToken, cancelOrder);
-
-// Yêu cầu hỗ trợ
-router.post("/:orderId/support", verifyToken, requestSupport);
-
-// Đánh giá sản phẩm
-router.post("/:orderId/review", verifyToken, leaveReview);
+router.get(
+  "/:orderId/refund-status",
+  authMiddleware.verifyToken,
+  orderController.getRefundStatus
+);
 
 module.exports = router;

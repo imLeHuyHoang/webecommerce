@@ -117,6 +117,7 @@ exports.loginUser = async (req, res) => {
 };
 
 // Đăng xuất
+// Đăng xuất
 exports.logoutUser = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
@@ -131,11 +132,13 @@ exports.logoutUser = async (req, res) => {
       }
     }
 
-    // Clear cookie regardless of token presence
-    res.clearCookie(
-      "refreshToken",
-      getCookieConfig(process.env.NODE_ENV === "production")
-    );
+    // Clear cookie without maxAge option
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      path: "/",
+    });
     res.status(200).json({ message: "Đăng xuất thành công." });
   } catch (error) {
     console.error("Logout error:", error);
@@ -213,6 +216,7 @@ exports.refreshToken = async (req, res) => {
     res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn." });
   }
 };
+
 // Đăng nhập bằng Google
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);

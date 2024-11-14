@@ -1,120 +1,75 @@
-// controllers/orderController.js
-
-const paymentService = require("../services/paymentService");
-const Product = require("../models/Product");
 const Order = require("../models/Order");
+const Product = require("../models/Product");
+const paymentService = require("../services/paymentService");
+const Cart = require("../models/Cart");
 
 exports.createOrder = async (req, res) => {
   try {
     const { shippingAddress, products, paymentMethod } = req.body;
-    if (!["cod", "zalopay"].includes(paymentMethod)) {
-      return res.status(400).json({ message: "Invalid payment method" });
+
+    if (!shippingAddress || !products || products.length === 0) {
+      return res.status(400).json({ message: "Invalid order information." });
     }
-    // Validate input and calculate total amount
+
     const productDetails = await Promise.all(
       products.map(async (item) => {
-        const productData = await Product.findById(item.product);
-        if (!productData) {
-          throw new Error(`Product ${item.product} not found`);
+        const product = await Product.findById(item.product);
+        if (!product) {
+          throw new Error(`Product with ID: ${item.product} not found`);
         }
         return {
-          product: item.product,
+          product: product._id,
+          title: product.title,
+          price: product.price,
           quantity: item.quantity,
-          price: productData.price,
         };
       })
     );
 
-    const total = productDetails.reduce(
-      (acc, item) => acc + item.price * item.quantity,
+    const totalAmount = productDetails.reduce(
+      (total, item) => total + item.price * item.quantity,
       0
     );
 
-    // Create the order in MongoDB
     const order = await Order.create({
-      user: req.user.id,
+      user: req.user._id, // Ensure the user field is included
       shippingAddress,
-      products: productDetails,
-      total,
+      products: productDetails.map((item) => ({
+        product: item.product,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      total: totalAmount,
       payment: { method: paymentMethod, isVerified: false },
-      paymentStatus: "pending", // Use the new paymentStatus field
-      shippingStatus: "processing", // Use the new shippingStatus field
+      paymentStatus: "pending",
+      shippingStatus: "processing",
     });
 
-    // Integrate with ZaloPay if the payment method is ZaloPay
     if (paymentMethod === "zalopay") {
-      const zaloPayOrder = await createOrderWithZaloPay(order);
-
-      // Save transaction information in the order
-      order.payment.transactionId = zaloPayOrder.order_token;
-      order.payment.appTransId = zaloPayOrder.app_trans_id;
-      await order.save();
-
-      return res.status(201).json({ orderUrl: zaloPayOrder.order_url });
+      const paymentResult = await paymentService.processZaloPayPayment(
+        order,
+        productDetails
+      );
+      if (paymentResult.success) {
+        return res.status(201).json({ orderUrl: paymentResult.orderUrl });
+      } else {
+        return res.status(400).json({ message: paymentResult.message });
+      }
     }
 
-    // Handle other payment methods (e.g., COD)
+    await order.save();
+
     res.status(201).json({ message: "Order created successfully." });
   } catch (error) {
     console.error("Error creating order:", error);
-    res.status(500).json({ message: error.message });
+    if (!res.headersSent) {
+      res
+        .status(500)
+        .json({ message: "Server error. Please try again later." });
+    }
   }
 };
 
-async function createOrderWithZaloPay(order) {
-  const appTransId = generateAppTransId();
-
-  // Retrieve product information for the item names
-  const items = await Promise.all(
-    order.products.map(async (item) => {
-      const productData = await Product.findById(item.product);
-      if (!productData) {
-        throw new Error(`Product ${item.product} not found`);
-      }
-      return {
-        itemid: item.product.toString(),
-        itemname: productData.title,
-        itemprice: item.price,
-        itemquantity: item.quantity,
-      };
-    })
-  );
-
-  const orderInfo = {
-    amount: order.total,
-    appTransId,
-    items,
-    embedData: {
-      orderId: order._id.toString(),
-    },
-  };
-
-  console.log("Order Info:", orderInfo);
-
-  const zaloPayResponse = await paymentService.createOrder(orderInfo);
-
-  if (zaloPayResponse.return_code === 1) {
-    return {
-      order_url: zaloPayResponse.order_url,
-      order_token: zaloPayResponse.zp_trans_token,
-      app_trans_id: appTransId,
-    };
-  } else {
-    console.error("ZaloPay Error:", zaloPayResponse);
-    throw new Error(zaloPayResponse.return_message);
-  }
-}
-
-function generateAppTransId() {
-  const date = new Date();
-  const yy = date.getFullYear().toString().slice(-2);
-  const mm = (date.getMonth() + 1).toString().padStart(2, "0");
-  const dd = date.getDate().toString().padStart(2, "0");
-  const time = date.getTime().toString().slice(-6);
-  return `${yy}${mm}${dd}_${time}`;
-}
-
-// 1. List all orders for the authenticated user
 exports.getUserOrders = async (req, res) => {
   try {
     const { status, startDate, endDate, page = 1, limit = 10 } = req.query;
@@ -161,44 +116,55 @@ exports.getOrderDetails = async (req, res) => {
     res.status(500).json({ message: "Error fetching order details" });
   }
 };
-
-// 3. Cancel an order if it's still processing
 exports.cancelOrder = async (req, res) => {
   try {
+    const { orderId } = req.params;
+    const userId = req.user.id;
+
+    console.log(
+      `Attempting to cancel order with ID: ${orderId} for user ID: ${userId}`
+    );
+
     const order = await Order.findOne({
-      _id: req.params.orderId,
-      user: req.user.id,
+      _id: orderId,
+      user: userId,
     });
+
     if (!order) {
+      console.error(
+        `Order with ID: ${orderId} not found for user ID: ${userId}`
+      );
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Only allow cancellation if the order is still processing
     if (order.shippingStatus !== "processing") {
       return res.status(400).json({ message: "Cannot cancel this order" });
     }
 
     if (order.paymentStatus === "paid" && order.payment.method === "zalopay") {
       // Initiate refund process with ZaloPay
-      const refundResult = await paymentService.refundOrder(
-        order.payment.appTransId,
-        order.total
-      );
+      const refundResult = await paymentService.refundZaloPayOrder(order);
 
-      if (refundResult.return_code !== 1) {
+      if (!refundResult.success) {
+        console.error("Refund failed:", refundResult.message);
         return res.status(500).json({
           message: "Refund failed",
-          error: refundResult.return_message,
+          error: refundResult.message,
         });
       }
 
+      // Cập nhật trạng thái đơn hàng
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
+
+      // Lưu order một lần duy nhất
       await order.save();
 
-      return res
-        .status(200)
-        .json({ message: "Order cancelled and refund initiated successfully" });
+      return res.status(200).json({
+        message:
+          refundResult.message ||
+          "Order cancelled and refund initiated successfully",
+      });
     } else {
       // For unpaid orders or COD payment method
       order.paymentStatus = "cancelled";
@@ -212,14 +178,10 @@ exports.cancelOrder = async (req, res) => {
     res.status(500).json({ message: "Error cancelling order" });
   }
 };
-
-// 4. Placeholder for requesting support for an order
-
 exports.requestSupport = async (req, res) => {
   try {
     const { message } = req.body;
 
-    // Save support request to database
     await SupportRequest.create({
       user: req.user.id,
       order: req.params.orderId,
@@ -233,7 +195,6 @@ exports.requestSupport = async (req, res) => {
   }
 };
 
-// 5. Placeholder for leaving a review for a product
 exports.leaveReview = async (req, res) => {
   const { productId, rating, comment } = req.body;
 
@@ -255,7 +216,6 @@ exports.leaveReview = async (req, res) => {
       return res.status(400).json({ message: "Product not found in order" });
     }
 
-    // Create or update the review
     const review = await Review.findOneAndUpdate(
       { user: req.user.id, product: productId },
       { rating, comment },
@@ -266,5 +226,66 @@ exports.leaveReview = async (req, res) => {
   } catch (error) {
     console.error("Error submitting review:", error);
     res.status(500).json({ message: "Error submitting review" });
+  }
+};
+// orderController.js
+
+exports.getRefundStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userId = req.user.id;
+
+    const order = await Order.findOne({
+      _id: orderId,
+      user: userId,
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (!order.refundId || !order.mRefundId) {
+      return res
+        .status(400)
+        .json({ message: "Order has no refund information" });
+    }
+
+    const refundStatusResponse = await paymentService.getRefundStatus(
+      order.mRefundId
+    );
+
+    // Xử lý returncode để hiển thị trạng thái dễ hiểu
+    let refundStatusText = "";
+    switch (refundStatusResponse.returncode) {
+      case 1:
+        refundStatusText = "success";
+        break;
+      case 2:
+        refundStatusText = "processing";
+        break;
+      case 0:
+        refundStatusText = "failed";
+        break;
+      case -1:
+        refundStatusText = "failed";
+        break;
+      default:
+        refundStatusText = "Không xác định";
+    }
+
+    // Cập nhật trạng thái hoàn tiền trong cơ sở dữ liệu
+    order.refundStatus = refundStatusText;
+    await order.save();
+
+    res.status(200).json({
+      orderId: order._id,
+      refundStatus: refundStatusText,
+      message: refundStatusResponse.returnmessage,
+      mRefundId: order.mRefundId,
+      rawData: refundStatusResponse,
+    });
+  } catch (error) {
+    console.error("Error getting refund status:", error);
+    res.status(500).json({ message: "Error getting refund status" });
   }
 };
