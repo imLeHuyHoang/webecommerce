@@ -31,7 +31,6 @@ app.use(cookieParser());
 
 // Static file serving
 app.use("/category", express.static(__dirname + "/upload/category"));
-app.use("/profile", express.static(__dirname + "/upload/profiles"));
 app.use("/products", express.static(__dirname + "/upload/products"));
 app.use("/images", express.static(__dirname + "/upload/products"));
 
