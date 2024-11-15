@@ -276,12 +276,7 @@ exports.loginUserAdmin = async (req, res) => {
         .json({ message: "Không có quyền truy cập admin." });
     }
 
-    const accessToken = generateToken(user, process.env.JWT_SECRET, "15m");
-    const refreshToken = generateToken(
-      user,
-      process.env.JWT_REFRESHSECRET,
-      "7d"
-    );
+    const { accessToken, refreshToken } = generateTokens(user);
 
     user.refreshToken = refreshToken;
     await user.save();
@@ -303,6 +298,7 @@ exports.loginUserAdmin = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error in loginUserAdmin:", error);
     res.status(500).json({ error: error.message });
   }
 };
