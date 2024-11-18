@@ -11,7 +11,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { z } from "zod";
-import ToastNotification from "../../utils/ToastNotification";
+import ToastNotification from "../ToastNotification/ToastNotification";
 
 // Define the validation schema using zod
 const userSchema = z.object({

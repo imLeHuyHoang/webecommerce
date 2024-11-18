@@ -5,10 +5,12 @@ import apiClient from "../../utils/api-client";
 import ProductSidebarSkeleton from "./Skeleton/ProductSidebarSkeleton";
 
 function ProductSidebar({ onCategoryChange }) {
+  // Khai báo state để lưu trữ danh mục, trạng thái loading và lỗi
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Sử dụng useEffect để gọi API lấy danh sách danh mục khi component được render lần đầu
   useEffect(() => {
     apiClient
       .get("/category")
@@ -24,10 +26,12 @@ function ProductSidebar({ onCategoryChange }) {
       });
   }, []);
 
+  // Hàm xử lý khi người dùng click vào một danh mục
   const handleCategoryClick = (categoryName) => {
     onCategoryChange(categoryName);
   };
 
+  // Render giao diện của component
   return (
     <div className="col-md-4 col-lg-3 mb-4">
       <h2 className="category mb-4">Category</h2>
@@ -63,4 +67,5 @@ function ProductSidebar({ onCategoryChange }) {
   );
 }
 
+// Xuất component ProductSidebar
 export default ProductSidebar;

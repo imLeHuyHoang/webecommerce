@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import apiClient from "../../utils/api-client";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import ToastNotification from "../../utils/ToastNotification";
+import ToastNotification from "../ToastNotification/ToastNotification";
 import "./Profile.css";
 
 const Profile = () => {

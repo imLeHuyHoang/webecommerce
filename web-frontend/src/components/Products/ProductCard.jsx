@@ -3,7 +3,7 @@ import "./ProductCard.css";
 import { NavLink } from "react-router-dom";
 import apiClient from "../../utils/api-client";
 import { useCart } from "../../context/CartContext";
-import ToastNotification from "../../utils/ToastNotification"; // Import ToastNotification
+import ToastNotification from "../ToastNotification/ToastNotification"; // Import ToastNotification
 
 function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
   const { incrementCartCount } = useCart();

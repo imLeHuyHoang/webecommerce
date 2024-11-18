@@ -15,7 +15,7 @@ import Dashboard from "../Admin/Dashboard.jsx";
 import UserManagement from "../Admin/UserManagement.jsx";
 import ProductManagement from "../Admin/ProductManagement.jsx";
 import OrderManagement from "../Admin/OrderManagement.jsx";
-import AdminLogin from "../Admin/AdminLogin.jsx";
+import AdminLogin from "../Admin/adminlogin/AdminLogin";
 import AdminRoute from "../Admin/AdminRoute.jsx";
 import CheckoutPage from "../Cart/checkoutPage.jsx";
 import PaymentResult from "../PaymentResult.jsx";

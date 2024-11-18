@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import apiClient from "../../../utils/api-client";
 import { useCart } from "../../../context/CartContext";
-import ToastNotification from "../../../utils/ToastNotification";
+import ToastNotification from "../../ToastNotification/ToastNotification";
 import "./SingleProductPage.css";
 
 const SingleProductPage = () => {

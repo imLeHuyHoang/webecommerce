@@ -18,6 +18,7 @@ const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const attributeRoutes = require("./routes/attributeRoutes");
 
 // Middleware setup
 app.use(morgan("dev"));
@@ -29,18 +30,19 @@ app.use(
 );
 app.use(cookieParser());
 
-// Static file serving
-app.use("/category", express.static(__dirname + "/upload/category"));
-app.use("/products", express.static(__dirname + "/upload/products"));
-app.use("/images", express.static(__dirname + "/upload/products"));
-
-// Route registration
 app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/attributes", attributeRoutes);
+
+// Static file serving
+app.use("/category", express.static(__dirname + "/upload/category"));
+app.use("/products", express.static(__dirname + "/upload/products"));
+
+// Route registration
 
 // Error handling middleware
 app.use((err, req, res, next) => {
