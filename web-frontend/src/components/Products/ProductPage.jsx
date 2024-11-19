@@ -22,6 +22,7 @@ const ProductPage = () => {
     navigate({ search: searchParams.toString() });
   };
   console.log("location", location);
+  console.log("productList", selectedCategoryName);
 
   // Render giao diện của component
   return (

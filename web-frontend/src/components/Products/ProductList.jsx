@@ -16,7 +16,7 @@ const ProductList = ({ selectedCategoryName }) => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await apiClient.get("/product", {
+        const response = await apiClient.get("/api/products", {
           params: {
             category: selectedCategoryName || undefined,
             page: page,
@@ -36,7 +36,7 @@ const ProductList = ({ selectedCategoryName }) => {
   }, [page, selectedCategoryName]);
 
   const handlePageClick = (pageNumber) => {
-    if (pageNumber !== page) {
+    if (pageNumber !== page && pageNumber > 0 && pageNumber <= totalPages) {
       setPage(pageNumber);
     }
   };

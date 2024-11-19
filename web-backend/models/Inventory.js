@@ -7,10 +7,13 @@ const inventorySchema = new mongoose.Schema(
       ref: "Product", // Tham chiếu đến bảng Product
       required: true,
     },
-    location: {
-      type: String,
-      required: true, // Địa điểm kho chứa (e.g., "Hanoi Warehouse", "HCM Warehouse")
-    },
+    location: [
+      {
+        type: String,
+        required: true,
+        trim: true,
+      },
+    ],
     quantity: {
       type: Number,
       required: true,

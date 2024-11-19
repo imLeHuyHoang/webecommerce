@@ -19,6 +19,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const attributeRoutes = require("./routes/attributeRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
 
 // Middleware setup
 app.use(morgan("dev"));
@@ -37,6 +38,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/attributes", attributeRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 // Static file serving
 app.use("/category", express.static(__dirname + "/upload/category"));
