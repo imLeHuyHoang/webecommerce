@@ -13,6 +13,7 @@ const ManageInventory = () => {
   const [selectedInventory, setSelectedInventory] = useState(null);
   const [form, setForm] = useState({
     product: "",
+    productCode: "",
     location: "",
     quantity: "",
   });
@@ -20,11 +21,13 @@ const ManageInventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
 
+  // Lấy dữ liệu tồn kho và sản phẩm khi component được mount
   useEffect(() => {
     fetchInventories();
     fetchProducts();
   }, []);
 
+  // Hàm lấy dữ liệu tồn kho từ server
   const fetchInventories = async () => {
     setLoading(true);
     try {
@@ -37,6 +40,7 @@ const ManageInventory = () => {
     }
   };
 
+  // Hàm lấy dữ liệu sản phẩm từ server
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/product`);
@@ -46,10 +50,12 @@ const ManageInventory = () => {
     }
   };
 
+  // Hàm xử lý khi nhấn nút thêm tồn kho
   const handleAddInventory = () => {
     setSelectedInventory(null);
     setForm({
       product: "",
+      productCode: "",
       location: "",
       quantity: "",
     });
@@ -57,10 +63,12 @@ const ManageInventory = () => {
     setShowModal(true);
   };
 
+  // Hàm xử lý khi nhấn nút sửa tồn kho
   const handleEditInventory = (inventory) => {
     setSelectedInventory(inventory);
     setForm({
       product: inventory.product._id,
+      productCode: inventory.product.code,
       location: inventory.location,
       quantity: inventory.quantity,
     });
@@ -68,9 +76,9 @@ const ManageInventory = () => {
     setShowModal(true);
   };
 
+  // Hàm xử lý khi nhấn nút xóa tồn kho
   const handleDeleteInventory = async (inventoryId) => {
-    if (!window.confirm("Are you sure you want to delete this inventory?"))
-      return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa tồn kho này không?")) return;
     try {
       await axios.delete(`${API_BASE_URL}/inventory/${inventoryId}`);
       fetchInventories();
@@ -79,26 +87,31 @@ const ManageInventory = () => {
     }
   };
 
+  // Hàm xử lý khi lưu tồn kho
   const handleSaveInventory = async (e) => {
     e.preventDefault();
+    console.log("Dữ liệu gửi:", form); // Log dữ liệu để kiểm tra
+
     try {
       if (selectedInventory) {
-        // Update inventory
+        // Cập nhật tồn kho
         await axios.put(
           `${API_BASE_URL}/inventory/${selectedInventory._id}`,
           form
         );
       } else {
-        // Add new inventory
+        // Thêm tồn kho mới
         await axios.post(`${API_BASE_URL}/inventory`, form);
       }
       setShowModal(false);
       fetchInventories();
     } catch (error) {
+      console.error("Lỗi API:", error.response.data); // Log lỗi để kiểm tra
       setError(error.message);
     }
   };
 
+  // Hàm xử lý khi thay đổi giá trị trong form
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -106,40 +119,34 @@ const ManageInventory = () => {
     });
   };
 
-  const handleProductSearch = async (e) => {
+  // Hàm xử lý tìm kiếm sản phẩm
+  const handleProductSearch = (e) => {
     const code = e.target.value;
-    setForm({ ...form, product: code });
+    setForm({ ...form, productCode: code }); // Hiển thị mã sản phẩm trong input
 
     if (code.length > 0) {
       const filtered = products.filter((product) =>
         product.code.toLowerCase().startsWith(code.toLowerCase())
       );
       setFilteredProducts(filtered);
-
-      if (
-        filtered.length === 1 &&
-        filtered[0].code.toLowerCase() === code.toLowerCase()
-      ) {
-        setProductInfo(filtered[0]);
-      } else {
-        setProductInfo(null);
-      }
     } else {
       setFilteredProducts([]);
-      setProductInfo(null);
     }
   };
 
+  // Hàm xử lý khi chọn sản phẩm từ danh sách
   const handleProductSelect = (product) => {
-    setForm({ ...form, product: product.code });
-    setProductInfo(product);
+    setForm({ ...form, product: product._id, productCode: product.code }); // Lưu _id vào form.product và hiển thị code trong input
+    setProductInfo(product); // Hiển thị thông tin sản phẩm
     setFilteredProducts([]);
   };
 
+  // Hàm xử lý khi thay đổi giá trị tìm kiếm
   const handleSearchTermChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
+  // Lọc danh sách tồn kho theo từ khóa tìm kiếm
   const filteredInventories = inventories.filter((inventory) => {
     return (
       inventory.product.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -150,15 +157,15 @@ const ManageInventory = () => {
     );
   });
 
-  //in ra data gửi đến server
+  // In ra dữ liệu gửi đến server
   console.log(form);
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Inventory Management</h2>
+        <h2>Quản lý tồn kho</h2>
         <button className="btn btn-primary" onClick={handleAddInventory}>
-          Add New Inventory
+          Thêm tồn kho mới
         </button>
       </div>
 
@@ -166,7 +173,7 @@ const ManageInventory = () => {
         <input
           type="text"
           className="form-control"
-          placeholder="Search by product code, name, or category"
+          placeholder="Tìm kiếm theo mã sản phẩm, tên, hoặc danh mục"
           value={searchTerm}
           onChange={handleSearchTermChange}
         />
@@ -175,16 +182,16 @@ const ManageInventory = () => {
       {error && <div className="alert alert-danger">{error}</div>}
 
       {loading ? (
-        <div>Loading...</div>
+        <div>Đang tải...</div>
       ) : (
         <table className="table table-striped table-bordered">
           <thead className="thead-dark">
             <tr>
-              <th>Product</th>
-              <th>Location</th>
-              <th>Quantity</th>
-              <th>Last Updated</th>
-              <th>Actions</th>
+              <th>Sản phẩm</th>
+              <th>Địa điểm</th>
+              <th>Số lượng</th>
+              <th>Cập nhật lần cuối</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -199,13 +206,13 @@ const ManageInventory = () => {
                     className="btn btn-warning btn-sm"
                     onClick={() => handleEditInventory(inventory)}
                   >
-                    Edit
+                    Sửa
                   </button>{" "}
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={() => handleDeleteInventory(inventory._id)}
                   >
-                    Delete
+                    Xóa
                   </button>
                 </td>
               </tr>
@@ -220,7 +227,7 @@ const ManageInventory = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {selectedInventory ? "Edit Inventory" : "Add New Inventory"}
+                  {selectedInventory ? "Sửa tồn kho" : "Thêm tồn kho mới"}
                 </h5>
                 <button
                   type="button"
@@ -232,14 +239,14 @@ const ManageInventory = () => {
                 <form onSubmit={handleSaveInventory}>
                   <div className="mb-3">
                     <label htmlFor="product" className="form-label">
-                      Product Code
+                      Mã sản phẩm
                     </label>
                     <input
                       type="text"
                       className="form-control"
                       id="product"
-                      name="product"
-                      value={form.product}
+                      name="productCode"
+                      value={form.productCode}
                       onChange={handleProductSearch}
                       required
                     />
@@ -260,19 +267,19 @@ const ManageInventory = () => {
                   {productInfo && (
                     <div className="mb-3">
                       <p>
-                        <strong>Product Name:</strong> {productInfo.name}
+                        <strong>Tên sản phẩm:</strong> {productInfo.name}
                       </p>
                       <p>
-                        <strong>Category:</strong> {productInfo.category.name}
+                        <strong>Danh mục:</strong> {productInfo.category.name}
                       </p>
                       <p>
-                        <strong>Price:</strong> ${productInfo.price}
+                        <strong>Giá:</strong> ${productInfo.price}
                       </p>
                     </div>
                   )}
                   <div className="mb-3">
                     <label htmlFor="location" className="form-label">
-                      Location
+                      Địa điểm
                     </label>
                     <input
                       type="text"
@@ -286,7 +293,7 @@ const ManageInventory = () => {
                   </div>
                   <div className="mb-3">
                     <label htmlFor="quantity" className="form-label">
-                      Quantity
+                      Số lượng
                     </label>
                     <input
                       type="number"
@@ -304,10 +311,10 @@ const ManageInventory = () => {
                       className="btn btn-secondary me-2"
                       onClick={() => setShowModal(false)}
                     >
-                      Cancel
+                      Hủy
                     </button>
                     <button type="submit" className="btn btn-primary">
-                      {selectedInventory ? "Update Inventory" : "Add Inventory"}
+                      {selectedInventory ? "Cập nhật tồn kho" : "Thêm tồn kho"}
                     </button>
                   </div>
                 </form>

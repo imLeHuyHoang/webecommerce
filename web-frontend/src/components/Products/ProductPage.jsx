@@ -1,8 +1,8 @@
-// ProductPage.js
 import React from "react";
 import ProductSidebar from "./ProductSidebar";
 import ProductList from "./ProductList";
 import { useLocation, useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const ProductPage = () => {
   // Lấy thông tin về URL hiện tại
@@ -19,19 +19,22 @@ const ProductPage = () => {
     // Cập nhật giá trị của tham số category trong URL
     searchParams.set("category", category);
     // Điều hướng đến URL mới với tham số category đã được cập nhật
+
     navigate({ search: searchParams.toString() });
   };
-  console.log("location", location);
-  console.log("productList", selectedCategoryName);
 
   // Render giao diện của component
   return (
-    <div className="container-fluid mt-4">
+    <div className="container-fluid">
       <div className="row">
-        {/* Truyền hàm handleCategoryChange vào ProductSidebar */}
-        <ProductSidebar onCategoryChange={handleCategoryChange} />
-        {/* Truyền giá trị danh mục được chọn vào ProductList */}
-        <ProductList selectedCategoryName={selectedCategoryName} />
+        <div className="col-md-3">
+          {/* Truyền hàm handleCategoryChange vào ProductSidebar */}
+          <ProductSidebar onCategoryChange={handleCategoryChange} />
+        </div>
+        <div className="col-md-9">
+          {/* Truyền giá trị danh mục được chọn vào ProductList */}
+          <ProductList selectedCategoryName={selectedCategoryName} />
+        </div>
       </div>
     </div>
   );

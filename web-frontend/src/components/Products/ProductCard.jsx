@@ -1,11 +1,23 @@
 import React, { useState } from "react";
-import "./ProductCard.css";
 import { NavLink } from "react-router-dom";
 import apiClient from "../../utils/api-client";
 import { useCart } from "../../context/CartContext";
-import ToastNotification from "../ToastNotification/ToastNotification"; // Import ToastNotification
+import ToastNotification from "../ToastNotification/ToastNotification";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./ProductCard.css";
 
-function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
+function ProductCard({
+  id,
+  title,
+  price,
+  stock,
+  rating,
+  ratingCount,
+  image,
+  description,
+  brand,
+  category,
+}) {
   const { incrementCartCount } = useCart();
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -45,14 +57,15 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
         show={showToast}
         onClose={() => setShowToast(false)}
       />
-      <article className="product_card">
-        <div className="product_image">
+      <div className="product-card">
+        <div className="card shadow-sm">
           <NavLink to={`/product/${id}`}>
             <img
               src={`${import.meta.env.VITE_API_BASE_URL.replace(
                 "/api",
                 ""
-              )}/products/${image}`} // Sử dụng biến môi trường
+              )}/products/${image}`}
+              className="card-img-top product-image"
               alt={title}
               onError={(e) => {
                 e.target.onerror = null;
@@ -60,26 +73,39 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
               }}
             />
           </NavLink>
+          <div className="card-body">
+            <h5 className="card-title product-title">{title}</h5>
+            <p className="card-text product-description text-muted">
+              {description}
+            </p>
+            <p className="product-price text-primary fw-bold">
+              {formatPrice(price)}
+            </p>
+            <p className="card-text">
+              <small className="text-muted">Brand: {brand}</small>
+            </p>
+            <p className="card-text">
+              <small className="text-muted">Category: {category.name}</small>
+            </p>
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="text-warning product-rating">
+                {"★".repeat(Math.round(rating))}
+                {"☆".repeat(5 - Math.round(rating))}
+                <span className="text-muted"> ({ratingCount})</span>
+              </div>
+              <button
+                onClick={addToCart}
+                className={`btn btn-primary btn-sm ${
+                  stock > 0 ? "" : "disabled"
+                }`}
+                disabled={stock === 0}
+              >
+                {stock > 0 ? "Buy Now" : "Out of Stock"}
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="product_details">
-          <h3 className="product_title">{title}</h3>
-          <p className="product_price">{formatPrice(price)}</p>
-          <footer className="align_center product_infor_footer">
-            <div className="product_rating">{"★" + rating.toFixed(1)}</div>
-            <span className="rating_count">({ratingCount} reviews)</span>
-          </footer>
-          <button
-            onClick={addToCart}
-            className={`buy_now_button ${stock > 0 ? "" : "disabled"}`}
-            disabled={stock === 0}
-          >
-            <span className="text">
-              {stock > 0 ? "Buy Now" : "Out of Stock"}
-            </span>
-            <span>Add to Cart</span>
-          </button>
-        </div>
-      </article>
+      </div>
     </>
   );
 }
