@@ -1,44 +1,54 @@
-import React from "react";
+// ProductPage.jsx
+import React, { useState, useEffect } from "react";
 import ProductSidebar from "./ProductSidebar";
 import ProductList from "./ProductList";
 import { useLocation, useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "./ProductPage.css";
 
 const ProductPage = () => {
-  // Lấy thông tin về URL hiện tại
   const location = useLocation();
-  // Sử dụng để điều hướng
   const navigate = useNavigate();
 
-  // Lấy tham số category từ URL
-  const searchParams = new URLSearchParams(location.search);
-  const selectedCategoryName = searchParams.get("category");
+  const [filters, setFilters] = useState({});
 
-  // Hàm thay đổi danh mục sản phẩm
-  const handleCategoryChange = (category) => {
-    // Cập nhật giá trị của tham số category trong URL
-    searchParams.set("category", category);
-    // Điều hướng đến URL mới với tham số category đã được cập nhật
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    setFilters({
+      category: searchParams.get("category") || "",
+      search: searchParams.get("search") || "",
+      brand: searchParams.get("brand") || "",
+      price: searchParams.get("price") || "",
+      rating: searchParams.get("rating") || "",
+    });
+  }, [location.search]);
 
+  const updateFilters = (filterKey, filterValue) => {
+    const newFilters = { ...filters, [filterKey]: filterValue };
+
+    // Cập nhật URL
+    const searchParams = new URLSearchParams(location.search);
+    if (filterValue) {
+      searchParams.set(filterKey, filterValue);
+    } else {
+      searchParams.delete(filterKey);
+    }
     navigate({ search: searchParams.toString() });
   };
 
-  // Render giao diện của component
+  const handleCategoryChange = (category) => {
+    updateFilters("category", category);
+  };
+
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-3">
-          {/* Truyền hàm handleCategoryChange vào ProductSidebar */}
-          <ProductSidebar onCategoryChange={handleCategoryChange} />
-        </div>
-        <div className="col-md-9">
-          {/* Truyền giá trị danh mục được chọn vào ProductList */}
-          <ProductList selectedCategoryName={selectedCategoryName} />
-        </div>
-      </div>
+    <div className="product-page">
+      <ProductSidebar
+        onCategoryChange={handleCategoryChange}
+        onFilterChange={updateFilters}
+        filters={filters}
+      />
+      <ProductList filters={filters} />
     </div>
   );
 };
 
-// Xuất component ProductPage
 export default ProductPage;

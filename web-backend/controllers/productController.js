@@ -13,9 +13,10 @@ const Category = require("../models/Category");
  */
 exports.getAllProducts = async (req, res) => {
   try {
-    const { category } = req.query;
+    const { category, search, brand, price, rating } = req.query;
     const query = {};
 
+    // Lọc theo danh mục
     if (category) {
       const categoryObj = await Category.findOne({ name: category });
       if (categoryObj) {
@@ -25,8 +26,36 @@ exports.getAllProducts = async (req, res) => {
       }
     }
 
+    // Tìm kiếm
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { code: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Lọc theo thương hiệu
+    if (brand) {
+      query.brand = { $regex: brand, $options: "i" };
+    }
+
+    // Lọc theo khoảng giá
+    if (price) {
+      const [minPrice, maxPrice] = price.split("-");
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // Lọc theo đánh giá
+    if (rating) {
+      query.averageRating = { $gte: Number(rating) };
+    }
+
     const products = await Product.find(query).populate("category", "name");
 
+    // Lấy thông tin kho hàng cho từng sản phẩm
     const productsWithInventory = await Promise.all(
       products.map(async (product) => {
         const inventory = await Inventory.findOne({ product: product._id });
@@ -36,7 +65,7 @@ exports.getAllProducts = async (req, res) => {
         };
       })
     );
-    console.log("Products with inventory:", productsWithInventory);
+
     res.json(productsWithInventory);
   } catch (error) {
     console.error("Error fetching products:", error);
