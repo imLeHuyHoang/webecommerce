@@ -20,10 +20,15 @@ const orderSchema = new mongoose.Schema(
           required: true,
         },
         quantity: { type: Number, required: true, min: 1 },
-        price: { type: Number, required: true },
+        price: { type: Number, required: true }, // Giá tại thời điểm mua
+        discount: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Discount", // Tham chiếu đến bảng Discount
+          default: null,
+        },
       },
     ],
-    total: { type: Number, required: true, min: 0 },
+    total: { type: Number, required: true, min: 0 }, // Tổng số tiền đơn hàng
 
     paymentStatus: {
       type: String,
@@ -47,9 +52,23 @@ const orderSchema = new mongoose.Schema(
       isVerified: { type: Boolean, default: false },
     },
     note: { type: String, trim: true },
-    refundId: { type: String },
-    mRefundId: { type: String }, // Đảm bảo trường này có mặt trong schema
-    refundStatus: { type: String, enum: ["processing", "success", "failed"] },
+
+    refund: {
+      refundId: { type: String }, // Mã hoàn tiền từ phía ngân hàng hoặc ZaloPay
+      mRefundId: { type: String }, // Mã hoàn tiền từ hệ thống nội bộ
+      status: {
+        type: String,
+        enum: ["processing", "success", "failed"],
+      },
+      amount: { type: Number, min: 0 }, // Số tiền được hoàn lại
+    },
+
+    timestamps: {
+      paymentDate: { type: Date }, // Ngày thanh toán
+      shippingDate: { type: Date }, // Ngày giao hàng
+      deliveryDate: { type: Date }, // Ngày hoàn tất giao hàng
+      cancelledDate: { type: Date }, // Ngày hủy đơn hàng
+    },
   },
   { timestamps: true }
 );

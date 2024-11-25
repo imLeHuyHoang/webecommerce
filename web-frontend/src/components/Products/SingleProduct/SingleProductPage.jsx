@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import apiClient from "../../../utils/api-client";
 import { useCart } from "../../../context/CartContext";
-import ToastNotification from "../../../utils/ToastNotification";
+import ToastNotification from "../../ToastNotification/ToastNotification";
 import "./SingleProductPage.css";
 
 const SingleProductPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { incrementCartCount } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [mainImage, setMainImage] = useState(""); // Thêm state cho ảnh chính
-  const [selectedImage, setSelectedImage] = useState(null); // State cho việc chọn ảnh con
+  const [mainImage, setMainImage] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0); // Track the current slide index
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [showAttributes, setShowAttributes] = useState(false); // State to show/hide attributes modal
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await apiClient.get(`/product/${id}`);
         setProduct(response.data);
-        setMainImage(response.data.images[0]); // Đặt ảnh chính ban đầu
+        setMainImage(response.data.images[0]);
       } catch (err) {
-        setError("Không thể tải sản phẩm.");
+        setError("Unable to load the product.");
       } finally {
         setLoading(false);
       }
@@ -33,13 +33,9 @@ const SingleProductPage = () => {
     fetchProduct();
   }, [id]);
 
-  const handleIncrease = () => {
+  const handleIncrease = () =>
     setQuantity((prev) => Math.min(prev + 1, product.stock));
-  };
-
-  const handleDecrease = () => {
-    setQuantity((prev) => Math.max(prev - 1, 1));
-  };
+  const handleDecrease = () => setQuantity((prev) => Math.max(prev - 1, 1));
 
   const addToCart = async (productId, quantity) => {
     const token = localStorage.getItem("accessToken");
@@ -51,37 +47,37 @@ const SingleProductPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         incrementCartCount(quantity);
-        setToastMessage("Sản phẩm đã được thêm vào giỏ hàng!");
+        setToastMessage("Product added to cart!");
       } else {
-        setToastMessage("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+        setToastMessage("Please login to add items to cart.");
       }
     } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
-      setToastMessage("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!");
+      setToastMessage("An error occurred while adding to cart.");
     } finally {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
     }
   };
 
-  const handleBuyNow = () => {
-    if (product) addToCart(product._id, quantity);
+  const handleImageClick = (img) => setMainImage(img);
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) =>
+      Math.min(prev + 1, Math.ceil(product.images.length / 5) - 1)
+    );
   };
+  const handlePrevSlide = () =>
+    setCurrentSlide((prev) => Math.max(prev - 1, 0));
 
-  const handleImageClick = (img) => {
-    setMainImage(img); // Cập nhật ảnh chính khi bấm vào ảnh nhỏ
-    setSelectedImage(img === selectedImage ? null : img); // Đổi trạng thái khi click vào ảnh nhỏ
-  };
+  const handleShowAttributes = () => setShowAttributes(true);
+  const handleCloseAttributes = () => setShowAttributes(false);
 
   if (loading) return <p className="text-center my-5">Loading...</p>;
   if (error) return <p className="text-center text-danger my-5">{error}</p>;
 
-  const mainImageUrl = mainImage
-    ? `${import.meta.env.VITE_API_BASE_URL.replace(
-        "/api",
-        ""
-      )}/products/${mainImage}`
-    : "/images/default-image.png";
+  const displayedImages = product.images.slice(
+    currentSlide * 5,
+    currentSlide * 5 + 5
+  );
 
   return (
     <div className="main-page">
@@ -92,39 +88,69 @@ const SingleProductPage = () => {
           onClose={() => setShowToast(false)}
         />
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-12">
+            <button
+              className="btn btn-outline-secondary button-back"
+              onClick={() => window.history.back()}
+            >
+              Back to Products
+            </button>
+          </div>
+
+          <div className="col-md-7">
             <div className="image-container mb-4">
-              <div className="small-images d-flex justify-content-center">
-                {product.images.map((img, index) => (
-                  <img
-                    key={index}
-                    src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                      "/api",
-                      ""
-                    )}/products/${img}`}
-                    alt={`Product ${index}`}
-                    className={`small-image img-thumbnail ${
-                      selectedImage === img ? "selected" : ""
-                    }`}
-                    onClick={() => handleImageClick(img)}
-                  />
-                ))}
-              </div>
-              <div className="main-image-container">
+              <div className="main-image-container text-center mb-3">
                 <img
-                  src={mainImageUrl}
+                  src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                    "/api",
+                    ""
+                  )}/products/${mainImage}`}
                   alt={product.title}
                   className="img-fluid main-image"
                 />
               </div>
+              <div className="small-images-container d-flex align-items-center">
+                {currentSlide > 0 && (
+                  <button
+                    className="btn btn-outline-secondary btn-sm me-2"
+                    onClick={handlePrevSlide}
+                  >
+                    &lt;
+                  </button>
+                )}
+                <div className="small-images d-flex justify-content-center">
+                  {displayedImages.map((img, index) => (
+                    <img
+                      key={index}
+                      src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                        "/api",
+                        ""
+                      )}/products/${img}`}
+                      alt={`Product ${index}`}
+                      className={`small-image img-thumbnail ${
+                        mainImage === img ? "selected" : ""
+                      }`}
+                      onClick={() => handleImageClick(img)}
+                    />
+                  ))}
+                </div>
+                {currentSlide < Math.ceil(product.images.length / 5) - 1 && (
+                  <button
+                    className="btn btn-outline-secondary btn-sm ms-2 "
+                    onClick={handleNextSlide}
+                  >
+                    &gt;
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="col-md-6">
+          <div className="col-md-5">
             <div className="product-details">
-              <h2>{product.title}</h2>
+              <h2>{product.name}</h2>
               <p>
-                Price: <strong>${product.price.toFixed(2)}</strong>
+                Price: <strong>${product.price}</strong>
               </p>
               <p>Stock: {product.stock}</p>
               <p>
@@ -137,7 +163,7 @@ const SingleProductPage = () => {
 
               <div className="quantity-controls my-3">
                 <button
-                  className="btn btn-outline-secondary justify-content-center"
+                  className="btn btn-outline-secondary"
                   onClick={handleDecrease}
                   disabled={quantity <= 1}
                 >
@@ -152,18 +178,38 @@ const SingleProductPage = () => {
                   +
                 </button>
               </div>
-              <div className="d-flex justify-content-center ">
-                <button
-                  className="btn btn-primary btn-block mt-4"
-                  onClick={handleBuyNow}
-                >
-                  Buy Now
-                </button>
-              </div>
+              <button
+                className="btn btn-primary"
+                onClick={() => addToCart(product._id, quantity)}
+              >
+                Add to Cart
+              </button>
+              <br />
+              <button className="btn btn-info" onClick={handleShowAttributes}>
+                Technical Details
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {showAttributes && (
+        <div className="modal-overlay" onClick={handleCloseAttributes}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={handleCloseAttributes}>
+              &times;
+            </button>
+            <h4>Technical Details</h4>
+            <ul>
+              {product.attributes.map((attr) => (
+                <li key={attr._id}>
+                  <strong>{attr.key}:</strong> {attr.value}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

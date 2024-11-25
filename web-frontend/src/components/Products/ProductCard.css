@@ -1,206 +1,52 @@
-/* Card chung */
-.product_card {
-  width: 300px;
-  border-radius: 15px;
-  overflow: hidden;
-  background: linear-gradient(
-    45deg,
-    #ffffff,
-    #ffcccb,
-    #ffffff
-  ); /* Gradient từ trắng đến màu nổi bật và lại trắng */
-  background-size: 200% 200%; /* Để gradient di chuyển */
-  animation: gradientMove 5s linear infinite; /* Áp dụng animation */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Bóng đổ cho card */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;
-  font-family: Arial, sans-serif;
+.card {
   position: relative;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  gap: 10px;
 }
 
-/* Animation gradient di chuyển */
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
-}
-
-/* Phần hình ảnh sản phẩm */
-.product_image {
-  width: 150px;
-  height: 150px;
-  margin: 20px auto;
-  display: block;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ cho div chứa ảnh */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.product_image img {
+.card-img {
   width: 100%;
-  height: 100%;
+  height: 200px;
   object-fit: cover;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 4px;
 }
 
-/* Hiệu ứng hover cho toàn card */
-.product_card:hover {
-  transform: translateY(-10px); /* Card sẽ nổi lên cao hơn */
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Bóng đổ mạnh hơn khi hover */
+.card-body {
+  padding: 1rem;
 }
 
-/* Hiệu ứng hover cho hình ảnh */
-.product_card:hover .product_image {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bóng đổ mạnh hơn khi hover */
-}
-
-.product_card:hover .product_image img {
-  transform: scale(1.2); /* Phóng to hình ảnh một chút */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ cho hình ảnh khi hover */
-  z-index: 2; /* Đảm bảo hình ảnh nổi lên hơn card */
-}
-
-/* Chi tiết sản phẩm */
-.product_details {
-  padding: 0 20px 20px 20px;
+.card-body.bg-light {
+  padding: 1rem;
   text-align: center;
 }
 
-.product_title {
-  font-size: 20px;
-  font-weight: bold;
+.font-weight-semibold {
+  font-weight: 600;
+}
+
+.text-default {
   color: #333;
-  margin-bottom: 10px;
 }
 
-.product_description {
-  font-size: 14px;
-  color: #777777;
-  margin-bottom: 10px;
-  background-color: #ffa500;
+.text-muted {
+  color: #6c757d;
 }
 
-.product_price {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 15px;
-}
-
-/* Footer card (thông tin thêm) */
-.product_infor_footer {
-  background-color: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-}
-
-.product_rating {
-  color: #0c0cea; /* Màu vàng cho sao */
-  font-size: 16px;
-}
-
-/* Nút Buy Now */
-.buy_now_button {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.btn.bg-cart {
+  background-color: orange;
+  color: #fff;
   transition: background-color 0.3s ease;
 }
 
-.buy_now_button.disabled {
+.btn.bg-cart:hover {
+  background-color: darkorange;
+  color: #fff;
+}
+
+.disabled {
   background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.buy_now_button:hover:not(.disabled) {
-  background-color: grey;
-}
-
-.buy_now_button {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #18181a;
-  color: #18181a;
-  display: inline-block;
-  font-size: 15px;
-  line-height: 15px;
-  padding: 18px 18px 17px;
-  text-decoration: none;
-  cursor: pointer;
-  background: #fff;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.buy_now_button.disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
   pointer-events: none;
-}
-
-.buy_now_button span:first-child {
-  position: relative;
-  transition: color 600ms cubic-bezier(0.48, 0, 0.12, 1);
-  z-index: 10;
-}
-
-.buy_now_button span:last-child {
-  color: black; /* Text color when not hovering */
-  display: block;
-  position: absolute;
-  bottom: 0;
-  transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1);
-  z-index: 100;
-  opacity: 0;
-  top: 50%;
-  left: 50%;
-  transform: translateY(225%) translateX(-50%);
-  height: 14px;
-  line-height: 13px;
-}
-
-.buy_now_button:after {
-  content: "";
-  position: absolute;
-  bottom: -50%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  transform-origin: bottom center;
-  transition: transform 600ms cubic-bezier(0.48, 0, 0.12, 1);
-  transform: skewY(9.3deg) scaleY(0);
-  z-index: 50;
-}
-
-.buy_now_button:hover:after {
-  transform-origin: bottom center;
-  transform: skewY(9.3deg) scaleY(2);
-}
-
-.buy_now_button:hover span:last-child {
-  transform: translateX(-50%) translateY(-100%);
-  opacity: 1;
-  transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
-}
-
-.buy_now_button:hover span:first-child {
-  color: white; /* Change text color when hovering */
+  cursor: not-allowed;
 }

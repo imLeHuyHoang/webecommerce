@@ -12,7 +12,11 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  phone: { type: String, default: "" },
+  phone: [
+    {
+      type: String,
+    },
+  ],
   gender: {
     type: String,
     enum: ["male", "female", "other"],
@@ -23,6 +27,8 @@ const userSchema = new mongoose.Schema({
   addresses: [addressSchema],
   lastLogin: { type: Date, default: Date.now },
   refreshToken: { type: String, default: null },
+  createAt: { type: Date, default: Date.now },
+  updateAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("User", userSchema);

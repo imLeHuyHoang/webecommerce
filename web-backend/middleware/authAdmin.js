@@ -1,10 +1,13 @@
+// middleware/authAdmin.js
+
 module.exports = function (req, res, next) {
-    // 401 Unauthorized
-    // 403 Forbidden
-    if (!process.env.AUTH) return next();
+  // Kiểm tra xem môi trường có yêu cầu xác thực hay không
+  if (!process.env.AUTH) return next();
 
-    if (!req.user.isAdmin)
-        return res.status(403).send("Access denied (Admin Only)");
+  // Kiểm tra xem người dùng có quyền admin hay không
+  if (!req.user || !req.user.isAdmin) {
+    return res.status(403).send("Access denied (Admin Only)");
+  }
 
-    next();
+  next();
 };

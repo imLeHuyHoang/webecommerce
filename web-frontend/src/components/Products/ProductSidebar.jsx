@@ -1,4 +1,3 @@
-// ProductSidebar.js
 import React, { useEffect, useState } from "react";
 import "./ProductSidebar.css";
 import apiClient from "../../utils/api-client";
@@ -13,13 +12,12 @@ function ProductSidebar({ onCategoryChange }) {
     apiClient
       .get("/category")
       .then((res) => {
-        console.log("API Response:", res.data); // Kiểm tra dữ liệu trả về
-        setCategories(Array.isArray(res.data) ? res.data : []); // Đảm bảo categories là mảng
+        setCategories(Array.isArray(res.data) ? res.data : []);
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
-        setCategories([]); // Gán giá trị mặc định nếu có lỗi
+        setCategories([]);
         setLoading(false);
       });
   }, []);
@@ -29,9 +27,21 @@ function ProductSidebar({ onCategoryChange }) {
   };
 
   return (
-    <div className="col-md-4 col-lg-3 mb-4">
-      <h2 className="category mb-4">Category</h2>
-      <div className="list-group">
+    <div
+      className="sidebar d-flex flex-column flex-shrink-0 p-3"
+      style={{ width: "280px" }}
+    >
+      <a
+        href="/"
+        className=" d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none"
+      >
+        <svg className="bi me-2" width="40" height="32">
+          <use xlinkHref="#bootstrap" />
+        </svg>
+        <span className="fs-4">Categories</span>
+      </a>
+      <hr />
+      <ul className="nav nav-pills flex-column mb-auto">
         {error && <em className="text-danger">{error}</em>}
         {loading ? (
           Array(5)
@@ -39,26 +49,30 @@ function ProductSidebar({ onCategoryChange }) {
             .map((_, index) => <ProductSidebarSkeleton key={index} />)
         ) : categories.length > 0 ? (
           categories.map((cat) => (
-            <button
-              key={cat._id}
-              onClick={() => handleCategoryClick(cat.name)}
-              className="list-group-item list-group-item-action sidebar_link mb-2"
-            >
-              <span>{cat.name}</span>
-              <img
-                src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                  "/api",
-                  ""
-                )}/category/${cat.image}`}
-                alt={cat.name}
-                className="link_emoji"
-              />
-            </button>
+            <li key={cat._id} className="nav-item">
+              <button
+                onClick={() => handleCategoryClick(cat.name)}
+                className="nav-link "
+              >
+                <img
+                  src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                    "/api",
+                    ""
+                  )}/category/${cat.images[0]}`}
+                  alt={cat.name}
+                  className="me-2 rounded-circle"
+                  width="20"
+                  height="20"
+                />
+                {cat.name}
+              </button>
+            </li>
           ))
         ) : (
-          <p>No categories available.</p>
+          <p className="">No categories available.</p>
         )}
-      </div>
+      </ul>
+      <hr />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-const Category = require("./models/category");
-const Product = require("./models/products");
+const Category = require("./models/Category");
+const Product = require("./models/Product");
 const data = require("./data.json");
 
 async function restoreProducts() {
