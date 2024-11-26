@@ -1,3 +1,4 @@
+// routes/cartRoutes.js
 const express = require("express");
 const router = express.Router();
 const { verifyToken } = require("../middleware/auth");
@@ -8,27 +9,32 @@ const {
   decreaseQuantity,
   increaseQuantity,
   clearCart,
+  applyCartDiscount,
+  removeCartDiscount,
 } = require("../controllers/cartController");
 
-// Lấy giỏ hàng
+// Get cart
 router.get("/", verifyToken, getCart);
 
-// Thêm sản phẩm vào giỏ hàng
+// Add to cart
 router.post("/", verifyToken, addToCart);
 
-// Xóa sản phẩm khỏi giỏ hàng
-router.delete("/:productId", verifyToken, removeFromCart);
+// Remove from cart
+router.delete("/product/:productId", verifyToken, removeFromCart);
 
-// Giảm số lượng sản phẩm trong giỏ hàng
-router.patch("/:productId/decrease", verifyToken, decreaseQuantity);
+// Decrease quantity
+router.patch("/product/:productId/decrease", verifyToken, decreaseQuantity);
 
-// Tăng số lượng sản phẩm trong giỏ hàng
-router.patch("/:productId/increase", verifyToken, increaseQuantity);
+// Increase quantity
+router.patch("/product/:productId/increase", verifyToken, increaseQuantity);
 
-// xóa giỏ hàng
-router.delete("/", verifyToken, removeFromCart);
-
-// Xóa giỏ hàng
+// Clear cart
 router.delete("/", verifyToken, clearCart);
+
+// Apply discount code to cart
+router.post("/apply-discount", verifyToken, applyCartDiscount);
+
+// Remove discount code from cart
+router.post("/remove-discount", verifyToken, removeCartDiscount);
 
 module.exports = router;

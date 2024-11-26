@@ -1,3 +1,4 @@
+// components/CartPage/CartPage.js
 import React, { useEffect, useState } from "react";
 import apiClient from "../../utils/api-client";
 import { useNavigate } from "react-router-dom";
@@ -7,11 +8,13 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(false);
   const { updateCart } = useCart();
   const { auth } = useAuth();
   const navigate = useNavigate();
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountError, setDiscountError] = useState("");
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -19,7 +22,7 @@ const CartPage = () => {
       try {
         if (auth.user) {
           const response = await apiClient.get("/cart");
-          setCartItems(response.data.products);
+          setCart(response.data);
         }
       } catch (error) {
         console.error("Error fetching cart:", error);
@@ -32,26 +35,13 @@ const CartPage = () => {
 
   const updateQuantity = async (productId, increment) => {
     try {
-      if (auth.user) {
-        await apiClient.patch(
-          `/cart/${productId}/${increment > 0 ? "increase" : "decrease"}`
-        );
+      if (increment > 0) {
+        await apiClient.patch(`/cart/product/${productId}/increase`);
       } else {
-        const updatedCart = cartItems.map((item) =>
-          item.product._id === productId
-            ? { ...item, quantity: item.quantity + increment }
-            : item
-        );
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        await apiClient.patch(`/cart/product/${productId}/decrease`);
       }
-      updateCart();
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.product._id === productId
-            ? { ...item, quantity: item.quantity + increment }
-            : item
-        )
-      );
+      const response = await apiClient.get("/cart");
+      setCart(response.data);
     } catch (error) {
       console.error("Error updating quantity:", error);
     }
@@ -59,31 +49,44 @@ const CartPage = () => {
 
   const removeItem = async (productId) => {
     try {
-      if (auth.user) {
-        await apiClient.delete(`/cart/${productId}`);
-      } else {
-        const updatedCart = cartItems.filter(
-          (item) => item.product._id !== productId
-        );
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-      }
-      updateCart();
-      setCartItems((prevItems) =>
-        prevItems.filter((item) => item.product._id !== productId)
-      );
+      await apiClient.delete(`/cart/product/${productId}`);
+      const response = await apiClient.get("/cart");
+      setCart(response.data);
     } catch (error) {
       console.error("Error removing item:", error);
     }
   };
 
-  const getTotalPrice = () =>
-    cartItems.reduce(
-      (total, item) => total + item.product.price * item.quantity,
-      0
-    );
+  const applyDiscountCode = async () => {
+    try {
+      const response = await apiClient.post("/cart/apply-discount", {
+        discountCode,
+      });
+      setCart(response.data);
+      setDiscountError("");
+    } catch (error) {
+      console.error("Error applying discount code:", error);
+      setDiscountError("Mã giảm giá không hợp lệ hoặc đã hết hạn.");
+    }
+  };
 
-  const getTotalQuantity = () =>
-    cartItems.reduce((total, item) => total + item.quantity, 0);
+  const removeDiscountCode = async () => {
+    try {
+      const response = await apiClient.post("/cart/remove-discount");
+      setCart(response.data);
+      setDiscountCode("");
+    } catch (error) {
+      console.error("Error removing discount code:", error);
+    }
+  };
+
+  const getTotalPrice = () => {
+    return cart ? cart.totalAmount : 0;
+  };
+
+  const getTotalQuantity = () => {
+    return cart ? cart.totalQuantity : 0;
+  };
 
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN", {
@@ -93,12 +96,13 @@ const CartPage = () => {
   };
 
   const handleProceedToCheckout = () => {
-    if (cartItems.length === 0) {
+    if (!cart || cart.products.length === 0) {
       alert("Giỏ hàng của bạn đang trống.");
       return;
     }
-    navigate("/checkout", { state: { cartItems } });
+    navigate("/checkout", { state: { cartItems: cart.products } });
   };
+  console.log(cart);
 
   return (
     <div className="container my-5">
@@ -107,10 +111,10 @@ const CartPage = () => {
         <div className="col-xl-8">
           {loading ? (
             <div className="text-center">Đang tải giỏ hàng...</div>
-          ) : cartItems.length === 0 ? (
+          ) : !cart || cart.products.length === 0 ? (
             <p className="text-center">Giỏ hàng của bạn đang trống.</p>
           ) : (
-            cartItems.map((item) => (
+            cart.products.map((item) => (
               <div
                 className="card border shadow-none mb-4"
                 key={item.product._id}
@@ -130,21 +134,10 @@ const CartPage = () => {
                     <div className="flex-grow-1 align-self-center overflow-hidden">
                       <h5 className="text-truncate font-size-18">
                         <a href="#" className="text-dark">
-                          {item.product.title}
+                          {item.product.name}
                         </a>
                       </h5>
-                      <p className="text-muted mb-0">
-                        {Array.from({ length: 5 }, (_, i) =>
-                          i < item.product.rating ? (
-                            <i key={i} className="bx bxs-star text-warning"></i>
-                          ) : (
-                            <i key={i} className="bx bx-star text-muted"></i>
-                          )
-                        )}
-                      </p>
-                      <p className="mb-0 mt-1">
-                        <span className="fw-medium">{item.product.color}</span>
-                      </p>
+                      {/* Additional product details if needed */}
                     </div>
                     <div className="flex-shrink-0 ms-2">
                       <ul className="list-inline mb-0 font-size-16">
@@ -163,9 +156,7 @@ const CartPage = () => {
                   <div className="row mt-3">
                     <div className="col-md-4">
                       <p className="text-muted mb-2">Giá</p>
-                      <h5 className="mb-0">
-                        {formatPrice(item.product.price)}
-                      </h5>
+                      <h5 className="mb-0">{formatPrice(item.price)}</h5>
                     </div>
                     <div className="col-md-5">
                       <p className="text-muted mb-2">Số lượng</p>
@@ -190,7 +181,7 @@ const CartPage = () => {
                     </div>
                     <div className="col-md-3">
                       <p className="text-muted mb-2">Tổng</p>
-                      <h5>{formatPrice(item.product.price * item.quantity)}</h5>
+                      <h5>{formatPrice(item.totalPrice)}</h5>
                     </div>
                   </div>
                 </div>
@@ -238,11 +229,48 @@ const CartPage = () => {
                   <tr className="bg-light">
                     <th>Tổng cộng :</th>
                     <td className="text-end fw-bold">
-                      {formatPrice(getTotalPrice() + 25)}
+                      {formatPrice(getTotalPrice())}
                     </td>
                   </tr>
                 </tbody>
               </table>
+
+              <div className="mt-4">
+                <h5 className="font-size-15">Mã giảm giá</h5>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Nhập mã giảm giá"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value)}
+                  />
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={applyDiscountCode}
+                  >
+                    Áp dụng
+                  </button>
+                </div>
+                {cart && cart.discountCode && (
+                  <div className="mt-2">
+                    <p>
+                      Mã giảm giá đang áp dụng:{" "}
+                      <strong>{cart.discountCode.code}</strong>
+                    </p>
+                    <button
+                      className="btn btn-link text-danger p-0"
+                      onClick={removeDiscountCode}
+                    >
+                      Xóa mã giảm giá
+                    </button>
+                  </div>
+                )}
+                {discountError && (
+                  <div className="text-danger mt-2">{discountError}</div>
+                )}
+              </div>
             </div>
           </div>
         </div>

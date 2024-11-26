@@ -9,7 +9,7 @@ const generateTokens = (user) => {
     id: user._id,
     email: user.email,
     roles: user.roles,
-    version: user.tokenVersion, // Add version control
+    version: user.tokenVersion, // Thêm kiểm soát phiên bản
   };
 
   const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
@@ -23,13 +23,13 @@ const generateTokens = (user) => {
   return { accessToken, refreshToken };
 };
 
-// Cookie configuration
+// Cấu hình cookie
 const getCookieConfig = (isProduction) => ({
   httpOnly: true,
   secure: isProduction,
   sameSite: isProduction ? "strict" : "lax",
   path: "/",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
 });
 
 // Đăng ký người dùng mới
@@ -37,7 +37,7 @@ exports.registerUser = async (req, res) => {
   const { name, email, password, phone, gender } = req.body;
 
   try {
-    // Input validation
+    // Kiểm tra đầu vào
     if (!email || !password) {
       return res
         .status(400)
@@ -73,7 +73,7 @@ exports.loginUser = async (req, res) => {
   const isProduction = process.env.NODE_ENV === "production";
 
   try {
-    // Input validation
+    // Kiểm tra đầu vào
     if (!email || !password) {
       return res
         .status(400)
@@ -92,11 +92,11 @@ exports.loginUser = async (req, res) => {
 
     const { accessToken, refreshToken } = generateTokens(user);
 
-    // Update refresh token in database
+    // Cập nhật refresh token trong cơ sở dữ liệu
     user.refreshToken = refreshToken;
     await user.save();
 
-    // Set refresh token in cookie
+    // Đặt refresh token trong cookie
     res.cookie("refreshToken", refreshToken, getCookieConfig(isProduction));
 
     const userResponse = {
@@ -117,22 +117,21 @@ exports.loginUser = async (req, res) => {
 };
 
 // Đăng xuất
-// Đăng xuất
 exports.logoutUser = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
 
     if (refreshToken) {
-      // Find user and invalidate refresh token
+      // Tìm người dùng và vô hiệu hóa refresh token
       const user = await User.findOne({ refreshToken });
       if (user) {
         user.refreshToken = null;
-        user.tokenVersion += 1; // Increment token version
+        user.tokenVersion += 1; // Tăng phiên bản token
         await user.save();
       }
     }
 
-    // Clear cookie without maxAge option
+    // Xóa cookie mà không có tùy chọn maxAge
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -183,10 +182,10 @@ exports.refreshToken = async (req, res) => {
       return res.status(401).json({ message: "Không tìm thấy refresh token." });
     }
 
-    // Verify refresh token
+    // Xác minh refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESHSECRET);
 
-    // Find user and validate token version
+    // Tìm người dùng và xác thực phiên bản token
     const user = await User.findById(decoded.id);
     if (
       !user ||
@@ -196,14 +195,14 @@ exports.refreshToken = async (req, res) => {
       throw new Error("Invalid refresh token");
     }
 
-    // Generate new tokens
+    // Tạo token mới
     const tokens = generateTokens(user);
 
-    // Update refresh token in database
+    // Cập nhật refresh token trong cơ sở dữ liệu
     user.refreshToken = tokens.refreshToken;
     await user.save();
 
-    // Set new refresh token in cookie
+    // Đặt refresh token mới trong cookie
     res.cookie(
       "refreshToken",
       tokens.refreshToken,
@@ -218,11 +217,11 @@ exports.refreshToken = async (req, res) => {
 };
 
 // Đăng nhập bằng Google
-
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-// Google Login
+
 exports.googleLogin = async (req, res) => {
   const { credential } = req.body;
+  const isProduction = process.env.NODE_ENV === "production";
 
   try {
     const ticket = await client.verifyIdToken({
@@ -234,27 +233,49 @@ exports.googleLogin = async (req, res) => {
     const { email, sub: googleId, name } = payload;
     const password = googleId; // Sử dụng googleId làm mật khẩu
 
-    console.log("Google ID Token payload:", payload); // Logging chi tiết
+    console.log("Google ID Token payload:", payload);
 
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Nếu người dùng chưa tồn tại, tạo tài khoản mới
-      user = new User({ email, password, name });
+      // Nếu người dùng không tồn tại, tạo người dùng mới
+      user = new User({
+        email,
+        password,
+        name,
+        tokenVersion: 0, // Đảm bảo tokenVersion được thiết lập
+      });
       await user.save();
     }
 
     // Tạo token
-    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const { accessToken, refreshToken } = generateTokens(user);
 
-    res.status(200).json({ accessToken, id: user._id });
+    // Cập nhật refresh token trong cơ sở dữ liệu
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Đặt refresh token trong cookie
+    res.cookie("refreshToken", refreshToken, getCookieConfig(isProduction));
+
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      roles: user.roles,
+    };
+
+    res.status(200).json({
+      accessToken,
+      user: userResponse,
+    });
   } catch (error) {
-    console.error("Error during Google login:", error); // Logging chi tiết
+    console.error("Error during Google login:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+// Đăng nhập admin
 
 exports.loginUserAdmin = async (req, res) => {
   const { email, password } = req.body;
@@ -303,7 +324,8 @@ exports.loginUserAdmin = async (req, res) => {
   }
 };
 
-// Hàm cập nhật thông tin người dùng
+// Cập nhật thông tin người dùng
+
 exports.updateUser = async (req, res) => {
   try {
     const { name, phone, gender, addresses, password } = req.body;
