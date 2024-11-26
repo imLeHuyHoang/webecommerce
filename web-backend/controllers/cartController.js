@@ -11,17 +11,31 @@ const calculateCartTotals = async (cart) => {
   for (let item of cart.products) {
     totalQuantity += item.quantity;
 
-    // Recalculate totalPrice for each item
+    // Get the latest price from the product
+    const product = await Product.findById(item.product);
+    if (product) {
+      item.price = product.price;
+    }
+
     let itemTotalPrice = item.price * item.quantity;
 
+    // Apply product discount if applicable
     if (item.discount) {
       const discount = await Discount.findById(item.discount);
-      if (discount) {
-        if (discount.type === "percentage") {
-          itemTotalPrice = itemTotalPrice * (1 - discount.value / 100);
-        } else if (discount.type === "fixed") {
-          itemTotalPrice = itemTotalPrice - discount.value;
+      if (discount && discount.isActive && discount.expiryDate >= new Date()) {
+        let discountAmount = 0;
+        if (discount.isPercentage) {
+          discountAmount = (itemTotalPrice * discount.value) / 100;
+        } else {
+          discountAmount = discount.value;
         }
+        if (discount.maxDiscountValue) {
+          discountAmount = Math.min(discountAmount, discount.maxDiscountValue);
+        }
+        itemTotalPrice -= discountAmount;
+      } else {
+        // Remove invalid discount
+        item.discount = null;
       }
     }
 
@@ -32,12 +46,25 @@ const calculateCartTotals = async (cart) => {
   // Apply cart discount if applicable
   if (cart.discountCode) {
     const discount = await Discount.findById(cart.discountCode);
-    if (discount) {
-      if (discount.type === "percentage") {
-        totalAmount = totalAmount * (1 - discount.value / 100);
-      } else if (discount.type === "fixed") {
-        totalAmount = totalAmount - discount.value;
+    if (discount && discount.isActive && discount.expiryDate >= new Date()) {
+      if (totalAmount >= discount.minOrderValue) {
+        let discountAmount = 0;
+        if (discount.isPercentage) {
+          discountAmount = (totalAmount * discount.value) / 100;
+        } else {
+          discountAmount = discount.value;
+        }
+        if (discount.maxDiscountValue) {
+          discountAmount = Math.min(discountAmount, discount.maxDiscountValue);
+        }
+        totalAmount -= discountAmount;
+      } else {
+        // Không đủ điều kiện áp dụng mã giảm giá
+        cart.discountCode = null;
       }
+    } else {
+      // Mã giảm giá không hợp lệ hoặc đã hết hạn
+      cart.discountCode = null;
     }
   }
 
@@ -228,9 +255,16 @@ exports.applyCartDiscount = async (req, res) => {
       return res.status(404).json({ message: "Mã giảm giá không tồn tại." });
     }
 
-    // Check if the discount code is expired
-    if (discount.expirationDate && discount.expirationDate < new Date()) {
-      return res.status(400).json({ message: "Mã giảm giá đã hết hạn." });
+    // Check if the discount code is expired or inactive
+    if (!discount.isActive || discount.expiryDate < new Date()) {
+      return res.status(400).json({ message: "Mã giảm giá không hợp lệ." });
+    }
+
+    // Check if discount type is 'cart'
+    if (discount.type !== "cart") {
+      return res
+        .status(400)
+        .json({ message: "Mã giảm giá này không áp dụng cho giỏ hàng." });
     }
 
     cart.discountCode = discount._id;
@@ -261,6 +295,94 @@ exports.removeCartDiscount = async (req, res) => {
     res.status(200).json(cart);
   } catch (error) {
     console.error("Error in removeCartDiscount:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Remove discount from a product in the cart
+exports.removeProductDiscount = async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const cart = await Cart.findOne({ user: req.user.id });
+    if (!cart) {
+      return res.status(404).json({ message: "Giỏ hàng không tồn tại." });
+    }
+
+    const itemIndex = cart.products.findIndex(
+      (item) => item.product.toString() === productId
+    );
+
+    if (itemIndex >= 0) {
+      cart.products[itemIndex].discount = null;
+
+      await calculateCartTotals(cart);
+
+      await cart.save();
+      res.status(200).json(cart);
+    } else {
+      res.status(404).json({ message: "Sản phẩm không có trong giỏ hàng." });
+    }
+  } catch (error) {
+    console.error("Error in removeProductDiscount:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+// controllers/cartController.js
+
+// Apply discount to a product in the cart
+exports.applyProductDiscount = async (req, res) => {
+  const { productId, discountCode } = req.body;
+  try {
+    const cart = await Cart.findOne({ user: req.user.id });
+    if (!cart) {
+      return res.status(404).json({ message: "Giỏ hàng không tồn tại." });
+    }
+
+    const discount = await Discount.findOne({ code: discountCode });
+    if (!discount) {
+      return res.status(404).json({ message: "Mã giảm giá không tồn tại." });
+    }
+
+    // Check if the discount code is expired or inactive
+    if (!discount.isActive || discount.expiryDate < new Date()) {
+      return res.status(400).json({ message: "Mã giảm giá không hợp lệ." });
+    }
+
+    // Check if discount type is 'product'
+    if (discount.type !== "product") {
+      return res
+        .status(400)
+        .json({ message: "Mã giảm giá này không áp dụng cho sản phẩm." });
+    }
+
+    const itemIndex = cart.products.findIndex(
+      (item) => item.product.toString() === productId
+    );
+
+    if (itemIndex >= 0) {
+      // Check if the discount is applicable to the product
+      if (
+        discount.applicableProducts.length > 0 &&
+        !discount.applicableProducts
+          .map((id) => id.toString())
+          .includes(productId)
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Mã giảm giá này không áp dụng cho sản phẩm này." });
+      }
+
+      cart.products[itemIndex].discount = discount._id;
+
+      await calculateCartTotals(cart);
+
+      await cart.save();
+      res.status(200).json(cart);
+    } else {
+      res.status(404).json({ message: "Sản phẩm không có trong giỏ hàng." });
+    }
+  } catch (error) {
+    console.error("Error in applyProductDiscount:", error);
     res.status(500).json({ error: error.message });
   }
 };

@@ -5,29 +5,30 @@ import "./ManageInventory.css"; // Import CSS
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ManageInventory = () => {
-  const [inventories, setInventories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [selectedInventory, setSelectedInventory] = useState(null);
+  // State variables
+  const [inventories, setInventories] = useState([]); // List of inventories
+  const [products, setProducts] = useState([]); // List of products
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(""); // Error message
+  const [showModal, setShowModal] = useState(false); // Modal visibility state
+  const [selectedInventory, setSelectedInventory] = useState(null); // Selected inventory for editing
   const [form, setForm] = useState({
     product: "",
     productCode: "",
     location: "",
     quantity: "",
-  });
-  const [productInfo, setProductInfo] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  }); // Form data
+  const [productInfo, setProductInfo] = useState(null); // Selected product info
+  const [searchTerm, setSearchTerm] = useState(""); // Search term for filtering inventories
+  const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products for product search
 
-  // Lấy dữ liệu tồn kho và sản phẩm khi component được mount
+  // Fetch inventories and products when component mounts
   useEffect(() => {
     fetchInventories();
     fetchProducts();
   }, []);
 
-  // Hàm lấy dữ liệu tồn kho từ server
+  // Fetch inventories from server
   const fetchInventories = async () => {
     setLoading(true);
     try {
@@ -40,7 +41,7 @@ const ManageInventory = () => {
     }
   };
 
-  // Hàm lấy dữ liệu sản phẩm từ server
+  // Fetch products from server
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/product`);
@@ -50,7 +51,7 @@ const ManageInventory = () => {
     }
   };
 
-  // Hàm xử lý khi nhấn nút thêm tồn kho
+  // Handle add inventory button click
   const handleAddInventory = () => {
     setSelectedInventory(null);
     setForm({
@@ -63,7 +64,7 @@ const ManageInventory = () => {
     setShowModal(true);
   };
 
-  // Hàm xử lý khi nhấn nút sửa tồn kho
+  // Handle edit inventory button click
   const handleEditInventory = (inventory) => {
     setSelectedInventory(inventory);
     setForm({
@@ -76,7 +77,7 @@ const ManageInventory = () => {
     setShowModal(true);
   };
 
-  // Hàm xử lý khi nhấn nút xóa tồn kho
+  // Handle delete inventory button click
   const handleDeleteInventory = async (inventoryId) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa tồn kho này không?")) return;
     try {
@@ -87,31 +88,31 @@ const ManageInventory = () => {
     }
   };
 
-  // Hàm xử lý khi lưu tồn kho
+  // Handle save inventory form submission
   const handleSaveInventory = async (e) => {
     e.preventDefault();
-    console.log("Dữ liệu gửi:", form); // Log dữ liệu để kiểm tra
+    console.log("Dữ liệu gửi:", form); // Log form data for debugging
 
     try {
       if (selectedInventory) {
-        // Cập nhật tồn kho
+        // Update existing inventory
         await axios.put(
           `${API_BASE_URL}/inventory/${selectedInventory._id}`,
           form
         );
       } else {
-        // Thêm tồn kho mới
+        // Add new inventory
         await axios.post(`${API_BASE_URL}/inventory`, form);
       }
       setShowModal(false);
       fetchInventories();
     } catch (error) {
-      console.error("Lỗi API:", error.response.data); // Log lỗi để kiểm tra
+      console.error("Lỗi API:", error.response.data); // Log API error for debugging
       setError(error.message);
     }
   };
 
-  // Hàm xử lý khi thay đổi giá trị trong form
+  // Handle form input change
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -119,10 +120,10 @@ const ManageInventory = () => {
     });
   };
 
-  // Hàm xử lý tìm kiếm sản phẩm
+  // Handle product search input change
   const handleProductSearch = (e) => {
     const code = e.target.value;
-    setForm({ ...form, productCode: code }); // Hiển thị mã sản phẩm trong input
+    setForm({ ...form, productCode: code }); // Display product code in input
 
     if (code.length > 0) {
       const filtered = products.filter((product) =>
@@ -134,31 +135,35 @@ const ManageInventory = () => {
     }
   };
 
-  // Hàm xử lý khi chọn sản phẩm từ danh sách
+  // Handle product selection from search results
   const handleProductSelect = (product) => {
-    setForm({ ...form, product: product._id, productCode: product.code }); // Lưu _id vào form.product và hiển thị code trong input
-    setProductInfo(product); // Hiển thị thông tin sản phẩm
+    setForm({ ...form, product: product._id, productCode: product.code }); // Save product ID and display code in input
+    setProductInfo(product); // Display product info
     setFilteredProducts([]);
   };
 
-  // Hàm xử lý khi thay đổi giá trị tìm kiếm
+  // Handle search term input change
   const handleSearchTermChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Lọc danh sách tồn kho theo từ khóa tìm kiếm
+  // Filter inventories based on search term
   const filteredInventories = inventories.filter((inventory) => {
     return (
-      inventory.product.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inventory.product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inventory.product.category.name
-        .toLowerCase()
+      inventory.product?.code
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      inventory.product?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      inventory.product?.category?.name
+        ?.toLowerCase()
         .includes(searchTerm.toLowerCase())
     );
   });
 
-  // In ra dữ liệu gửi đến server
-  console.log(form);
+  // Log products data for debugging
+  console.log(products);
 
   return (
     <div className="container mt-4">

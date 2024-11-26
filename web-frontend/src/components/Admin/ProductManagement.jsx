@@ -3,6 +3,7 @@ import ManageProducts from "./manage/ManageProducts";
 import ManageCategories from "./manage/ManageCategories";
 import ManageAttributes from "./manage/ManageAttributes";
 import ManageInventory from "./manage/ManageInventory";
+import ManageDiscounts from "./manage/ManageDiscounts";
 import "./ProductManagement.css"; // Import file CSS
 
 const ProductManagement = () => {
@@ -18,6 +19,8 @@ const ProductManagement = () => {
         return <ManageAttributes />;
       case "inventory":
         return <ManageInventory />;
+      case "discounts":
+        return <ManageDiscounts />;
       default:
         return <ManageProducts />;
     }
@@ -94,7 +97,21 @@ const ProductManagement = () => {
                   Manage Inventory
                 </a>
               </li>
+              <li>
+                <a
+                  className={`nav-link ${
+                    activeKey === "discounts" ? "active" : "text-white"
+                  }`}
+                  onClick={() => setActiveKey("discounts")}
+                >
+                  <svg className="bi me-2" width="16" height="16">
+                    <use xlinkHref="#people-circle"></use>
+                  </svg>
+                  Manage Discounts
+                </a>
+              </li>
             </ul>
+
             <hr />
             <div className="dropdown">
               <ul

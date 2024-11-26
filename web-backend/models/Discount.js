@@ -1,38 +1,47 @@
+// models/Discount.js
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const DiscountSchema = new Schema(
+const discountSchema = new mongoose.Schema(
   {
     code: {
       type: String,
       required: true,
-      unique: true,
+      unique: true, // Mã giảm giá là duy nhất
       trim: true,
     },
-    percentage: {
+    type: {
+      type: String,
+      enum: ["product", "cart"], // "product": áp dụng cho sản phẩm, "cart": áp dụng cho giỏ hàng
+      required: true,
+    },
+    value: {
       type: Number,
-      required: true,
-      min: [0, "Discount percentage cannot be negative."],
-      max: [100, "Discount percentage cannot exceed 100%."],
+      required: true, // Giá trị giảm giá
     },
-    startDate: {
-      type: Date,
-      required: true,
+    isPercentage: {
+      type: Boolean,
+      default: false, // true: giảm giá theo phần trăm, false: giảm giá cố định
     },
-    endDate: {
-      type: Date,
-      required: true,
+    minOrderValue: {
+      type: Number,
+      default: 0, // Giá trị đơn hàng tối thiểu để áp dụng mã giảm giá
     },
-    createAt: {
+    applicableProducts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product", // Sản phẩm áp dụng giảm giá (nếu có)
+      },
+    ],
+    expiryDate: {
       type: Date,
-      default: Date.now,
+      required: true, // Ngày hết hạn của mã giảm giá
     },
-    updateAt: {
-      type: Date,
-      default: Date.now,
+    isActive: {
+      type: Boolean,
+      default: true, // Trạng thái của mã giảm giá
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Discount", DiscountSchema);
+module.exports = mongoose.model("Discount", discountSchema);

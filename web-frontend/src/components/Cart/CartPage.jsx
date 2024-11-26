@@ -66,7 +66,10 @@ const CartPage = () => {
       setDiscountError("");
     } catch (error) {
       console.error("Error applying discount code:", error);
-      setDiscountError("Mã giảm giá không hợp lệ hoặc đã hết hạn.");
+      setDiscountError(
+        error.response?.data?.message ||
+          "Mã giảm giá không hợp lệ hoặc đã hết hạn."
+      );
     }
   };
 
@@ -102,7 +105,33 @@ const CartPage = () => {
     }
     navigate("/checkout", { state: { cartItems: cart.products } });
   };
-  console.log(cart);
+
+  const applyProductDiscount = async (productId, discountCode) => {
+    try {
+      const response = await apiClient.post("/cart/product/apply-discount", {
+        productId,
+        discountCode,
+      });
+      setCart(response.data);
+    } catch (error) {
+      console.error("Error applying product discount:", error);
+      alert(
+        error.response?.data?.message ||
+          "Mã giảm giá không hợp lệ hoặc không áp dụng cho sản phẩm này."
+      );
+    }
+  };
+
+  const removeProductDiscount = async (productId) => {
+    try {
+      const response = await apiClient.post(
+        `/cart/product/${productId}/remove-discount`
+      );
+      setCart(response.data);
+    } catch (error) {
+      console.error("Error removing product discount:", error);
+    }
+  };
 
   return (
     <div className="container my-5">
@@ -184,6 +213,55 @@ const CartPage = () => {
                       <h5>{formatPrice(item.totalPrice)}</h5>
                     </div>
                   </div>
+
+                  {/* Product Discount */}
+                  <div className="mt-3">
+                    {item.discount ? (
+                      <div>
+                        <p>
+                          Mã giảm giá sản phẩm:{" "}
+                          <strong>{item.discount.code}</strong>
+                        </p>
+                        <button
+                          className="btn btn-link text-danger p-0"
+                          onClick={() =>
+                            removeProductDiscount(item.product._id)
+                          }
+                        >
+                          Xóa mã giảm giá
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="input-group">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Nhập mã giảm giá sản phẩm"
+                          value={item.discountCodeInput || ""}
+                          onChange={(e) => {
+                            const newProducts = cart.products.map((p) =>
+                              p.product._id === item.product._id
+                                ? { ...p, discountCodeInput: e.target.value }
+                                : p
+                            );
+                            setCart({ ...cart, products: newProducts });
+                          }}
+                        />
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() =>
+                            applyProductDiscount(
+                              item.product._id,
+                              item.discountCodeInput
+                            )
+                          }
+                        >
+                          Áp dụng
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
@@ -236,12 +314,12 @@ const CartPage = () => {
               </table>
 
               <div className="mt-4">
-                <h5 className="font-size-15">Mã giảm giá</h5>
+                <h5 className="font-size-15">Mã giảm giá giỏ hàng</h5>
                 <div className="input-group">
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Nhập mã giảm giá"
+                    placeholder="Nhập mã giảm giá giỏ hàng"
                     value={discountCode}
                     onChange={(e) => setDiscountCode(e.target.value)}
                   />
