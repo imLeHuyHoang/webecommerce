@@ -6,11 +6,29 @@ import { useCart } from "../../context/CartContext";
 import ToastNotification from "../ToastNotification/ToastNotification";
 import "./ProductCard.css";
 
+/**
+ * Component ProductCard
+ *
+ * Đây là component để hiển thị thông tin của một sản phẩm, bao gồm hình ảnh, tiêu đề, giá, đánh giá và nút thêm vào giỏ hàng.
+ *
+ * @param {string} id - ID của sản phẩm
+ * @param {string} title - Tiêu đề của sản phẩm
+ * @param {number} price - Giá của sản phẩm
+ * @param {number} stock - Số lượng sản phẩm còn trong kho
+ * @param {number} rating - Đánh giá của sản phẩm
+ * @param {number} ratingCount - Số lượng đánh giá của sản phẩm
+ * @param {string} image - Đường dẫn hình ảnh của sản phẩm
+ */
 function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
   const { incrementCartCount } = useCart();
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
+  /**
+   * Hàm addToCart
+   *
+   * Hàm này được sử dụng để thêm sản phẩm vào giỏ hàng.
+   */
   const addToCart = async () => {
     const token = localStorage.getItem("accessToken");
     const product = { productId: id, quantity: 1 };
@@ -32,6 +50,14 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
     }
   };
 
+  /**
+   * Hàm formatPrice
+   *
+   * Hàm này được sử dụng để định dạng giá sản phẩm theo đơn vị tiền tệ Việt Nam.
+   *
+   * @param {number} price - Giá của sản phẩm
+   * @returns {string} - Giá sản phẩm đã được định dạng
+   */
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN", {
       style: "currency",
@@ -39,6 +65,7 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
     });
   };
 
+  // Render giao diện của component
   return (
     <>
       <ToastNotification
