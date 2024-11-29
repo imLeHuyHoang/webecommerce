@@ -31,7 +31,8 @@ router.post(
   verifyToken,
   cartController.applyProductDiscount
 );
-router.post(
+// routes/cartRoutes.js
+router.delete(
   "/product/:productId/remove-discount",
   verifyToken,
   cartController.removeProductDiscount

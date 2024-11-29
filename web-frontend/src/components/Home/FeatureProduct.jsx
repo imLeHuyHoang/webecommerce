@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "../Products/ProductCard";
+import apiClient from "../../utils/api-client";
 import "./FeatureProduct.css"; // Import CSS
 
 function FeatureProduct() {
@@ -8,12 +9,10 @@ function FeatureProduct() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/product`
-        );
-        const data = await response.json();
-        if (data && data.products) {
-          const randomProducts = data.products.slice(0, 4);
+        const response = await apiClient.get("/product");
+        const data = response.data;
+        if (data && data.length > 0) {
+          const randomProducts = data.slice(0, 4);
           setRandomProducts(randomProducts);
         }
       } catch (error) {
@@ -27,16 +26,16 @@ function FeatureProduct() {
   return (
     <section className="featured-product">
       <div className="container">
-        <h2 className="text-center mb-5">Featured Products</h2>
+        <h2 className="text-center mb-5">Sản phẩm nổi bật hiện tại </h2>
         <div className="row">
           {randomProducts.map((product) => (
-            <div key={product._id} className="items_in_row col-md-3 mb-4 ">
+            <div key={product._id} className="items_in_row col-md-3 mb-4">
               <ProductCard
                 id={product._id}
                 stock={product.stock}
                 rating={product.reviews?.rate || 0}
                 ratingCount={product.reviews?.counts || 0}
-                title={product.title}
+                title={product.name}
                 price={product.price}
                 image={product.images?.[0]}
               />

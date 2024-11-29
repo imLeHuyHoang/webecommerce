@@ -7,8 +7,9 @@
   font-family: "Montserrat", sans-serif;
 }
 body {
-  font-size: 16px;
-  background-color: #f6f8fa;
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .align_center {

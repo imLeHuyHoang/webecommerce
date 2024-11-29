@@ -4,6 +4,7 @@ import apiClient from "../../../utils/api-client";
 import { useCart } from "../../../context/CartContext";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import "./SingleProductPage.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const SingleProductPage = () => {
   const { id } = useParams();
@@ -13,10 +14,10 @@ const SingleProductPage = () => {
   const [error, setError] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState("");
-  const [currentSlide, setCurrentSlide] = useState(0); // Track the current slide index
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
-  const [showAttributes, setShowAttributes] = useState(false); // State to show/hide attributes modal
+  const [showAttributes, setShowAttributes] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -25,7 +26,7 @@ const SingleProductPage = () => {
         setProduct(response.data);
         setMainImage(response.data.images[0]);
       } catch (err) {
-        setError("Unable to load the product.");
+        setError("Không thể tải sản phẩm.");
       } finally {
         setLoading(false);
       }
@@ -47,12 +48,12 @@ const SingleProductPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         incrementCartCount(quantity);
-        setToastMessage("Product added to cart!");
+        setToastMessage("Sản phẩm đã được thêm vào giỏ hàng!");
       } else {
-        setToastMessage("Please login to add items to cart.");
+        setToastMessage("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
       }
     } catch (error) {
-      setToastMessage("An error occurred while adding to cart.");
+      setToastMessage("Có lỗi xảy ra khi thêm vào giỏ hàng.");
     } finally {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
@@ -71,7 +72,7 @@ const SingleProductPage = () => {
   const handleShowAttributes = () => setShowAttributes(true);
   const handleCloseAttributes = () => setShowAttributes(false);
 
-  if (loading) return <p className="text-center my-5">Loading...</p>;
+  if (loading) return <p className="text-center my-5">Đang tải...</p>;
   if (error) return <p className="text-center text-danger my-5">{error}</p>;
 
   const displayedImages = product.images.slice(
@@ -93,32 +94,37 @@ const SingleProductPage = () => {
               className="btn btn-outline-secondary button-back"
               onClick={() => window.history.back()}
             >
-              Back to Products
+              <i className="fas fa-arrow-left"></i> Quay lại sản phẩm
             </button>
           </div>
-
           <div className="col-md-7">
             <div className="image-container mb-4">
               <div className="main-image-container text-center mb-3">
                 <img
+                  id="mainImage"
                   src={`${import.meta.env.VITE_API_BASE_URL.replace(
                     "/api",
                     ""
                   )}/products/${mainImage}`}
-                  alt={product.title}
+                  alt="Hình ảnh sản phẩm chính"
                   className="img-fluid main-image"
+                  width="600"
+                  height="400"
                 />
               </div>
               <div className="small-images-container d-flex align-items-center">
-                {currentSlide > 0 && (
-                  <button
-                    className="btn btn-outline-secondary btn-sm me-2"
-                    onClick={handlePrevSlide}
-                  >
-                    &lt;
-                  </button>
-                )}
-                <div className="small-images d-flex justify-content-center">
+                <button
+                  id="prevSlideBtn"
+                  className="btn btn-outline-secondary btn-sm me-2 small-button"
+                  onClick={handlePrevSlide}
+                  disabled={currentSlide === 0}
+                >
+                  &lt;
+                </button>
+                <div
+                  id="smallImagesContainer"
+                  className="small-images d-flex justify-content-center"
+                >
                   {displayedImages.map((img, index) => (
                     <img
                       key={index}
@@ -126,81 +132,108 @@ const SingleProductPage = () => {
                         "/api",
                         ""
                       )}/products/${img}`}
-                      alt={`Product ${index}`}
+                      alt={`Hình ảnh sản phẩm ${index + 1}`}
                       className={`small-image img-thumbnail ${
                         mainImage === img ? "selected" : ""
                       }`}
+                      width="80"
+                      height="80"
                       onClick={() => handleImageClick(img)}
                     />
                   ))}
                 </div>
-                {currentSlide < Math.ceil(product.images.length / 5) - 1 && (
-                  <button
-                    className="btn btn-outline-secondary btn-sm ms-2 "
-                    onClick={handleNextSlide}
-                  >
-                    &gt;
-                  </button>
-                )}
+                <button
+                  id="nextSlideBtn"
+                  className="btn btn-outline-secondary btn-sm ms-2 small-button"
+                  onClick={handleNextSlide}
+                  disabled={
+                    currentSlide >= Math.ceil(product.images.length / 5) - 1
+                  }
+                >
+                  &gt;
+                </button>
               </div>
             </div>
           </div>
-
           <div className="col-md-5">
             <div className="product-details">
-              <h2>{product.name}</h2>
+              <h2 id="productName">{product.name}</h2>
               <p>
-                Price: <strong>${product.price}</strong>
+                Giá:{" "}
+                <strong id="productPrice">
+                  {product.price.toLocaleString("vi-VN")} VND
+                </strong>
               </p>
-              <p>Stock: {product.stock}</p>
               <p>
-                Rating: {product.reviews?.rate || 0} (
-                {product.reviews?.counts || 0} reviews)
+                Tồn kho: <span id="productStock">{product.stock}</span>
+              </p>
+              <p>
+                Đánh giá:{" "}
+                <span id="productRating">{product.reviews?.rate || 0}</span> (
+                <span id="productReviews">{product.reviews?.counts || 0}</span>{" "}
+                đánh giá)
               </p>
               <div className="product-description">
-                <p>{product.description}</p>
+                <p id="productDescription">{product.description}</p>
               </div>
-
               <div className="quantity-controls my-3">
                 <button
-                  className="btn btn-outline-secondary"
+                  id="decreaseQuantityBtn"
+                  className="btn btn-outline-secondary button-decrease"
                   onClick={handleDecrease}
                   disabled={quantity <= 1}
                 >
                   -
                 </button>
-                <span className="mx-3 quantity">{quantity}</span>
+                <span id="quantity" className="mx-3 quantity">
+                  {quantity}
+                </span>
                 <button
-                  className="btn btn-outline-secondary"
+                  id="increaseQuantityBtn"
+                  className="btn btn-outline-secondary button-increase"
                   onClick={handleIncrease}
                   disabled={quantity >= product.stock}
                 >
                   +
                 </button>
               </div>
-              <button
-                className="btn btn-primary"
-                onClick={() => addToCart(product._id, quantity)}
-              >
-                Add to Cart
-              </button>
-              <br />
-              <button className="btn btn-info" onClick={handleShowAttributes}>
-                Technical Details
-              </button>
+              <div className="d-flex align-items-center two-button">
+                <button
+                  id="addToCartBtn"
+                  className="btn btn-primary add-button"
+                  onClick={() => addToCart(product._id, quantity)}
+                >
+                  Thêm vào giỏ hàng
+                </button>
+                <button
+                  id="showAttributesBtn"
+                  className="btn btn-info ms-3 attribute-button"
+                  onClick={handleShowAttributes}
+                  style={{ marginLeft: "20px" }}
+                >
+                  Chi tiết kỹ thuật
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
       {showAttributes && (
-        <div className="modal-overlay" onClick={handleCloseAttributes}>
+        <div
+          className="modal-overlay"
+          id="attributesModal"
+          onClick={handleCloseAttributes}
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={handleCloseAttributes}>
+            <button
+              className="close-button"
+              id="closeAttributesBtn"
+              onClick={handleCloseAttributes}
+            >
               &times;
             </button>
-            <h4>Technical Details</h4>
-            <ul>
+            <h4>Chi tiết kỹ thuật</h4>
+            <ul id="attributesList">
               {product.attributes.map((attr) => (
                 <li key={attr._id}>
                   <strong>{attr.key}:</strong> {attr.value}

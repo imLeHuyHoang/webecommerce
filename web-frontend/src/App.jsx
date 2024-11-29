@@ -5,8 +5,8 @@ import Routing from "../src/components/Routing/Routing";
 import Navbar from "../src/components/Navbar/Navbar";
 import Footer from "../src/components/Footer/Footer";
 import { AuthProvider } from "./context/AuthContext";
-import CartProvider, { useCart } from "./context/CartContext";
-
+import CartProvider from "./context/CartContext";
+import { ToastProvider } from "./components/ToastNotification/ToastContext";
 import { AuthAdminProvider } from "./context/AuthAdminContext";
 
 function App() {
@@ -15,13 +15,15 @@ function App() {
       <AuthProvider>
         <AuthAdminProvider>
           <CartProvider>
-            <div className="app-container">
-              <Navbar />
-              <div className="content">
-                <Routing />
+            <ToastProvider>
+              <div className="app-container">
+                <Navbar />
+                <div className="content">
+                  <Routing />
+                </div>
+                <Footer />
               </div>
-              <Footer />
-            </div>
+            </ToastProvider>
           </CartProvider>
         </AuthAdminProvider>
       </AuthProvider>

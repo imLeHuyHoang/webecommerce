@@ -11,7 +11,6 @@ exports.createDiscount = async (req, res) => {
       value,
       isPercentage,
       minOrderValue,
-      maxDiscountValue,
       expiryDate,
       isActive,
       applicableProducts,
@@ -22,6 +21,12 @@ exports.createDiscount = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Vui lòng nhập đầy đủ thông tin." });
+    }
+
+    //kiểm tra xem đã có code nào trùng chưa
+    const discountExist = await Discount.findOne({ code: code });
+    if (discountExist) {
+      return res.status(400).json({ message: "Mã giảm giá đã tồn tại." });
     }
 
     // Nếu loại giảm giá là 'product', kiểm tra danh sách sản phẩm
@@ -48,7 +53,6 @@ exports.createDiscount = async (req, res) => {
       value,
       isPercentage,
       minOrderValue,
-      maxDiscountValue,
       expiryDate,
       isActive,
       applicableProducts: type === "product" ? applicableProducts : [],
@@ -71,7 +75,6 @@ exports.updateDiscount = async (req, res) => {
       value,
       isPercentage,
       minOrderValue,
-      maxDiscountValue,
       expiryDate,
       isActive,
       applicableProducts,
@@ -112,7 +115,6 @@ exports.updateDiscount = async (req, res) => {
     discount.value = value;
     discount.isPercentage = isPercentage;
     discount.minOrderValue = minOrderValue;
-    discount.maxDiscountValue = maxDiscountValue;
     discount.expiryDate = expiryDate;
     discount.isActive = isActive;
     discount.applicableProducts = type === "product" ? applicableProducts : [];

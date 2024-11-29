@@ -79,7 +79,6 @@ const ManageDiscount = () => {
       type: discount.type,
       value: discount.value.toString(),
       isPercentage: discount.isPercentage,
-      value: discount.value ? discount.value.toString() : "",
       expiryDate: discount.expiryDate.split("T")[0],
       isActive: discount.isActive,
       applicableProducts: discount.applicableProducts.map((p) => p._id),
@@ -148,7 +147,10 @@ const ManageDiscount = () => {
     if (form.isPercentage) {
       return form.value > 0 && form.value <= 100;
     } else {
-      return form.value > 0 && form.value <= getMinProductPrice();
+      if (form.type === "product") {
+        return form.value > 0 && form.value <= getMinProductPrice();
+      }
+      return form.value > 0;
     }
   };
 
@@ -292,7 +294,7 @@ const ManageDiscount = () => {
                 onChange={(e) => setForm({ ...form, value: e.target.value })}
                 required
               />
-              {form.value > getMinProductPrice() && (
+              {form.type === "product" && form.value > getMinProductPrice() && (
                 <div className="text-danger">
                   Giá trị giảm giá không được lớn hơn giá trị sản phẩm nhỏ nhất
                 </div>

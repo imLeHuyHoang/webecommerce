@@ -270,9 +270,16 @@ exports.applyCartDiscount = async (req, res) => {
     cart.discountCode = discount._id;
 
     await calculateCartTotals(cart);
-
     await cart.save();
-    res.status(200).json(cart);
+    const updatedCart = await Cart.findOne({ user: req.user.id })
+      .populate({
+        path: "products.product",
+        select: "name price images",
+      })
+      .populate("products.discount")
+      .populate("discountCode");
+
+    res.status(200).json(updatedCart);
   } catch (error) {
     console.error("Error in applyCartDiscount:", error);
     res.status(500).json({ error: error.message });
@@ -292,7 +299,15 @@ exports.removeCartDiscount = async (req, res) => {
     await calculateCartTotals(cart);
 
     await cart.save();
-    res.status(200).json(cart);
+    const updatedCart = await Cart.findOne({ user: req.user.id })
+      .populate({
+        path: "products.product",
+        select: "name price images",
+      })
+      .populate("products.discount")
+      .populate("discountCode");
+
+    res.status(200).json(updatedCart);
   } catch (error) {
     console.error("Error in removeCartDiscount:", error);
     res.status(500).json({ error: error.message });
@@ -318,7 +333,17 @@ exports.removeProductDiscount = async (req, res) => {
       await calculateCartTotals(cart);
 
       await cart.save();
-      res.status(200).json(cart);
+
+      // Lấy lại cart với thông tin đầy đủ
+      const updatedCart = await Cart.findOne({ user: req.user.id })
+        .populate({
+          path: "products.product",
+          select: "name price images",
+        })
+        .populate("products.discount")
+        .populate("discountCode");
+
+      res.status(200).json(updatedCart);
     } else {
       res.status(404).json({ message: "Sản phẩm không có trong giỏ hàng." });
     }
@@ -327,6 +352,7 @@ exports.removeProductDiscount = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 // controllers/cartController.js
 
 // Apply discount to a product in the cart
@@ -377,7 +403,15 @@ exports.applyProductDiscount = async (req, res) => {
       await calculateCartTotals(cart);
 
       await cart.save();
-      res.status(200).json(cart);
+      const updatedCart = await Cart.findOne({ user: req.user.id })
+        .populate({
+          path: "products.product",
+          select: "name price images",
+        })
+        .populate("products.discount")
+        .populate("discountCode");
+
+      res.status(200).json(updatedCart);
     } else {
       res.status(404).json({ message: "Sản phẩm không có trong giỏ hàng." });
     }

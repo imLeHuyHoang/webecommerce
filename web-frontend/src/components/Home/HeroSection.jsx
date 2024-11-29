@@ -12,7 +12,7 @@ const HeroSection = ({ title, subtitle, link, image }) => {
         className="mask"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", minHeight: "400px" }}
       >
-        <div className="container h-100 d-flex align-items-center">
+        <div className="container  d-flex align-items-center">
           <div className="text-center w-100">
             <h1 className="mb-3">{title}</h1>
             <h4 className="mb-4">{subtitle}</h4>

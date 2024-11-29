@@ -1,0 +1,31 @@
+/* styles.css */
+.service-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  transition: box-shadow 0.3s ease;
+}
+.service-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.services-section .services {
+  max-width: 1000px;
+
+  padding: 16px;
+}
+.service-card {
+  height: 250px;
+  object-fit: cover;
+}
+p {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .services-section .services {
+    padding: 10px;
+  }
+  p {
+    font-size: 16px;
+  }
+}

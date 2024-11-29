@@ -1,161 +1,96 @@
-/* Main page container */
+/* SingleProductPage.css */
 .main-page {
   padding: 20px;
-  background-color: #f8f9fa;
-}
-
-/* Single product page container */
-.single-product-page {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-.btn-info {
-  background-color: #17a2b8;
-  color: #fff;
-  border: none;
-  margin-top: 10px;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 .button-back {
   margin-bottom: 20px;
 }
-/* Main image container */
-.main-image-container {
+.image-container {
   position: relative;
-  overflow: hidden;
-  border-radius: 8px;
+}
+.main-image-container {
+  border: 1px solid #ddd;
+  padding: 10px;
+  background: #fff;
 }
 
-.main-image {
-  max-width: 100%;
-  height: auto;
-  transition: transform 0.3s ease;
+.quantity-controls .button-increase {
+  height: 30px;
+  width: 30px;
+  padding: 0px;
 }
 
-.main-image:hover {
-  transform: scale(1.05);
+.quantity-controls .button-decrease {
+  height: 30px;
+  width: 30px;
+  padding: 0px;
 }
 
-/* Small images container */
 .small-images-container {
-  display: flex;
+  margin-top: 10px;
   justify-content: center;
-  align-items: center;
 }
-
-.small-images {
-  display: flex;
-  gap: 10px;
-}
-
 .small-image {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 4px;
   cursor: pointer;
-  transition: transform 0.3s ease, border 0.3s ease;
+  margin-right: 10px;
+  height: 50px;
+  width: 50px;
 }
-
-.small-image:hover {
-  transform: scale(1.1);
-}
-
 .small-image.selected {
   border: 2px solid #007bff;
 }
-
-/* Product details */
 .product-details {
   padding: 20px;
+  border: 1px solid #ddd;
+  background: #fff;
+  max-width: 90%;
 }
-
-.product-details h2 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-}
-
-.product-details p {
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
-
-.product-description {
-  margin-top: 20px;
-  font-size: 1rem;
-  color: #6c757d;
-}
-
-/* Quantity controls */
 .quantity-controls {
   display: flex;
   align-items: center;
 }
-
-.quantity-controls button {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.25rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.quantity-controls button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
 .quantity {
-  font-size: 1.25rem;
-  font-weight: bold;
+  font-size: 1.2rem;
 }
-
-/* Add to cart button */
-.btn-block {
-  width: 100%;
-  padding: 10px;
-  font-size: 1.25rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
+.small-images-container .small-button {
+  height: 40px;
+  width: 40px;
+  padding: 0px;
 }
-
-.btn-block:hover {
-  background-color: #0056b3;
-  color: #fff;
+.two-button .add-button {
+  height: 60px;
+  width: 150px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
-
-/* Modal overlay */
+.two-button .attribute-button {
+  height: 60px;
+  width: 150px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1050;
+  z-index: 1000;
 }
 
-/* Modal content */
 .modal-content {
-  background-color: #fff;
+  background: white;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   position: relative;
-  max-width: 500px;
-  width: 100%;
 }
 
-/* Close button */
 .close-button {
   position: absolute;
   top: 10px;
@@ -164,10 +99,22 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #000;
-  transition: color 0.3s ease;
 }
+@media (max-width: 576px) {
+  .small-image {
+    height: 40px;
+    width: 40px;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
 
-.close-button:hover {
-  color: #ff0000;
+  .small-images-container .small-button {
+    height: 30px;
+    width: 30px;
+    padding: 0px;
+  }
+  .image-container,
+  .product-details {
+    max-width: 100%;
+  }
 }

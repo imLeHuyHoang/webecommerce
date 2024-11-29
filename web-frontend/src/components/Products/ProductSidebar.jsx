@@ -4,18 +4,23 @@ import "./ProductSidebar.css";
 import apiClient from "../../utils/api-client";
 import ProductSidebarSkeleton from "./Skeleton/ProductSidebarSkeleton";
 
-function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
+function ProductSidebar({
+  onCategoryChange,
+  onFilterChange,
+  filters,
+  showFilters,
+}) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // State cho bộ lọc
+  // States for filters
   const [searchTerm, setSearchTerm] = useState("");
   const [brand, setBrand] = useState("");
   const [priceRange, setPriceRange] = useState("");
   const [rating, setRating] = useState("");
 
-  // State cho danh mục được chọn
+  // State for selected category
   const [selectedCategory, setSelectedCategory] = useState(
     filters.category || ""
   );
@@ -44,7 +49,7 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
 
   const handleCategoryClick = (categoryName) => {
     if (selectedCategory === categoryName) {
-      // Bỏ chọn nếu nhấn lại cùng một danh mục
+      // Deselect if the same category is clicked
       setSelectedCategory("");
       onCategoryChange("");
       onFilterChange("category", "");
@@ -56,7 +61,7 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
   };
 
   return (
-    <div className="product-sidebar">
+    <div className={`product-sidebar ${showFilters ? "show" : ""}`}>
       <h4 className="sidebar-title">Danh mục</h4>
       <ul className="category-list">
         {error && <em className="text-danger">{error}</em>}
@@ -80,6 +85,8 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
                 )}/category/${cat.images[0]}`}
                 alt={cat.name}
                 className="category-image"
+                width="20"
+                height="20"
               />
               {cat.name}
             </li>
@@ -88,16 +95,21 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
           <p>Không có danh mục nào.</p>
         )}
       </ul>
+      {/*thêm 1 dòng để cho người dùng biết đang ở category nào */}
+      <p className="selected-category">
+        Bạn đang ở danh mục: {selectedCategory}
+      </p>
 
       <div className="filters">
         <h4 className="sidebar-title">Bộ lọc</h4>
 
-        {/* Tìm kiếm */}
+        {/* Search Filter */}
         <div className="filter-group">
           <label htmlFor="search">Tìm kiếm</label>
           <input
             type="text"
             id="search"
+            className="form-control"
             placeholder="Nhập từ khóa..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -110,7 +122,7 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
           />
         </div>
 
-        {/* Thương hiệu */}
+        {/* Brand Filter */}
         <div className="filter-group">
           <label htmlFor="brand">Thương hiệu</label>
           <input
@@ -125,10 +137,11 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
                 onFilterChange("brand", brand);
               }
             }}
+            className="form-control"
           />
         </div>
 
-        {/* Khoảng giá */}
+        {/* Price Range Filter */}
         <div className="filter-group">
           <label htmlFor="price">Khoảng giá</label>
           <select
@@ -138,6 +151,7 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
               setPriceRange(e.target.value);
               onFilterChange("price", e.target.value);
             }}
+            className="form-control"
           >
             <option value="">Tất cả</option>
             <option value="0-5000000">Dưới 5 triệu</option>
@@ -147,7 +161,7 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
           </select>
         </div>
 
-        {/* Đánh giá */}
+        {/* Rating Filter */}
         <div className="filter-group">
           <label htmlFor="rating">Đánh giá</label>
           <select
@@ -157,6 +171,7 @@ function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
               setRating(e.target.value);
               onFilterChange("rating", e.target.value);
             }}
+            className="form-control"
           >
             <option value="">Tất cả</option>
             <option value="4">4 sao trở lên</option>

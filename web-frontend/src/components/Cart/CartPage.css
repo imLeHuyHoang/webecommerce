@@ -1,53 +1,9 @@
-/* src/pages/CartPage/CartPage.css */
-
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+.cartpage .container {
+  max-width: 1200px;
 }
-
-.card {
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: scale(1.05);
-}
-
-.btn-outline-primary:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-  color: white;
-}
-
-.btn-success:hover {
-  background-color: #28a745;
-  color: white;
-}
-
-.text-muted:hover {
-  color: #000 !important;
-}
-
 .avatar-lg {
   width: 100px;
   height: 100px;
-  object-fit: cover;
 }
 
 .text-truncate {
@@ -56,152 +12,102 @@
   text-overflow: ellipsis;
 }
 
-.font-size-18 {
-  font-size: 18px;
+.input-group .form-control {
+  flex: 0 0 40%;
+}
+
+.input-group .btn {
+  flex: 0 0 40%;
 }
 
 .font-size-16 {
   font-size: 16px;
 }
 
-.fw-medium {
-  font-weight: 500;
+.font-size-15 {
+  font-size: 15px;
 }
 
-.me-1 {
-  margin-right: 0.25rem;
+.font-size-18 {
+  font-size: 18px;
 }
 
-.me-4 {
-  margin-right: 1.5rem;
+.btn-link {
+  text-decoration: none;
 }
 
-.ms-2 {
-  margin-left: 0.5rem;
+.btn-link:hover {
+  text-decoration: underline;
 }
 
-.pb-3 {
-  padding-bottom: 1rem;
+.card-body {
+  padding: 1.5rem;
 }
 
-.mb-0 {
-  margin-bottom: 0;
+.table td,
+.table th {
+  vertical-align: middle;
 }
 
-.mb-2 {
-  margin-bottom: 0.5rem;
+.table .bg-light {
+  background-color: #f8f9fa;
 }
-
-.mb-4 {
-  margin-bottom: 1.5rem;
-}
-
-.mt-1 {
-  margin-top: 0.25rem;
-}
-
-.mt-3 {
-  margin-top: 1rem;
-}
-
-.my-4 {
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.text-center {
+.input-group .form-control {
+  max-width: 200px;
+  height: 40px;
+  margin: 0px;
+  padding: 0px;
+  font-size: 12px;
   text-align: center;
 }
-
-.text-end {
-  text-align: right;
+.input-group .btn {
+  max-width: 70px;
+  height: 40px;
+  margin: 0px;
+  padding: 0px;
+  font-size: 12px;
+}
+.input-group .text-discount-cart {
+  font-size: 12px;
+}
+.input-group .text-discount-cart {
+  font-size: 12px;
+}
+.button-quantity .btn-outline-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; /* Adjust width as needed */
+  height: 30px; /* Adjust height as needed */
+  background: none;
+  border: 1px solid #007bff;
+  color: #007bff;
+  padding: 0;
+  cursor: pointer;
 }
 
-.text-dark {
-  color: #000 !important;
+.row .text-muted {
+  margin: 0px;
 }
 
-.text-warning {
-  color: #ffc107 !important;
+.card .card-header {
+  margin: 0px;
 }
 
-.text-muted {
-  color: #6c757d !important;
-}
+@media (max-width: 575.98px) {
+  .avatar-lg {
+    width: 80px;
+    height: 80px;
+  }
+  .input-group .form-control {
+    font-size: 14px;
+  }
+  .input-group .btn {
+    font-size: 14px;
+  }
 
-.bg-light {
-  background-color: #f8f9fa !important;
-}
-
-.border {
-  border: 1px solid #dee2e6 !important;
-}
-
-.border-bottom {
-  border-bottom: 1px solid #dee2e6 !important;
-}
-
-.shadow-none {
-  box-shadow: none !important;
-}
-
-.rounded {
-  border-radius: 0.25rem !important;
-}
-
-.overflow-hidden {
-  overflow: hidden !important;
-}
-
-.flex-grow-1 {
-  flex-grow: 1 !important;
-}
-
-.flex-shrink-0 {
-  flex-shrink: 0 !important;
-}
-
-.align-self-center {
-  align-self: center !important;
-}
-
-.align-items-start {
-  align-items: flex-start !important;
-}
-
-.d-flex {
-  display: flex !important;
-}
-
-.list-inline {
-  padding-left: 0;
-  list-style: none;
-}
-
-.list-inline-item {
-  display: inline-block;
-}
-
-.list-inline-item:not(:last-child) {
-  margin-right: 0.5rem;
-}
-
-.font-size-16 {
-  font-size: 16px;
-}
-
-.font-size-18 {
-  font-size: 18px;
-}
-
-.fw-bold {
-  font-weight: 700 !important;
-}
-
-.form-select-sm {
-  height: calc(1.8125rem + 2px);
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  border-radius: 0.2rem;
+  .input-group .form-control,
+  .input-group .btn {
+    flex: 1 1 auto;
+  }
 }

@@ -1,7 +1,7 @@
 // ProductList.jsx
 import React, { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
-import "./ProductList.css";
+import "./ProductList.css"; // Updated CSS file
 import apiClient from "../../utils/api-client";
 
 function ProductList({ filters }) {
@@ -48,49 +48,55 @@ function ProductList({ filters }) {
   }
 
   return (
-    <div className="product-list">
-      {currentProducts.length > 0 ? (
-        <>
-          <div className="product-grid">
-            {currentProducts.map((product) => (
-              <ProductCard
-                key={product._id}
-                id={product._id}
-                title={product.name}
-                price={product.price}
-                stock={product.stock}
-                rating={product.reviews?.rate || 0}
-                ratingCount={product.reviews?.counts || 0}
-                image={product.images?.[0]}
-              />
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <nav>
-              <ul className="pagination">
-                {[...Array(totalPages)].map((_, index) => (
-                  <li
-                    key={index}
-                    className={`page-item ${
-                      currentPage === index + 1 ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(index + 1)}
+    <section className="product-list">
+      <div className="container products-list">
+        {currentProducts.length > 0 ? (
+          <>
+            <div className="product-grid">
+              {currentProducts.map((product) => (
+                <div key={product._id} className="product-card">
+                  <ProductCard
+                    id={product._id}
+                    title={product.name}
+                    price={product.price}
+                    stock={product.stock}
+                    rating={product.reviews?.rate || 0}
+                    ratingCount={product.reviews?.counts || 0}
+                    image={product.images?.[0]}
+                  />
+                </div>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <nav>
+                <ul className="pagination justify-content-center">
+                  {[...Array(totalPages)].map((_, index) => (
+                    <li
+                      key={index}
+                      className={`page-item ${
+                        currentPage === index + 1 ? "active" : ""
+                      }`}
                     >
-                      {index + 1}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
-        </>
-      ) : (
-        <p>Không có sản phẩm nào.</p>
-      )}
-    </div>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(index + 1)}
+                      >
+                        {index + 1}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="current-page-info text-center">
+                  Trang {currentPage} trên {totalPages}
+                </div>
+              </nav>
+            )}
+          </>
+        ) : (
+          <p>Không có sản phẩm nào.</p>
+        )}
+      </div>
+    </section>
   );
 }
 

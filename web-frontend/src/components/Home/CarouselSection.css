@@ -1,6 +1,6 @@
 .carousel-image {
   object-fit: cover; /* Ensure the image fits within the frame */
-  height: 500px; /* Fixed height for the image */
+  height: 400px; /* Fixed height for the image */
 }
 
 @media (max-width: 768px) {
