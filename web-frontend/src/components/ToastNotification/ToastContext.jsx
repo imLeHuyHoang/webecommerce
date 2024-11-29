@@ -22,7 +22,7 @@ export const ToastProvider = ({ children }) => {
         prevToasts
           .map((toast) => ({
             ...toast,
-            progress: toast.progress - 1.67, // Giảm dần progress (100% / 60 lần trong 3 giây)
+            progress: toast.progress - 1, // Giảm dần progress (100% / 60 lần trong 3 giây)
           }))
           .filter((toast) => toast.progress > 0)
       );

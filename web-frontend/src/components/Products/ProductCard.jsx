@@ -11,10 +11,11 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
   const { addToast } = React.useContext(ToastContext);
 
   const addToCart = async () => {
-    const token = localStorage.getItem("accessToken");
     const product = { productId: id, quantity: 1 };
-
     try {
+      //kiểm tra localstorage có token hay không
+      const token = localStorage.getItem("accessToken");
+
       if (token) {
         await apiClient.post("/cart/add", product, {
           headers: { Authorization: `Bearer ${token}` },

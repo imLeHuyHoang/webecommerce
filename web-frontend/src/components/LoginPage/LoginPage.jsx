@@ -43,7 +43,6 @@ const Login = () => {
       });
       const { accessToken, user } = response.data;
 
-      // Store user and accessToken
       login(user, accessToken);
       navigate("/");
     } catch (error) {
@@ -57,93 +56,82 @@ const Login = () => {
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <section
-        className="vh-100 d-flex align-items-center justify-content-center"
-        style={{ backgroundColor: "#343a40" }}
-      >
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-md-6 col-lg-5">
-              <div
-                className="card shadow-lg border-0"
-                style={{ borderRadius: "1rem", backgroundColor: "#212529" }}
-              >
-                <div className="card-body p-4 text-center text-white">
-                  <h2 className="fw-bold mb-4">Đăng Nhập</h2>
-                  <p className="text-white-50 mb-4">
-                    Vui lòng nhập email và mật khẩu của bạn!
-                  </p>
+      <div className="bg-light d-flex align-items-center justify-content-center min-vh-100">
+        <div
+          className="bg-white p-5 rounded shadow-lg w-100 google-login-container"
+          style={{ maxWidth: "400px" }}
+        >
+          <h5 className="text-center text-login ">Đăng nhập</h5>
 
-                  {error && <div className="alert alert-danger">{error}</div>}
+          {error && <div className="alert alert-danger">{error}</div>}
 
-                  <form onSubmit={handleSubmit} className="mb-3">
-                    <div className="form-floating mb-3">
-                      <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        className="form-control"
-                        placeholder="Email"
-                        onChange={handleChange}
-                        required
-                      />
-                      <label htmlFor="email">Email</label>
-                    </div>
-
-                    <div className="form-floating mb-3">
-                      <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        className="form-control"
-                        placeholder="Password"
-                        onChange={handleChange}
-                        required
-                      />
-                      <label htmlFor="password">Mật khẩu</label>
-                    </div>
-
-                    <button className="btn btn-primary w-100 " type="submit">
-                      Đăng nhập
-                    </button>
-                  </form>
-
-                  <Link to="#" className="small text-forget d-block mb-3">
-                    Quên mật khẩu?
-                  </Link>
-
-                  <div className="icon d-flex justify-content-center gap-2">
-                    <GoogleLogin
-                      onSuccess={handleGoogleLoginSuccess}
-                      onError={handleGoogleLoginFailure}
-                      render={(renderProps) => (
-                        <button
-                          className="btn btn-info"
-                          onClick={renderProps.onClick}
-                        >
-                          <i className="fab fa-google"></i>
-                        </button>
-                      )}
-                    />
-                  </div>
-
-                  <p className="mt-4">
-                    Bạn chưa có tài khoản?{" "}
-                    <Link to="/signup" className="text-white-50 signup">
-                      Đăng ký
-                    </Link>
-                  </p>
-                  <p>
-                    <Link to="/admin-login" className="text-white-50">
-                      Đăng nhập với tư cách admin?
-                    </Link>
-                  </p>
-                </div>
-              </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="form-control"
+                placeholder="Nhập email của bạn"
+                onChange={handleChange}
+                required
+              />
             </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                Mật khẩu
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="form-control"
+                placeholder="Nhập mật khẩu của bạn"
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="d-flex justify-content-between mb-3">
+              <Link to="#" className="forget-pass">
+                Quên mật khẩu?
+              </Link>
+            </div>
+            <button type="submit" className="btn btn-primary w-100">
+              Đăng nhập
+            </button>
+          </form>
+
+          <div className="text-center my-3">
+            <span className="text-muted">hoặc</span>
+          </div>
+          <div className="google-login">
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={handleGoogleLoginFailure}
+              render={(renderProps) => (
+                <button
+                  className="btn btn-danger w-100 mb-3 google-login-btn"
+                  onClick={renderProps.onClick}
+                >
+                  <i className="fab fa-google me-2"></i> Đăng nhập với Google
+                </button>
+              )}
+            />
+          </div>
+
+          <div className="d-flex justify-content-between two-button">
+            <Link to="/signup" className="text-decoration-none">
+              Bạn chưa có tài khoản? Đăng ký
+            </Link>
+            <Link to="/admin-login" className="text-decoration-none">
+              Đăng nhập với tư cách admin?
+            </Link>
           </div>
         </div>
-      </section>
+      </div>
     </GoogleOAuthProvider>
   );
 };

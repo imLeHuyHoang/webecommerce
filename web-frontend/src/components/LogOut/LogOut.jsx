@@ -18,6 +18,10 @@ const Logout = () => {
     handleLogout();
   }, [logout, logoutAdmin]);
 
+  //xóa token khỏi localstorage
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+
   return <p>Đang đăng xuất...</p>;
 };
 
