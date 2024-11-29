@@ -44,7 +44,7 @@ const SingleProductPage = () => {
 
     try {
       if (token) {
-        await apiClient.post("/cart", cartItem, {
+        await apiClient.post("/cart/add", cartItem, {
           headers: { Authorization: `Bearer ${token}` },
         });
         incrementCartCount(quantity);

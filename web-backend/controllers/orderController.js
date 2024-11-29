@@ -1,48 +1,87 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const Discount = require("../models/Discount"); // Thêm dòng này
 const paymentService = require("../services/paymentService");
-const Cart = require("../models/Cart");
+
+// ... phần code còn lại
 
 exports.createOrder = async (req, res) => {
   try {
-    const { shippingAddress, products, paymentMethod } = req.body;
+    const {
+      shippingAddress,
+      products,
+      paymentMethod,
+      cartDiscountCode, // Include this
+    } = req.body;
 
     if (!shippingAddress || !products || products.length === 0) {
       return res.status(400).json({ message: "Invalid order information." });
     }
 
+    // Ensure shippingAddress.phone is a string
+    if (Array.isArray(shippingAddress.phone)) {
+      shippingAddress.phone = shippingAddress.phone[0];
+    }
+
+    // Initialize total amount before cart-level discount
+    let totalAmount = 0;
+    let cartDiscount = null;
+
+    // Process product details with discounts
     const productDetails = await Promise.all(
       products.map(async (item) => {
         const product = await Product.findById(item.product);
         if (!product) {
           throw new Error(`Product with ID: ${item.product} not found`);
         }
+
+        let price = product.price; // Original price
+        let discount = null;
+
+        // Process product discount if available
+        if (item.discount) {
+          discount = await Discount.findById(item.discount);
+          if (discount) {
+            const discountValue = discount.isPercentage
+              ? (price * discount.value) / 100
+              : discount.value;
+            price -= discountValue; // Apply discount
+          }
+        }
+
+        totalAmount += price * item.quantity;
+
         return {
           product: product._id,
-          title: product.title,
-          price: product.price,
+          name: product.name, // Sử dụng product.name thay vì product.title
           quantity: item.quantity,
+          price: price, // Giá đã áp dụng giảm giá
+          discount: discount ? discount._id : null,
         };
       })
     );
 
-    const totalAmount = productDetails.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
+    // Process cart-level discount if available
+    if (cartDiscountCode) {
+      cartDiscount = await Discount.findById(cartDiscountCode);
+      if (cartDiscount) {
+        const cartDiscountValue = cartDiscount.isPercentage
+          ? (totalAmount * cartDiscount.value) / 100
+          : cartDiscount.value;
+        totalAmount -= cartDiscountValue;
+      }
+    }
 
-    const order = await Order.create({
-      user: req.user._id, // Ensure the user field is included
+    // Create the order
+    const order = new Order({
+      user: req.user._id,
       shippingAddress,
-      products: productDetails.map((item) => ({
-        product: item.product,
-        quantity: item.quantity,
-        price: item.price,
-      })),
+      products: productDetails,
       total: totalAmount,
       payment: { method: paymentMethod, isVerified: false },
       paymentStatus: "pending",
       shippingStatus: "processing",
+      discountCode: cartDiscount ? cartDiscount._id : null,
     });
 
     if (paymentMethod === "zalopay") {
@@ -51,6 +90,7 @@ exports.createOrder = async (req, res) => {
         productDetails
       );
       if (paymentResult.success) {
+        await order.save();
         return res.status(201).json({ orderUrl: paymentResult.orderUrl });
       } else {
         return res.status(400).json({ message: paymentResult.message });

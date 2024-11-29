@@ -20,6 +20,12 @@
 p {
   font-size: 16px;
 }
+.container .text-services {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0px;
+}
 
 @media (max-width: 768px) {
   .services-section .services {

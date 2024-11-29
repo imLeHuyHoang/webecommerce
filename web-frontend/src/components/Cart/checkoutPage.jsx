@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../../utils/api-client";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
+import UserInfoForm from "../Profile/UserInforForm";
 import "react-toastify/dist/ReactToastify.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./CheckoutPage.css";
 
 const CheckoutPage = () => {
@@ -11,6 +13,7 @@ const CheckoutPage = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
+  const [isEditingUserInfo, setIsEditingUserInfo] = useState(false); // New state
   const [newAddress, setNewAddress] = useState({
     province: "",
     district: "",
@@ -20,18 +23,18 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("zalopay");
   const { auth } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState(null); // State to store cart data
+  const [loading, setLoading] = useState(false); // Loading state
 
   useEffect(() => {
-    // Lấy thông tin người dùng và địa chỉ mặc định
+    // Fetch user data and default address
     const fetchUserData = async () => {
       try {
         const response = await apiClient.get("/user/profile");
         const user = response.data;
         setUserInfo(user);
 
-        // Đặt địa chỉ mặc định (nếu có)
+        // Set default address
         const defaultAddress =
           user.addresses.find((addr) => addr.default) || user.addresses[0];
         setSelectedAddress(defaultAddress);
@@ -44,26 +47,66 @@ const CheckoutPage = () => {
   }, []);
 
   useEffect(() => {
-    if (location.state && location.state.cartItems) {
-      setCartItems(location.state.cartItems);
-    } else {
-      const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-      if (localCart.length > 0) {
-        setCartItems(localCart);
-      } else {
-        alert(
-          "Giỏ hàng của bạn đang trống. Vui lòng thêm sản phẩm vào giỏ hàng."
-        );
-        navigate("/cart");
+    // Fetch cart data
+    const fetchCartData = async () => {
+      setLoading(true);
+      try {
+        const response = await apiClient.get("/cart");
+        setCart(response.data);
+      } catch (error) {
+        console.error("Error fetching cart data:", error);
+        toast.error("Lỗi khi tải dữ liệu giỏ hàng. Vui lòng thử lại.");
+        navigate("/cart"); // Redirect to cart page if there's an error
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [location.state, navigate]);
+    };
 
-  const getTotalPrice = () =>
-    cartItems.reduce(
-      (total, item) => total + item.product.price * item.quantity,
+    fetchCartData();
+  }, [navigate]);
+
+  // Function to calculate total price before discounts
+  const getTotalPriceBeforeDiscount = () => {
+    if (!cart || !cart.products) return 0;
+    return cart.products.reduce(
+      (total, item) => total + item.price * item.quantity,
       0
     );
+  };
+
+  // Function to calculate total discount
+  const getTotalDiscount = () => {
+    if (!cart || !cart.products) return 0;
+    let totalDiscount = 0;
+
+    // Product-level discounts
+    totalDiscount += cart.products.reduce((total, item) => {
+      if (item.discount) {
+        const discountAmount = item.discount.isPercentage
+          ? (item.price * item.discount.value * item.quantity) / 100
+          : item.discount.value * item.quantity;
+        return total + discountAmount;
+      }
+      return total;
+    }, 0);
+
+    // Cart-level discount
+    if (cart.discountCode) {
+      const cartTotalAfterProductDiscounts =
+        getTotalPriceBeforeDiscount() - totalDiscount;
+      const cartDiscountAmount = cart.discountCode.isPercentage
+        ? (cartTotalAfterProductDiscounts * cart.discountCode.value) / 100
+        : cart.discountCode.value;
+      totalDiscount += cartDiscountAmount;
+    }
+
+    return totalDiscount;
+  };
+
+  // Function to calculate total amount after discounts
+  const getTotalAmount = () => {
+    return getTotalPriceBeforeDiscount() - getTotalDiscount();
+  };
 
   const formatPrice = (price) =>
     price.toLocaleString("vi-VN", {
@@ -72,27 +115,30 @@ const CheckoutPage = () => {
     });
 
   const handlePlaceOrder = async () => {
-    if (!selectedAddress || cartItems.length === 0) {
-      alert("Vui lòng điền đầy đủ thông tin và giỏ hàng.");
+    if (!selectedAddress || !cart || cart.products.length === 0) {
+      alert(
+        "Bạn chưa cập nhật thông tin cá nhân, hãy cập nhật thông tin của mình."
+      );
       return;
     }
 
     const shippingAddress = {
       name: userInfo.name,
-      phone: userInfo.phone,
+      phone: Array.isArray(userInfo.phone) ? userInfo.phone[0] : userInfo.phone,
       address: `${selectedAddress.street}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`,
     };
 
     const orderData = {
       shippingAddress,
       paymentMethod,
-      products: cartItems.map((item) => ({
+      products: cart.products.map((item) => ({
         product: item.product._id,
         quantity: item.quantity,
-        price: item.product.price,
+        price: item.price,
+        discount: item.discount ? item.discount._id : null,
       })),
+      cartDiscountCode: cart.discountCode ? cart.discountCode._id : null,
     };
-    console.log("Order data:", orderData);
 
     try {
       const response = await apiClient.post("/order/create", orderData);
@@ -110,6 +156,7 @@ const CheckoutPage = () => {
       }
     } catch (error) {
       console.error("Error during checkout:", error);
+      console.log(orderData);
       toast.error("Có lỗi xảy ra trong quá trình đặt hàng. Vui lòng thử lại.");
     }
   };
@@ -117,175 +164,397 @@ const CheckoutPage = () => {
   const handleAddNewAddress = async () => {
     try {
       const updatedAddresses = [...userInfo.addresses, newAddress];
-      await apiClient.put("/user/profile", { addresses: updatedAddresses });
-      window.location.reload(); // Reload để cập nhật danh sách địa chỉ mới
+      const response = await apiClient.put("/user/profile", {
+        addresses: updatedAddresses,
+      });
+      setUserInfo(response.data);
+      setSelectedAddress(newAddress);
+      setIsAddingNewAddress(false);
+      setIsEditingAddress(false);
     } catch (error) {
       console.error("Error adding new address:", error);
       alert("Lỗi khi thêm địa chỉ mới. Vui lòng thử lại.");
     }
   };
 
-  return (
-    <div className="container mt-4">
-      <ToastContainer />
-      <h2>Thanh toán</h2>
-      <div className="row">
-        <div className="col-md-6">
-          <h4>Thông tin giao hàng</h4>
-          {userInfo && selectedAddress && (
-            <>
-              <div className="form-group">
-                <label>Họ và tên</label>
-                <input
-                  name="name"
-                  value={userInfo.name}
-                  className="form-control"
-                  readOnly
-                />
-              </div>
-              <div className="form-group">
-                <label>Số điện thoại</label>
-                <input
-                  name="phone"
-                  value={userInfo.phone}
-                  className="form-control"
-                  readOnly
-                />
-              </div>
-              <div className="form-group">
-                <label>Địa chỉ giao hàng</label>
-                <input
-                  name="address"
-                  value={`${selectedAddress.street}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`}
-                  className="form-control"
-                  readOnly
-                />
-                <button
-                  onClick={() => setIsEditingAddress(!isEditingAddress)}
-                  className="btn btn-link"
-                >
-                  Thay đổi địa chỉ mặc định
-                </button>
-              </div>
-              {isEditingAddress && (
-                <div className="form-group">
-                  <label>Chọn địa chỉ khác</label>
-                  <select
-                    value={selectedAddress._id}
-                    onChange={(e) =>
-                      setSelectedAddress(
-                        userInfo.addresses.find(
-                          (addr) => addr._id === e.target.value
-                        )
-                      )
-                    }
-                    className="form-control"
-                  >
-                    {userInfo.addresses.map((address) => (
-                      <option key={address._id} value={address._id}>
-                        {`${address.street}, ${address.ward}, ${address.district}, ${address.province}`}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={() => setIsEditingAddress(false)}
-                    className="btn btn-link"
-                  >
-                    Xác nhận
-                  </button>
-                  <button
-                    onClick={() => setIsAddingNewAddress(true)}
-                    className="btn btn-link"
-                  >
-                    Thêm địa chỉ mới
-                  </button>
-                </div>
-              )}
-              {isAddingNewAddress && (
-                <div className="form-group mt-3">
-                  <label>Thêm địa chỉ mới</label>
-                  <input
-                    placeholder="Tỉnh/Thành phố"
-                    value={newAddress.province}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, province: e.target.value })
-                    }
-                    className="form-control mb-2"
-                  />
-                  <input
-                    placeholder="Quận/Huyện"
-                    value={newAddress.district}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, district: e.target.value })
-                    }
-                    className="form-control mb-2"
-                  />
-                  <input
-                    placeholder="Phường/Xã"
-                    value={newAddress.ward}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, ward: e.target.value })
-                    }
-                    className="form-control mb-2"
-                  />
-                  <input
-                    placeholder="Thông tin nhỏ hơn (số nhà, tên đường, ...)"
-                    value={newAddress.street}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, street: e.target.value })
-                    }
-                    className="form-control mb-2"
-                  />
-                  <button
-                    onClick={handleAddNewAddress}
-                    className="btn btn-primary"
-                  >
-                    Lưu địa chỉ mới
-                  </button>
-                  <button
-                    onClick={() => setIsAddingNewAddress(false)}
-                    className="btn btn-link"
-                  >
-                    Hủy
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-          <div className="form-group">
-            <label>Phương thức thanh toán</label>
-            <select
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="form-control"
-            >
-              <option value="zalopay">ZaloPay</option>
-              <option value="cod">Thanh toán khi nhận hàng (COD)</option>
-            </select>
-          </div>
-          <button className="btn btn-primary" onClick={handlePlaceOrder}>
-            Thanh toán
-          </button>
-        </div>
+  const handleUserInfoSave = (updatedUserInfo) => {
+    setUserInfo(updatedUserInfo);
+    setIsEditingUserInfo(false);
+  };
 
-        <div className="col-md-6">
-          <h4>Thông tin đơn hàng</h4>
-          <div className="order-items">
-            {cartItems.map((item) => (
-              <div className="order-item" key={item.product._id}>
-                <div>{item.product.title}</div>
-                <div>
-                  {item.quantity} x {formatPrice(item.product.price)}
+  if (loading) {
+    return (
+      <div className="container mt-4">
+        <h2>Thanh toán</h2>
+        <p>Đang tải dữ liệu...</p>
+      </div>
+    );
+  }
+
+  return (
+    <section className="container-checkout">
+      <div className="container mt-5">
+        <ToastContainer />
+        <div className="row">
+          <div className="col-md-4">
+            <h2 className="mb-4 ">Khách Hàng</h2>
+            <div className="card mb-4 user-information">
+              <div className="card-body">
+                {userInfo && (
+                  <>
+                    {!userInfo.name || !userInfo.phone || isEditingUserInfo ? (
+                      // Show user info form if missing data or editing
+                      <div>
+                        <p>
+                          Vui lòng bổ sung thông tin để tiếp tục thanh toán.
+                        </p>
+                        <UserInfoForm
+                          initialData={userInfo}
+                          onSave={handleUserInfoSave}
+                        />
+                      </div>
+                    ) : (
+                      // Display user info
+                      <>
+                        <p className="card-text ">
+                          <strong className="user-name">Họ và tên:</strong>{" "}
+                          {userInfo.name}
+                        </p>
+                        <p className="card-text">
+                          <strong className="user-phone">Số điện thoại:</strong>{" "}
+                          {userInfo.phone}
+                        </p>
+                        <button
+                          className="btn btn-link"
+                          onClick={() => setIsEditingUserInfo(true)}
+                        >
+                          Chỉnh, sửa thông tin
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+                {selectedAddress ? (
+                  <>
+                    <p className="card-text">
+                      <strong className="user-address">Địa chỉ:</strong>{" "}
+                      {`${selectedAddress.street}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`}
+                    </p>
+                    <button
+                      className="btn btn-primary "
+                      onClick={() => setIsEditingAddress(!isEditingAddress)}
+                    >
+                      Thay đổi địa chỉ
+                    </button>
+                    {isEditingAddress && (
+                      <div className="mb-3">
+                        <label className="form-label">Chọn địa chỉ khác</label>
+                        <select
+                          className="form-select"
+                          value={selectedAddress._id}
+                          onChange={(e) =>
+                            setSelectedAddress(
+                              userInfo.addresses.find(
+                                (addr) => addr._id === e.target.value
+                              )
+                            )
+                          }
+                        >
+                          {userInfo.addresses.map((address) => (
+                            <option key={address._id} value={address._id}>
+                              {`${address.street}, ${address.ward}, ${address.district}, ${address.province}`}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          className="btn btn-secondary mt-2"
+                          onClick={() => setIsAddingNewAddress(true)}
+                        >
+                          Thêm địa chỉ mới
+                        </button>
+                        {isAddingNewAddress && (
+                          <div id="newAddressForm" className="mt-3">
+                            <div className="mb-3">
+                              <label className="form-label">
+                                Tỉnh/Thành phố
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={newAddress.province}
+                                onChange={(e) =>
+                                  setNewAddress({
+                                    ...newAddress,
+                                    province: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="mb-3">
+                              <label className="form-label">Quận/Huyện</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={newAddress.district}
+                                onChange={(e) =>
+                                  setNewAddress({
+                                    ...newAddress,
+                                    district: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="mb-3">
+                              <label className="form-label">Phường/Xã</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={newAddress.ward}
+                                onChange={(e) =>
+                                  setNewAddress({
+                                    ...newAddress,
+                                    ward: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="mb-3">
+                              <label className="form-label">
+                                Số nhà, tên đường
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={newAddress.street}
+                                onChange={(e) =>
+                                  setNewAddress({
+                                    ...newAddress,
+                                    street: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <button
+                              className="btn btn-primary"
+                              onClick={handleAddNewAddress}
+                            >
+                              Lưu địa chỉ mới
+                            </button>
+                            <button
+                              className="btn btn-link"
+                              onClick={() => setIsAddingNewAddress(false)}
+                            >
+                              Hủy
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // If no address is selected
+                  <>
+                    <p>Bạn chưa có địa chỉ giao hàng.</p>
+                    <button
+                      className="btn btn-secondary mt-2"
+                      onClick={() => setIsAddingNewAddress(true)}
+                    >
+                      Thêm địa chỉ mới
+                    </button>
+                    {isAddingNewAddress && (
+                      <div id="newAddressForm" className="mt-3">
+                        <div className="mb-3">
+                          <label className="form-label">Tỉnh/Thành phố</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={newAddress.province}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                province: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Quận/Huyện</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={newAddress.district}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                district: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Phường/Xã</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={newAddress.ward}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                ward: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Số nhà, tên đường
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={newAddress.street}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                street: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <button
+                          className="btn btn-primary"
+                          onClick={handleAddNewAddress}
+                        >
+                          Lưu địa chỉ mới
+                        </button>
+                        <button
+                          className="btn btn-link"
+                          onClick={() => setIsAddingNewAddress(false)}
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            <h2 className="mb-4">Phương thức thanh toán</h2>
+            <div className="card mb-4 pay-information">
+              <div className="card-body">
+                <div className="mb-3">
+                  <label className="form-label">Phương thức thanh toán</label>
+                  <select
+                    className="form-select"
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  >
+                    <option className="zalopay" value="zalopay">
+                      ZaloPay
+                    </option>
+                    <option className="cod" value="cod">
+                      Thanh toán khi nhận hàng
+                    </option>
+                  </select>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-          <div className="order-total">
-            <strong>Tổng tiền: {formatPrice(getTotalPrice())}</strong>
+          <div className="col-md-8">
+            <h2 className="mb-4">Thông tin đơn hàng</h2>
+            <div className="card mb-4 card-information ">
+              <div className="card-body">
+                {cart && cart.products.length > 0 ? (
+                  <>
+                    <div className="row mb-3 infor">
+                      <div className="col-4 text-name-product ">
+                        <strong className="text-name-product">
+                          Tên sản phẩm
+                        </strong>
+                      </div>
+                      <div className="col-2 text-quantity">
+                        <strong className="text-quantity">Số lượng</strong>
+                      </div>
+                      <div className="col-3 text-price">
+                        <strong className="text-price">Đơn giá</strong>
+                      </div>
+                      <div className="col-3 text-total ">
+                        <strong className="text-total">Thành tiền</strong>
+                      </div>
+                    </div>
+                    {cart.products.map((item) => {
+                      const discountAmount = item.discount
+                        ? item.discount.isPercentage
+                          ? (item.price * item.discount.value * item.quantity) /
+                            100
+                          : item.discount.value * item.quantity
+                        : 0;
+                      return (
+                        <div
+                          className="row mb-3 product-infor"
+                          key={item.product._id}
+                        >
+                          <div className="col-4 product-name">
+                            • {item.product.name}
+                          </div>
+                          <div className="col-2 product-quantity">
+                            {item.quantity}
+                          </div>
+                          <div className="col-3 product-price">
+                            {formatPrice(item.price)}
+                          </div>
+                          <div className="col-3 product-total">
+                            {formatPrice(
+                              item.price * item.quantity - discountAmount
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <p>Giỏ hàng của bạn đang trống.</p>
+                )}
+              </div>
+            </div>
+
+            <h2 className="mb-4">Tổng cộng đơn hàng</h2>
+            <div className="card mb-4 total">
+              <div className="card-body">
+                <p className="card-text">
+                  <strong>Tổng tiền hàng:</strong>{" "}
+                  {formatPrice(getTotalPriceBeforeDiscount())}
+                </p>
+                <p className="card-text">
+                  <strong>Tổng giảm giá:</strong>{" "}
+                  {formatPrice(getTotalDiscount())}
+                </p>
+                <p className="card-text">
+                  <strong>Tổng tiền thanh toán:</strong>{" "}
+                  {formatPrice(getTotalAmount())}
+                </p>
+              </div>
+            </div>
+
+            <button
+              className="btn btn-success btn-lg w-100"
+              onClick={handlePlaceOrder}
+              disabled={
+                !userInfo ||
+                !userInfo.name ||
+                !userInfo.phone ||
+                !selectedAddress ||
+                !cart ||
+                cart.products.length === 0
+              }
+            >
+              Thanh toán
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -13,11 +13,11 @@
 }
 
 .input-group .form-control {
-  flex: 0 0 40%;
+  flex: 0 0 100%;
 }
 
 .input-group .btn {
-  flex: 0 0 40%;
+  flex: 0 0 100%;
 }
 
 .font-size-16 {
@@ -70,9 +70,7 @@
 .input-group .text-discount-cart {
   font-size: 12px;
 }
-.input-group .text-discount-cart {
-  font-size: 12px;
-}
+
 .button-quantity .btn-outline-primary {
   display: flex;
   align-items: center;
@@ -109,5 +107,8 @@
   .input-group .form-control,
   .input-group .btn {
     flex: 1 1 auto;
+  }
+  .input-group .text-discount-product {
+    font-size: 12px;
   }
 }

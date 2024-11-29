@@ -6,7 +6,9 @@ function ServicesSection() {
   return (
     <section className="services-section py-5 bg-light">
       <div className="container services">
-        <h2 className="text-center mb-5">Dịch Vụ Của Chúng Tôi</h2>
+        <h2 className="text-center text-services mb-5">
+          Dịch Vụ Của Chúng Tôi
+        </h2>
         <div className="row">
           <div className="col-md-4 text-center mb-4">
             <div className="service-card">

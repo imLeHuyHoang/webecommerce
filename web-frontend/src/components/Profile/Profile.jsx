@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import apiClient from "../../utils/api-client";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
+import UserInfoForm from "./UserInforForm"; // Reusing the UserInfoForm component
 import ToastNotification from "../ToastNotification/ToastNotification";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
 
 const Profile = () => {
@@ -11,9 +12,6 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    gender: "",
     addresses: [{ province: "", district: "", ward: "", street: "" }],
   });
   const [newAddress, setNewAddress] = useState({
@@ -30,21 +28,6 @@ const Profile = () => {
   // Reference for detecting outside clicks
   const newAddressFormRef = useRef(null);
 
-  // Validation schema
-  const profileSchema = z.object({
-    name: z.string().min(1, "Họ tên không được để trống"),
-    phone: z.string().min(1, "Số điện thoại không được để trống"),
-    gender: z.enum(["male", "female", "other"]),
-    addresses: z.array(
-      z.object({
-        province: z.string().min(1, "Tỉnh/Thành phố không được để trống"),
-        district: z.string().min(1, "Quận/Huyện không được để trống"),
-        ward: z.string().min(1, "Phường/Xã không được để trống"),
-        street: z.string().min(1, "Đường không được để trống"),
-      })
-    ),
-  });
-
   // Fetch user profile data
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -52,9 +35,6 @@ const Profile = () => {
         const response = await apiClient.get("/user/profile");
         setUser(response.data);
         setFormData({
-          name: response.data.name,
-          phone: response.data.phone,
-          gender: response.data.gender,
           addresses: response.data.addresses.length
             ? response.data.addresses
             : [{ province: "", district: "", ward: "", street: "" }],
@@ -68,15 +48,6 @@ const Profile = () => {
     };
     fetchUserProfile();
   }, []);
-
-  // Update profile fields
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
 
   // Update individual address fields for editing
   const handleAddressChange = (index, e) => {
@@ -114,8 +85,12 @@ const Profile = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      profileSchema.parse(formData);
-      const response = await apiClient.put("/user/profile", formData);
+      // Update addresses
+      const updatedData = {
+        ...user,
+        addresses: formData.addresses,
+      };
+      const response = await apiClient.put("/user/profile", updatedData);
       setUser(response.data);
       setIsEditing(false);
       setShowNewAddressForm(false);
@@ -146,199 +121,207 @@ const Profile = () => {
     };
   }, [showNewAddressForm]);
 
+  // Handle user info save from UserInfoForm
+  const handleUserInfoSave = (updatedUserInfo) => {
+    setUser(updatedUserInfo);
+    setIsEditing(false);
+    setToastMessage("Cập nhật thông tin thành công.");
+    setShowToast(true);
+  };
+
   if (loading) return <p>Đang tải thông tin người dùng...</p>;
 
   return (
-    <div className="container profile-page">
-      {/* Frame 1: Chào mừng người dùng */}
-      <div className="welcome-frame text-left">
-        <div className="welcome-frame-text">
-          Xin chào, {user.name}! Rất vui khi bạn đã quay lại!{" "}
-          <span role="img" aria-label="smile">
-            😊
-          </span>
+    <div className="bg-light py-5">
+      <div className="container bg-white p-5 rounded shadow-sm">
+        {/* Welcome Message */}
+        <div className="mb-4">
+          <h1 className="h2 font-weight-bold">Xin chào, {user.name}!</h1>
+          <p className="text-muted">Rất vui khi bạn đã quay lại.</p>
         </div>
-      </div>
 
-      {/* Frame 2: Tình trạng đơn hàng */}
-      <div className="order-status-frame my-4">
-        <div className="row">
-          <div className="col-md-4 mb-3">
-            <div className="card status-card pending">
-              <div className="card-body text-center">
-                <i className="fas fa-hourglass-half fa-2x mb-2"></i>
-                <h5>Đang chờ xác nhận:3</h5>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card status-card shipping">
-              <div className="card-body text-center">
-                <i className="fas fa-shipping-fast fa-2x mb-2"></i>
-                <h5>Đang giao hàng:2</h5>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card status-card canceled">
-              <div className="card-body text-center">
-                <i className="fas fa-times-circle fa-2x mb-2"></i>
-                <h5>Đã hủy:1</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Frame 3: Thông tin người dùng */}
-      <div className="user-info-frame my-4">
-        <h3>
-          Thông tin người dùng{" "}
-          <i
-            className="fas fa-edit edit-icon"
-            onClick={() => setIsEditing(!isEditing)}
-          ></i>
-        </h3>
-        {!isEditing ? (
+        {/* Order Status */}
+        <div className="mb-4">
+          <h2 className="h4 font-weight-bold mb-3">Tình trạng đơn hàng</h2>
           <div className="row">
-            {/* Cột bên trái: Thông tin cá nhân */}
-            <div className="col-md-6">
-              <div className="info-field">
-                <strong>Họ tên:</strong> {user.name}
-              </div>
-              <div className="info-field">
-                <strong>Số điện thoại:</strong> {user.phone}
-              </div>
-              <div className="info-field">
-                <strong>Giới tính:</strong>{" "}
-                {user.gender === "male"
-                  ? "Nam"
-                  : user.gender === "female"
-                  ? "Nữ"
-                  : "Khác"}
+            <div className="col-md-4 mb-3">
+              <div className="bg-light p-3 rounded shadow-sm text-center">
+                <h3 className="h5 font-weight-bold">Đơn hàng chờ xác nhận</h3>
+                <p className="display-4 font-weight-bold">3</p>
               </div>
             </div>
-            {/* Cột bên phải: Địa chỉ */}
-            <div className="col-md-6">
-              {user.addresses.map((address, index) => (
-                <div key={index} className="address-card p-3 mb-2">
-                  <h5>Địa chỉ {index + 1}</h5>
-                  <p>
-                    {address.street}, {address.ward}, {address.district},{" "}
-                    {address.province}
-                  </p>
-                </div>
-              ))}
+            <div className="col-md-4 mb-3">
+              <div className="bg-light p-3 rounded shadow-sm text-center">
+                <h3 className="h5 font-weight-bold">Đơn hàng đang giao</h3>
+                <p className="display-4 font-weight-bold">5</p>
+              </div>
+            </div>
+            <div className="col-md-4 mb-3">
+              <div className="bg-light p-3 rounded shadow-sm text-center">
+                <h3 className="h5 font-weight-bold">Đơn hàng đã hủy</h3>
+                <p className="display-4 font-weight-bold">1</p>
+              </div>
             </div>
           </div>
-        ) : (
-          // Form chỉnh sửa thông tin
-          <form onSubmit={handleSubmit}>
-            <div className="row">
-              {/* Cột bên trái: Thông tin cá nhân */}
-              <div className="col-md-6">
-                <div className="form-group">
-                  <label>Họ tên</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Số điện thoại</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Giới tính</label>
-                  <select
-                    className="form-control"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                  >
-                    <option value="male">Nam</option>
-                    <option value="female">Nữ</option>
-                    <option value="other">Khác</option>
-                  </select>
-                </div>
-              </div>
-              {/* Cột bên phải: Địa chỉ */}
-              <div className="col-md-6">
-                {formData.addresses.map((address, index) => (
-                  <div key={index} className="address-edit-card p-3 mb-2">
-                    <h5>
-                      Địa chỉ {index + 1}
-                      <i
-                        className="fas fa-trash-alt delete-icon ml-2"
-                        onClick={() => handleDeleteAddress(index)}
-                      ></i>
-                    </h5>
-                    <div className="form-group">
-                      <label>Tỉnh/Thành phố</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="province"
-                        value={address.province}
-                        onChange={(e) => handleAddressChange(index, e)}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Quận/Huyện</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="district"
-                        value={address.district}
-                        onChange={(e) => handleAddressChange(index, e)}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Phường/Xã</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="ward"
-                        value={address.ward}
-                        onChange={(e) => handleAddressChange(index, e)}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Đường</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="street"
-                        value={address.street}
-                        onChange={(e) => handleAddressChange(index, e)}
-                      />
-                    </div>
+        </div>
+
+        {/* User Information */}
+        <div className="mb-4">
+          <h2 className="h4 font-weight-bold mb-3">
+            Thông tin người dùng
+            <i
+              className="fas fa-edit ml-2"
+              style={{ cursor: "pointer" }}
+              onClick={() => setIsEditing(!isEditing)}
+            ></i>
+          </h2>
+          {!isEditing ? (
+            <>
+              {/* Personal Information */}
+              <div className="mb-4">
+                <h3 className="h5 font-weight-bold mb-2">Thông tin cá nhân</h3>
+                <div className="row">
+                  <div className="col-md-6">
+                    <label className="text-muted">Họ tên</label>
+                    <p className="bg-light p-2 rounded">{user.name}</p>
                   </div>
-                ))}
-                {/* Nút thêm địa chỉ mới */}
+                  <div className="col-md-6">
+                    <label className="text-muted">Số điện thoại</label>
+                    <p className="bg-light p-2 rounded">{user.phone}</p>
+                  </div>
+                </div>
+                <div className="mt-3"></div>
                 <button
-                  type="button"
-                  className="btn btn-primary mt-2"
-                  onClick={() => setShowNewAddressForm(!showNewAddressForm)}
+                  className="btn btn-dark mt-3"
+                  onClick={() => setIsEditing(true)}
                 >
-                  Thêm địa chỉ
+                  Chỉnh sửa thông tin
                 </button>
-                {/* Form thêm địa chỉ mới */}
+              </div>
+
+              {/* Addresses */}
+              <div>
+                <div className="row">
+                  {user.addresses.map((address, index) => (
+                    <div key={index} className="col-md-6 mb-3">
+                      <div className="bg-light p-3 rounded shadow-sm">
+                        <h4 className="font-weight-bold">
+                          Địa chỉ {index + 1}
+                        </h4>
+                        <p>{address.street}</p>
+                        <p>{address.ward}</p>
+                        <p> {address.district}</p>
+                        <p>{address.province}</p>
+                        <div className="mt-2">
+                          <button
+                            className="btn btn-dark mr-2"
+                            onClick={() => setIsEditing(true)}
+                          >
+                            Chỉnh sửa
+                          </button>
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => handleDeleteAddress(index)}
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  className="btn btn-dark mt-3"
+                  onClick={() => {
+                    setIsEditing(true);
+                    setShowNewAddressForm(true);
+                  }}
+                >
+                  Thêm địa chỉ mới
+                </button>
+              </div>
+            </>
+          ) : (
+            // Editing Form
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <h3 className="h5 font-weight-bold mb-2">
+                  Chỉnh sửa thông tin cá nhân
+                </h3>
+                <UserInfoForm initialData={user} onSave={handleUserInfoSave} />
+              </div>
+
+              {/* Edit Addresses */}
+              <div>
+                <h3 className="h5 font-weight-bold mb-2">Chỉnh sửa địa chỉ</h3>
+                <div className="row">
+                  {formData.addresses.map((address, index) => (
+                    <div key={index} className="col-md-6 mb-3">
+                      <div className="bg-light p-3 rounded shadow-sm">
+                        <h4 className="font-weight-bold">
+                          Địa chỉ {index + 1}
+                          <i
+                            className="fas fa-trash-alt text-danger ml-2"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleDeleteAddress(index)}
+                          ></i>
+                        </h4>
+                        <div className="form-group">
+                          <label>Tỉnh/Thành phố</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="province"
+                            value={address.province}
+                            onChange={(e) => handleAddressChange(index, e)}
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Quận/Huyện</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="district"
+                            value={address.district}
+                            onChange={(e) => handleAddressChange(index, e)}
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Phường/Xã</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="ward"
+                            value={address.ward}
+                            onChange={(e) => handleAddressChange(index, e)}
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Số nhà, tên đường</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="street"
+                            value={address.street}
+                            onChange={(e) => handleAddressChange(index, e)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add New Address Form */}
                 {showNewAddressForm && (
                   <div
-                    className="address-new-card p-3 mb-2 mt-2"
+                    className="bg-light p-3 rounded shadow-sm mt-3"
                     ref={newAddressFormRef}
                   >
-                    <h5>Thêm địa chỉ mới</h5>
+                    <h4 className="font-weight-bold">Thêm địa chỉ mới</h4>
                     <div className="form-group">
                       <label>Tỉnh/Thành phố</label>
                       <input
@@ -352,6 +335,7 @@ const Profile = () => {
                             province: e.target.value,
                           })
                         }
+                        required
                       />
                     </div>
                     <div className="form-group">
@@ -367,6 +351,7 @@ const Profile = () => {
                             district: e.target.value,
                           })
                         }
+                        required
                       />
                     </div>
                     <div className="form-group">
@@ -382,10 +367,11 @@ const Profile = () => {
                             ward: e.target.value,
                           })
                         }
+                        required
                       />
                     </div>
                     <div className="form-group">
-                      <label>Đường</label>
+                      <label>Số nhà, tên đường</label>
                       <input
                         type="text"
                         className="form-control"
@@ -397,6 +383,7 @@ const Profile = () => {
                             street: e.target.value,
                           })
                         }
+                        required
                       />
                     </div>
                     <button
@@ -408,31 +395,42 @@ const Profile = () => {
                     </button>
                   </div>
                 )}
-              </div>
-            </div>
-            {/* Nút lưu thay đổi */}
-            <div className="text-right mt-3">
-              <button
-                type="button"
-                className="btn btn-secondary mr-2"
-                onClick={() => setIsEditing(false)}
-              >
-                Hủy
-              </button>
-              <button type="submit" className="btn btn-primary">
-                {saving ? "Đang lưu..." : "Lưu thay đổi"}
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
 
-      {/* Toast notifications */}
-      <ToastNotification
-        message={toastMessage}
-        show={showToast}
-        onClose={() => setShowToast(false)}
-      />
+                {!showNewAddressForm && (
+                  <button
+                    type="button"
+                    className="btn btn-dark mt-3"
+                    onClick={() => setShowNewAddressForm(true)}
+                  >
+                    Thêm địa chỉ mới
+                  </button>
+                )}
+              </div>
+
+              {/* Save and Cancel Buttons */}
+              <div className="text-right mt-4">
+                <button
+                  type="button"
+                  className="btn btn-secondary mr-2"
+                  onClick={() => setIsEditing(false)}
+                >
+                  Hủy
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* Toast notifications */}
+        <ToastNotification
+          message={toastMessage}
+          show={showToast}
+          onClose={() => setShowToast(false)}
+        />
+      </div>
     </div>
   );
 };

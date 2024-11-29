@@ -205,8 +205,12 @@ const CartPage = () => {
 
     // Tính giảm giá của giỏ hàng nếu có
     if (cart.discountCode) {
+      const cartTotalBeforeDiscount = cart.products.reduce((total, item) => {
+        return total + item.price * item.quantity;
+      }, 0);
+
       const cartDiscountAmount = cart.discountCode.isPercentage
-        ? ((cart.totalAmount - totalDiscount) * cart.discountCode.value) / 100
+        ? (cartTotalBeforeDiscount * cart.discountCode.value) / 100
         : cart.discountCode.value;
       totalDiscount += cartDiscountAmount;
     }
@@ -333,7 +337,7 @@ const CartPage = () => {
                               <div className="input-group">
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className="form-control text-discount-product"
                                   placeholder="Nhập mã giảm giá sản phẩm"
                                   value={
                                     productDiscountCodes[item.product._id] || ""
@@ -399,7 +403,7 @@ const CartPage = () => {
                     <tr>
                       <td>Tổng Tiền :</td>
                       <td className="text-end">
-                        {formatPrice(getTotalPrice())}
+                        {formatPrice(getTotalPrice() + getTotalDiscount())}
                       </td>
                     </tr>
                     <tr>
@@ -407,22 +411,22 @@ const CartPage = () => {
                       <td className="text-end">{getTotalQuantity()}</td>
                     </tr>
                     <tr>
-                      <td>Tổng giảm giá :</td>
+                      <td>Số tiền giảm giá :</td>
                       <td className="text-end">
                         {formatPrice(getTotalDiscount())}
                       </td>
                     </tr>
                     <tr className="bg-light">
-                      <th>Tổng cộng :</th>
+                      <th>Tổng số tiền thanh toán :</th>
                       <td className="text-end fw-bold">
-                        {formatPrice(getTotalPrice() - getTotalDiscount())}
+                        {formatPrice(getTotalPrice())}
                       </td>
                     </tr>
                   </tbody>
                 </table>
 
                 <div className="mt-4">
-                  <h5>Mã giảm giá giỏ hàng</h5>
+                  <h5>Hãy dùng mã giảm giá cho toàn bộ giỏ hàng</h5>
                   <div className="input-group">
                     <input
                       type="text"

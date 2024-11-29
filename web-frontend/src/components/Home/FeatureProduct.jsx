@@ -26,7 +26,9 @@ function FeatureProduct() {
   return (
     <section className="featured-product">
       <div className="container">
-        <h2 className="text-center mb-5">Sản phẩm nổi bật hiện tại</h2>
+        <h2 className="text-center mb-5 text-feature">
+          Sản phẩm nổi bật hiện tại
+        </h2>
         <div className="row">
           {randomProducts.map((product) => (
             <div key={product._id} className="items_in_row col-md-3 mb-4">
