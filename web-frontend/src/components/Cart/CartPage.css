@@ -67,9 +67,6 @@
   padding: 0px;
   font-size: 12px;
 }
-.input-group .text-discount-cart {
-  font-size: 12px;
-}
 
 .button-quantity .btn-outline-primary {
   display: flex;
@@ -91,6 +88,102 @@
 .card .card-header {
   margin: 0px;
 }
+.btn.usecode {
+  background-color: #ffffff; /* Màu nền mặc định */
+  color: #000000; /* Màu chữ mặc định */
+  border: 1px solid black;
+  font-size: 12px; /* Kích thước chữ */
+  border-radius: 5px; /* Bo góc */
+  cursor: pointer; /* Hiển thị con trỏ tay */
+  transition: all 0.3s ease-in-out; /* Thêm hiệu ứng chuyển đổi */
+}
+
+/* Hiệu ứng hover */
+.btn.usecode:hover {
+  background-color: #0026ff; /* Màu nền khi hover */
+  color: #0d1e4c; /* Màu chữ khi hover */
+  transform: scale(1.05); /* Phóng to nhẹ */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+}
+
+/* Hiệu ứng khi nhấn */
+.btn.usecode:active {
+  transform: scale(0.95); /* Thu nhỏ nhẹ khi nhấn */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Đổ bóng nhỏ hơn */
+}
+/* Nút Tiếp tục mua sắm */
+#continue-shopping {
+  background-color: transparent; /* Nền trong suốt */
+  color: #6c757d; /* Màu chữ (text-muted) */
+  border: 1px solid #6c757d; /* Viền */
+  font-size: 12px; /* Kích thước chữ */
+  display: flex; /* Để căn chỉnh biểu tượng và chữ */
+  align-items: center; /* Căn giữa theo trục dọc */
+  gap: 8px; /* Khoảng cách giữa biểu tượng và chữ */
+  cursor: pointer; /* Con trỏ tay khi hover */
+  text-decoration: none; /* Xóa gạch chân */
+  transition: all 0.3s ease-in-out; /* Hiệu ứng mượt */
+  margin: 0px;
+}
+
+/* Hiệu ứng hover cho nút Tiếp tục mua sắm */
+#continue-shopping:hover {
+  color: #0d1e4c; /* Màu chữ khi hover */
+  text-decoration: underline; /* Thêm gạch chân khi hover */
+}
+
+/* CSS cho nút Áp dụng */
+#apply-cart-discount {
+  background-color: #ffffff; /* Màu nền */
+  color: #000000; /* Màu chữ */
+  border: 1px solid #007bff; /* Viền */
+  font-size: 12px; /* Kích thước chữ */
+  border-radius: 5px; /* Bo góc */
+  cursor: pointer; /* Con trỏ tay khi hover */
+  transition: all 0.3s ease-in-out; /* Hiệu ứng mượt */
+}
+
+/* Hiệu ứng hover cho nút Áp dụng */
+#apply-cart-discount:hover {
+  background-color: #003cff; /* Màu nền khi hover */
+  color: #ffffff; /* Màu chữ khi hover */
+  transform: scale(1.05); /* Phóng to nhẹ */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+}
+
+/* Hiệu ứng khi nhấn nút */
+#apply-cart-discount:active {
+  transform: scale(0.95); /* Thu nhỏ nhẹ khi nhấn */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Đổ bóng nhỏ hơn */
+}
+
+/* Nút Thanh toán */
+#proceed-to-checkout {
+  background-color: #28a745; /* Màu nền (btn-success) */
+  color: #fff; /* Màu chữ */
+  border: none; /* Xóa viền */
+  font-size: 12px; /* Kích thước chữ */
+  border-radius: 5px; /* Bo góc */
+  display: flex; /* Để căn chỉnh biểu tượng và chữ */
+  align-items: center; /* Căn giữa theo trục dọc */
+  gap: 8px; /* Khoảng cách giữa biểu tượng và chữ */
+  cursor: pointer; /* Con trỏ tay khi hover */
+  transition: all 0.3s ease-in-out; /* Hiệu ứng mượt */
+}
+
+/* Hiệu ứng hover cho nút Thanh toán */
+#proceed-to-checkout:hover {
+  background-color: #218838; /* Màu nền khi hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+  transform: scale(1.05); /* Phóng to nhẹ */
+}
+
+/* Hiệu ứng khi nhấn cho cả hai nút */
+#continue-shopping:active,
+#proceed-to-checkout:active {
+  transform: scale(0.95); /* Thu nhỏ nhẹ khi nhấn */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Đổ bóng nhỏ hơn */
+}
 
 @media (max-width: 575.98px) {
   .avatar-lg {
@@ -107,8 +200,5 @@
   .input-group .form-control,
   .input-group .btn {
     flex: 1 1 auto;
-  }
-  .input-group .text-discount-product {
-    font-size: 12px;
   }
 }

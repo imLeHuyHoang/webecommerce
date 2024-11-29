@@ -133,7 +133,7 @@ const Profile = () => {
 
   return (
     <div className="bg-light py-5">
-      <div className="container bg-white p-5 rounded shadow-sm">
+      <div className=" profile-container bg-white p-5 rounded shadow-sm">
         {/* Welcome Message */}
         <div className="mb-4">
           <h1 className="h2 font-weight-bold">Xin chào, {user.name}!</h1>

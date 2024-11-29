@@ -350,7 +350,7 @@ const CartPage = () => {
                                   }}
                                 />
                                 <button
-                                  className="btn btn-primary"
+                                  className="btn usecode"
                                   type="button"
                                   onClick={() =>
                                     applyProductDiscount(
@@ -368,24 +368,6 @@ const CartPage = () => {
                       </div>
                     );
                   })}
-                </div>
-                <div className="row my-4">
-                  <div className="col-sm-12 d-flex justify-content-between">
-                    <button
-                      onClick={() => navigate("/product")}
-                      className="btn btn-link text-muted"
-                      id="continue-shopping"
-                    >
-                      <FaArrowLeft className="me-1" /> Tiếp tục mua sắm
-                    </button>
-                    <button
-                      onClick={handleProceedToCheckout}
-                      className="btn btn-success"
-                      id="proceed-to-checkout"
-                    >
-                      <FaCartArrowDown className="me-1" /> Thanh toán
-                    </button>
-                  </div>
                 </div>
               </>
             )}
@@ -427,17 +409,17 @@ const CartPage = () => {
 
                 <div className="mt-4">
                   <h5>Hãy dùng mã giảm giá cho toàn bộ giỏ hàng</h5>
-                  <div className="input-group">
+                  <div className="input-group usecode">
                     <input
                       type="text"
-                      className="form-control text-discount-cart"
+                      className="form-control"
                       placeholder="Nhập mã giảm giá "
                       value={discountCode}
                       onChange={(e) => setDiscountCode(e.target.value)}
                       id="cart-discount-code"
                     />
                     <button
-                      className="btn btn-primary text-discount-cart"
+                      className="btn  text-discount-cart"
                       type="button"
                       onClick={applyCartDiscount}
                       id="apply-cart-discount"
@@ -464,6 +446,24 @@ const CartPage = () => {
                       {discountError}
                     </div>
                   )}
+                </div>
+                <div className="row my-4">
+                  <div className="col-sm-12 d-flex justify-content-between">
+                    <button
+                      onClick={() => navigate("/product")}
+                      className="btn btn-link text-muted"
+                      id="continue-shopping"
+                    >
+                      <FaArrowLeft className="" /> Tiếp tục mua sắm
+                    </button>
+                    <button
+                      onClick={handleProceedToCheckout}
+                      className="btn btn-success"
+                      id="proceed-to-checkout"
+                    >
+                      <FaCartArrowDown className="" /> Thanh toán
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
