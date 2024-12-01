@@ -160,19 +160,6 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// Xóa người dùng
-exports.deleteUser = async (req, res) => {
-  try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
-    if (!deletedUser) {
-      return res.status(404).json({ message: "Người dùng không tồn tại." });
-    }
-    res.status(200).json({ message: "Xóa người dùng thành công." });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // Refresh Token
 exports.refreshToken = async (req, res) => {
   try {
@@ -357,5 +344,113 @@ exports.updateUser = async (req, res) => {
   } catch (error) {
     console.error("Update error:", error); // Log lỗi chi tiết
     res.status(500).json({ error: error.message });
+  }
+};
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Check if the requester is an admin
+    if (!req.user.roles.includes("admin")) {
+      return res.status(403).json({ message: "Access denied." });
+    }
+
+    const users = await User.find().select("-password -refreshToken");
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+};
+
+///
+// controllers/userController.js
+
+// Create a new user by admin
+exports.createUserByAdmin = async (req, res) => {
+  try {
+    const { name, email, password, phone, gender, roles } = req.body;
+
+    // Validate input
+    if (!name || !email || !password || !roles) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email is already in use." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      gender,
+      roles,
+      tokenVersion: 0,
+    });
+
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error("Create user by admin error:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+};
+
+// controllers/userController.js
+
+// Update a user by admin
+exports.updateUserByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, phone, gender, addresses, password, roles, isActive } =
+      req.body;
+
+    const updates = {};
+
+    if (name) updates.name = name;
+    if (phone) updates.phone = phone;
+    if (gender) updates.gender = gender;
+    if (addresses) updates.addresses = addresses;
+    if (roles) updates.roles = roles;
+    if (typeof isActive !== "undefined") updates.isActive = isActive;
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      updates.password = hashedPassword;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true }
+    ).select("-password -refreshToken");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Update user by admin error:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+};
+// controllers/userController.js
+
+// Delete a user by admin
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json({ message: "User deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Server error." });
   }
 };

@@ -1,90 +1,138 @@
-/* ManageProducts.css */
+/* General styles */
+.container {
+  margin-top: 2rem;
+}
 
-/* Định dạng cho bảng */
 .table-responsive {
-  overflow-x: auto;
+  margin-top: 1rem;
 }
 
-.table {
-  width: 100%;
-  margin-bottom: 1rem;
-  background-color: transparent;
-}
-
-.table th,
-.table td {
-  padding: 0.75rem;
+.table th {
   vertical-align: top;
-  border-top: 1px solid #dee2e6;
+  text-align: left;
+  padding: 8px;
+  white-space: nowrap;
 }
 
-.table thead th {
-  vertical-align: bottom;
-  border-bottom: 2px solid #dee2e6;
+.table td {
+  vertical-align: top;
+  text-align: left;
+  padding: 3px;
 }
 
-.table tbody + tbody {
-  border-top: 2px solid #dee2e6;
+.Actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.table-hover tbody tr:hover {
-  background-color: rgba(0, 0, 0, 0.075);
+.btn-edit,
+.btn-delete {
+  margin: 0 5px; /* Adjust the margin as needed */
 }
 
-/* Định dạng cho hình ảnh */
-.category-image {
+.table img {
   width: 50px;
   margin-right: 5px;
 }
 
-/* Định dạng cho modal */
-.modal.show {
-  display: block;
-}
-
 .modal-dialog {
-  max-width: 500px;
-  margin: 1.75rem auto;
-}
-
-.modal-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  pointer-events: auto;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 0.3rem;
-  outline: 0;
+  max-width: 90%;
 }
 
 .modal-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  padding: 1rem 1rem;
-  border-bottom: 1px solid #dee2e6;
-  border-top-left-radius: 0.3rem;
-  border-top-right-radius: 0.3rem;
-}
-
-.modal-title {
-  margin-bottom: 0;
-  line-height: 1.5;
+  align-items: center;
 }
 
 .modal-body {
-  position: relative;
-  flex: 1 1 auto;
-  padding: 1rem;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
-.modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0.75rem;
-  border-top: 1px solid #dee2e6;
+/* Responsive styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .table th,
+  .table td {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+
+  .table img {
+    width: 40px;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+  }
+
+  .form-control {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+
+  .d-flex {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .d-flex > * {
+    margin-bottom: 0.5rem;
+  }
+
+  .d-flex > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .table th,
+  .table td {
+    font-size: 0.75rem;
+    padding: 0.25rem;
+  }
+
+  .table img {
+    width: 30px;
+  }
+
+  .btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .form-label {
+    font-size: 0.75rem;
+  }
+
+  .form-control {
+    font-size: 0.75rem;
+    padding: 0.25rem;
+  }
 }

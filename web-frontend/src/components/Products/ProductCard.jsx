@@ -52,7 +52,7 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
           }}
         />
       </NavLink>
-      <div className="card-body">
+      <div className="card-body card-body-information">
         <h5 className="card-title">{title}</h5>
         <p className="card-price">Giá: {formatPrice(price)}</p>
         <p className="card-stock">{stock > 0 ? "Còn hàng" : "Hết hàng"}</p>

@@ -1,4 +1,4 @@
-// UserManagement.jsx - Techstore Admin User Management with Roles and Permissions
+// UserManagement.jsx
 
 import React, { useState, useEffect } from "react";
 import {
@@ -9,17 +9,36 @@ import {
   Button,
   Modal,
   Form,
+  Spinner,
 } from "react-bootstrap";
 import { z } from "zod";
+import apiClient from "../../utils/api-client";
 import ToastNotification from "../ToastNotification/ToastNotification";
 
-// Define the validation schema using zod
-const userSchema = z.object({
+// Validation schemas using zod
+
+// Schema for new users
+const newUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
   roles: z.array(z.string()).min(1, "At least one role is required"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
 });
+
+// Schema for existing users
+const existingUserSchema = z
+  .object({
+    _id: z.string(),
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address").optional(),
+    roles: z.array(z.string()).min(1, "At least one role is required"),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters long")
+      .optional()
+      .or(z.literal("")),
+  })
+  .nonstrict();
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -28,72 +47,151 @@ const UserManagement = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // API base URL
+  const API_URL = import.meta.env.VITE_API_BASE_URL + "/user";
+
+  // Access token from local storage or context
+  const accessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
-    // Fetch user list from server or database (mocked data for now)
-    setUsers([
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john.doe@example.com",
-        roles: ["user"],
-        isActive: true,
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane.smith@example.com",
-        roles: ["admin"],
-        isActive: true,
-      },
-    ]);
+    fetchUsers();
   }, []);
 
+  // Fetch users from backend
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await apiClient.get(`${API_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setToastMessage("Error fetching users");
+      setShowToast(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddUser = () => {
-    setSelectedUser(null);
+    setSelectedUser({
+      name: "",
+      email: "",
+      password: "",
+      roles: [],
+      isActive: true,
+    });
+    setErrors({});
     setShowModal(true);
   };
 
   const handleEditUser = (user) => {
-    setSelectedUser(user);
+    setSelectedUser({ ...user, password: "" });
+    setErrors({});
     setShowModal(true);
   };
 
-  const handleDeleteUser = (userId) => {
-    setUsers(users.filter((user) => user.id !== userId));
-    setToastMessage("User deleted successfully");
-    setShowToast(true);
-  };
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
 
-  const handleBanUser = (userId) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === userId ? { ...user, isActive: !user.isActive } : user
-      )
-    );
-    setToastMessage("User status updated successfully");
-    setShowToast(true);
-  };
-
-  const handleSaveUser = () => {
     try {
-      // Validate the selected user using the schema
-      userSchema.parse(selectedUser);
+      await apiClient.delete(`${API_URL}/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setUsers(users.filter((user) => user._id !== userId));
+      setToastMessage("User deleted successfully");
+      setShowToast(true);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setToastMessage("Error deleting user");
+      setShowToast(true);
+    }
+  };
 
-      if (selectedUser.id) {
+  const handleBanUser = async (userId) => {
+    try {
+      // Find the user
+      const user = users.find((u) => u._id === userId);
+      if (!user) return;
+
+      // Toggle isActive status
+      const updatedUser = { isActive: !user.isActive };
+
+      // Update user in backend
+      const response = await apiClient.put(
+        `${API_URL}/${userId}`,
+        updatedUser,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      // Update users state
+      setUsers(users.map((u) => (u._id === userId ? response.data : u)));
+      setToastMessage("User status updated successfully");
+      setShowToast(true);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      setToastMessage("Error updating user status");
+      setShowToast(true);
+    }
+  };
+
+  const handleSaveUser = async () => {
+    try {
+      // Prepare the user data for validation and submission
+      const userToSubmit = { ...selectedUser };
+
+      // If password is empty, delete it from the object
+      if (!userToSubmit.password) {
+        delete userToSubmit.password;
+      }
+
+      // Choose the appropriate schema
+      if (userToSubmit._id) {
+        existingUserSchema.parse(userToSubmit);
+      } else {
+        newUserSchema.parse(userToSubmit);
+      }
+
+      if (userToSubmit._id) {
         // Update existing user
+        const response = await apiClient.put(
+          `${API_URL}/${userToSubmit._id}`,
+          userToSubmit,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
-            user.id === selectedUser.id ? selectedUser : user
+            user._id === userToSubmit._id ? response.data : user
           )
         );
         setToastMessage("User updated successfully");
       } else {
         // Add new user
-        setUsers((prevUsers) => [
-          ...prevUsers,
-          { ...selectedUser, id: prevUsers.length + 1 },
-        ]);
+        const response = await apiClient.post(
+          `${API_URL}/admin`,
+          userToSubmit,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        setUsers((prevUsers) => [...prevUsers, response.data]);
         setToastMessage("User added successfully");
       }
       setShowToast(true);
@@ -107,14 +205,41 @@ const UserManagement = () => {
           errorObject[error.path[0]] = error.message;
         });
         setErrors(errorObject);
+      } else if (e.response && e.response.data && e.response.data.message) {
+        // Handle server validation errors
+        setToastMessage(e.response.data.message);
+        setShowToast(true);
+      } else {
+        console.error("Error saving user:", e);
+        setToastMessage("Error saving user");
+        setShowToast(true);
       }
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSelectedUser({ ...selectedUser, [name]: value });
+    setSelectedUser((prevState) => ({ ...prevState, [name]: value }));
   };
+
+  const handleRolesChange = (e) => {
+    const options = e.target.options;
+    const roles = [];
+    for (let i = 0, l = options.length; i < l; i++) {
+      if (options[i].selected) {
+        roles.push(options[i].value);
+      }
+    }
+    setSelectedUser({ ...selectedUser, roles });
+  };
+
+  if (loading) {
+    return (
+      <Container fluid className="text-center">
+        <Spinner animation="border" />
+      </Container>
+    );
+  }
 
   return (
     <Container fluid>
@@ -135,7 +260,7 @@ const UserManagement = () => {
           <Table striped bordered hover responsive>
             <thead>
               <tr>
-                <th>ID</th>
+                {/* Removed ID column for brevity */}
                 <th>Name</th>
                 <th>Email</th>
                 <th>Roles</th>
@@ -145,8 +270,8 @@ const UserManagement = () => {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
+                <tr key={user._id}>
+                  {/* Removed ID cell for brevity */}
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.roles.join(", ")}</td>
@@ -161,14 +286,14 @@ const UserManagement = () => {
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => handleDeleteUser(user.id)}
+                      onClick={() => handleDeleteUser(user._id)}
                       className="me-2"
                     >
                       Delete
                     </Button>
                     <Button
                       variant={user.isActive ? "secondary" : "success"}
-                      onClick={() => handleBanUser(user.id)}
+                      onClick={() => handleBanUser(user._id)}
                     >
                       {user.isActive ? "Ban" : "Unban"}
                     </Button>
@@ -184,11 +309,12 @@ const UserManagement = () => {
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>
-            {selectedUser?.id ? "Edit User" : "Add New User"}
+            {selectedUser?._id ? "Edit User" : "Add New User"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
+            {/* Name Field */}
             <Form.Group className="mb-3" controlId="formUserName">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -203,6 +329,8 @@ const UserManagement = () => {
                 {errors.name}
               </Form.Control.Feedback>
             </Form.Group>
+
+            {/* Email Field */}
             <Form.Group className="mb-3" controlId="formUserEmail">
               <Form.Label>Email</Form.Label>
               <Form.Control
@@ -212,11 +340,14 @@ const UserManagement = () => {
                 onChange={handleChange}
                 isInvalid={!!errors.email}
                 required
+                disabled={!!selectedUser?._id}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.email}
               </Form.Control.Feedback>
             </Form.Group>
+
+            {/* Password Field */}
             <Form.Group className="mb-3" controlId="formUserPassword">
               <Form.Label>Password</Form.Label>
               <Form.Control
@@ -225,12 +356,16 @@ const UserManagement = () => {
                 value={selectedUser?.password || ""}
                 onChange={handleChange}
                 isInvalid={!!errors.password}
-                required
+                placeholder={
+                  selectedUser?._id ? "Leave blank to keep unchanged" : ""
+                }
               />
               <Form.Control.Feedback type="invalid">
                 {errors.password}
               </Form.Control.Feedback>
             </Form.Group>
+
+            {/* Roles Field */}
             <Form.Group className="mb-3" controlId="formUserRoles">
               <Form.Label>Roles</Form.Label>
               <Form.Control
@@ -238,15 +373,7 @@ const UserManagement = () => {
                 multiple
                 name="roles"
                 value={selectedUser?.roles || []}
-                onChange={(e) =>
-                  setSelectedUser({
-                    ...selectedUser,
-                    roles: Array.from(
-                      e.target.selectedOptions,
-                      (option) => option.value
-                    ),
-                  })
-                }
+                onChange={handleRolesChange}
                 isInvalid={!!errors.roles}
               >
                 <option value="user">User</option>
@@ -258,6 +385,8 @@ const UserManagement = () => {
             </Form.Group>
           </Form>
         </Modal.Body>
+
+        {/* Modal Footer */}
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Close

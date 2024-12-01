@@ -1,3 +1,5 @@
+// routes/userRoutes.js
+
 const express = require("express");
 const router = express.Router();
 const {
@@ -6,25 +8,33 @@ const {
   getProfile,
   refreshToken,
   logoutUser,
-  updateUser, // Sử dụng updateUser thay vì updateUserProfile
+  updateUser,
   deleteUser,
   googleLogin,
   loginUserAdmin,
+  getAllUsers,
+  createUserByAdmin,
+  updateUserByAdmin,
 } = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/auth");
-
-// Định nghĩa các route
+const authAdmin = require("../middleware/authAdmin");
+// Public routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/google-login", googleLogin);
+router.post("/loginadmin", loginUserAdmin);
+
+// Protected routes
 router.get("/profile", verifyToken, getProfile);
+router.put("/profile", verifyToken, updateUser);
 router.get("/refreshToken", refreshToken);
 router.post("/logout", logoutUser);
-router.put("/profile", verifyToken, updateUser);
-router.delete("/:id", deleteUser);
-router.post("/google-login", googleLogin);
 
-// Route cho admin login
-router.post("/loginadmin", loginUserAdmin);
+// Admin routes
+router.get("/users", verifyToken, authAdmin, getAllUsers);
+router.post("/admin", verifyToken, authAdmin, createUserByAdmin);
+router.put("/:id", verifyToken, authAdmin, updateUserByAdmin);
+router.delete("/:id", verifyToken, authAdmin, deleteUser);
 
 module.exports = router;
