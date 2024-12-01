@@ -20,6 +20,7 @@ exports.verifyToken = async (req, res, next) => {
     }
 
     req.user = user; // Set req.user to the full user object
+    console.log(user);
     next();
   } catch (error) {
     console.error("Token verification error:", error);

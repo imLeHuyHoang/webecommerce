@@ -5,9 +5,10 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan"); // Logging
 require("dotenv").config();
 require("./db/connectDB"); // Connect to MongoDB
+const cronJobs = require("./services/cronJobs");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -46,8 +47,7 @@ app.use("/api/discounts", discountRoutes);
 app.use("/category", express.static(__dirname + "/upload/category"));
 app.use("/products", express.static(__dirname + "/upload/products"));
 
-// Route registration
-
+cronJobs;
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

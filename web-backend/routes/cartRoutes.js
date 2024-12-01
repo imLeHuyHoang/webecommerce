@@ -38,4 +38,7 @@ router.delete(
   cartController.removeProductDiscount
 );
 
+//router check-stock
+router.post("/check-stock", verifyToken, cartController.checkStock);
+
 module.exports = router;

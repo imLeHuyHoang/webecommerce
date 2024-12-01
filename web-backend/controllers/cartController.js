@@ -2,6 +2,7 @@
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 const Discount = require("../models/Discount");
+const Inventory = require("../models/Inventory");
 
 // Helper function to calculate cart totals
 const calculateCartTotals = async (cart) => {
@@ -418,5 +419,36 @@ exports.applyProductDiscount = async (req, res) => {
   } catch (error) {
     console.error("Error in applyProductDiscount:", error);
     res.status(500).json({ error: error.message });
+  }
+};
+exports.checkStock = async (req, res) => {
+  try {
+    const { products } = req.body; // Giả sử `products` là mảng các đối tượng { productId, quantity }
+    console.log(products);
+
+    const outOfStockItems = [];
+    const nameOfOutOfStockItems = [];
+
+    for (let item of products) {
+      const inventory = await Inventory.findOne({ product: item.productId });
+      if (!inventory || inventory.quantity < item.quantity) {
+        outOfStockItems.push(item.productId);
+        const product = await Product.findById(item.productId).select("name");
+        nameOfOutOfStockItems.push(product.name);
+      }
+    }
+
+    if (outOfStockItems.length > 0) {
+      return res.status(400).json({
+        message: "Một số sản phẩm hết hàng.",
+        outOfStockItems,
+        nameOfOutOfStockItems,
+      });
+    }
+
+    res.status(200).json({ message: "Tất cả sản phẩm có sẵn trong kho." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi khi kiểm tra tồn kho." });
   }
 };

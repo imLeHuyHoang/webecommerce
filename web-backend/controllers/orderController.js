@@ -73,13 +73,14 @@ exports.createOrder = async (req, res) => {
       total: totalAmount,
       payment: { method: paymentMethod, isVerified: false },
       paymentStatus: "pending",
+      paymentExpiry: new Date(Date.now() + 30 * 60 * 1000),
       shippingStatus: "processing",
       discountCode: cartDiscount ? cartDiscount._id : null,
       note: note || "",
       refund: {
         refundId: null,
         mRefundId: null,
-        status: null,
+        status: "null",
         amount: null,
       },
     });
@@ -195,7 +196,7 @@ exports.cancelOrder = async (req, res) => {
       order.refund = {
         refundId: refundResult.refundId,
         mRefundId: refundResult.mRefundId,
-        status: "processing",
+        status: "null",
         amount: refundResult.amount,
       };
       order.orderTimestamps.cancellation = new Date();

@@ -35,6 +35,10 @@ const orderSchema = new mongoose.Schema(
       enum: ["unpaid", "paid", "pending", "cancelled"],
       default: "unpaid",
     },
+    paymentExpiry: {
+      type: Date, // Lưu thời gian hết hạn thanh toán
+      required: true,
+    },
     shippingStatus: {
       type: String,
       enum: ["processing", "shipping", "shipped", "cancelled"],
@@ -56,8 +60,8 @@ const orderSchema = new mongoose.Schema(
       mRefundId: { type: String, default: null },
       status: {
         type: String,
-        enum: ["processing", "success", "failed"],
-        default: null,
+        enum: ["processing", "success", "failed", "null"],
+        default: "null",
       },
       amount: { type: Number, min: 0, default: null },
     },
