@@ -16,7 +16,7 @@ const CartProvider = ({ children }) => {
 
     if (accessToken) {
       try {
-        const response = await apiClient.get("/cart", {
+        const response = await apiClient.get("/cart/", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         count = response.data.products.reduce(

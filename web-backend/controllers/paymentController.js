@@ -37,9 +37,7 @@ exports.paymentCallback = async (req, res) => {
       return res.sendStatus(404);
     }
 
-    // Lưu zp_trans_id vào order
     order.payment.transactionId = zp_trans_id;
-    // xóa các sản phẩm
 
     if (type === 1) {
       order.payment.isVerified = true;
@@ -47,7 +45,6 @@ exports.paymentCallback = async (req, res) => {
       order.shippingStatus = "processing";
       order.paymentDate = new Date();
 
-      // xóa các sản phẩm trong giỏ hàng mà thuộc order vừa thanh toán
       await Cart.deleteMany({ user: order.user });
     } else if (type === 2) {
       order.paymentStatus = "cancelled";

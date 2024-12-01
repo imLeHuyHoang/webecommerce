@@ -1,5 +1,3 @@
-const Discount = require("./Discount");
-
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
@@ -48,25 +46,26 @@ const orderSchema = new mongoose.Schema(
         enum: ["cod", "zalopay"],
         required: true,
       },
-      transactionId: { type: String },
-      appTransId: { type: String },
+      transactionId: { type: String, default: null },
+      appTransId: { type: String, default: null },
       isVerified: { type: Boolean, default: false },
     },
     note: { type: String, trim: true, maxlength: 500 },
     refund: {
-      refundId: { type: String },
-      mRefundId: { type: String },
+      refundId: { type: String, default: null },
+      mRefundId: { type: String, default: null },
       status: {
         type: String,
         enum: ["processing", "success", "failed"],
+        default: null,
       },
-      amount: { type: Number, min: 0 },
+      amount: { type: Number, min: 0, default: null },
     },
     orderTimestamps: {
-      payment: { type: Date },
-      shipping: { type: Date },
-      delivery: { type: Date },
-      cancellation: { type: Date },
+      payment: { type: Date, default: null },
+      shipping: { type: Date, default: null },
+      delivery: { type: Date, default: null },
+      cancellation: { type: Date, default: null },
     },
     discountCode: {
       type: mongoose.Schema.Types.ObjectId,
@@ -78,8 +77,6 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Middleware to handle total calculation considering discounts
-// order.js
-
 orderSchema.pre("save", async function (next) {
   let total = 0;
 
@@ -90,7 +87,9 @@ orderSchema.pre("save", async function (next) {
 
   // Apply cart-level discount if present
   if (this.discountCode) {
-    const cartDiscount = await Discount.findById(this.discountCode);
+    const cartDiscount = await mongoose
+      .model("Discount")
+      .findById(this.discountCode);
     if (cartDiscount) {
       const cartDiscountValue = cartDiscount.isPercentage
         ? (total * cartDiscount.value) / 100

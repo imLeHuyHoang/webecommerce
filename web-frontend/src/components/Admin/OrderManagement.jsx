@@ -1,179 +1,173 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../utils/api-client";
+import OrderForm from "./OrderForm";
+import ToastNotification from "../ToastNotification/ToastNotification";
 
-const OrderManagement = () => {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/order";
+
+const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [statusUpdate, setStatusUpdate] = useState("");
-  const [cancelReason, setCancelReason] = useState("");
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    variant: "",
+  });
 
-  // thêm dữ liệu ví dụ để test
-  const tempData = [
-    {
-      _id: "1",
-      user: { name: "John Doe" },
-      total: 100,
-      status: "processing",
-      payment: { method: "credit card" },
-      note: "Lorem ipsum dolor sit amet",
-    },
-    {
-      _id: "2",
-      user: { name: "Jane Smith" },
-      total: 200,
-      status: "shipped",
-      payment: { method: "paypal" },
-      note: "Consectetur adipiscing elit",
-    },
-    {
-      _id: "3",
-      user: { name: "Bob Johnson" },
-      total: 300,
-      status: "delivered",
-      payment: { method: "cash" },
-      note: "Sed do eiusmod tempor incididunt",
-    },
-  ];
-
+  // Fetch orders
   useEffect(() => {
-    setOrders(tempData);
-  }, []);
-
-  useEffect(() => {
-    // Fetch all orders when the component mounts
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get("/api/orders");
-        setOrders(response.data);
-      } catch (error) {
-        console.error("Failed to fetch orders", error);
-      }
-    };
     fetchOrders();
   }, []);
 
-  const handleSelectOrder = (order) => {
+  const fetchOrders = async () => {
+    try {
+      const response = await apiClient.get(`${API_BASE_URL}/admin/all`);
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      setToast({
+        show: true,
+        message: "Failed to load orders",
+        variant: "danger",
+      });
+    }
+  };
+
+  const handleAddOrder = () => {
+    setSelectedOrder(null);
+    setShowModal(true);
+  };
+
+  const handleEditOrder = (order) => {
     setSelectedOrder(order);
+    setShowModal(true);
   };
 
-  const handleUpdateStatus = async () => {
-    if (!selectedOrder) return;
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to delete this order?")) return;
     try {
-      await axios.patch(`/api/orders/${selectedOrder._id}`, {
-        status: statusUpdate,
+      await apiClient.delete(`${API_BASE_URL}/admin/${orderId}`);
+      setToast({
+        show: true,
+        message: "Order deleted successfully",
+        variant: "success",
       });
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === selectedOrder._id
-            ? { ...order, status: statusUpdate }
-            : order
-        )
-      );
-      setSelectedOrder(null);
-      setStatusUpdate("");
-      alert("Order status updated successfully.");
+      fetchOrders();
     } catch (error) {
-      console.error("Failed to update order status", error);
+      console.error("Error deleting order:", error);
+      setToast({
+        show: true,
+        message: "Failed to delete order",
+        variant: "danger",
+      });
     }
   };
 
-  const handleCancelOrder = async () => {
-    if (!selectedOrder) return;
-    try {
-      await axios.patch(`/api/orders/${selectedOrder._id}/cancel`, {
-        reason: cancelReason,
-      });
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === selectedOrder._id
-            ? { ...order, status: "cancelled" }
-            : order
-        )
-      );
-      setSelectedOrder(null);
-      setCancelReason("");
-      alert("Order cancelled successfully.");
-    } catch (error) {
-      console.error("Failed to cancel order", error);
-    }
+  const handleSaveOrder = () => {
+    setShowModal(false);
+    fetchOrders();
   };
 
   return (
-    <div className="order-management">
-      <h1>Order Management</h1>
-      <div className="order-list">
-        <h2>Orders List</h2>
-        {Array.isArray(orders) && orders.length === 0 ? (
-          <p>No orders available</p>
-        ) : (
-          <table>
-            <thead>
+    <>
+      <div className="container mt-5">
+        {/* Header Section */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h1>Order Management</h1>
+          <button className="btn btn-primary" onClick={handleAddOrder}>
+            Add New Order
+          </button>
+        </div>
+
+        {/* Orders Table */}
+        <div className="table-responsive">
+          <table className="table table-bordered">
+            <thead className="table-dark">
               <tr>
                 <th>Order ID</th>
-                <th>Customer Name</th>
+                <th>User</th>
                 <th>Total</th>
-                <th>Status</th>
+                <th>Payment Status</th>
+                <th>Shipping Status</th>
+                <th>Order Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(orders) &&
+              {orders.length > 0 ? (
                 orders.map((order) => (
                   <tr key={order._id}>
                     <td>{order._id}</td>
-                    <td>{order.user.name}</td>
-                    <td>${order.total.toFixed(2)}</td>
-                    <td>{order.status}</td>
-                    <td>
-                      <button onClick={() => handleSelectOrder(order)}>
-                        View Details
+                    <td>{order.user?.name || "N/A"}</td>
+                    <td>{order.total}</td>
+                    <td>{order.paymentStatus}</td>
+                    <td>{order.shippingStatus}</td>
+                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                    <td className="Actions">
+                      <button
+                        className="btn btn-warning btn-sm me-2 btn-edit"
+                        onClick={() => handleEditOrder(order)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm btn-delete"
+                        onClick={() => handleDeleteOrder(order._id)}
+                      >
+                        Delete
                       </button>
                     </td>
                   </tr>
-                ))}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center">
+                    No orders found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
-        )}
+        </div>
       </div>
 
-      {selectedOrder && (
-        <div className="order-details">
-          <h2>Order Details</h2>
-          <p>Order ID: {selectedOrder._id}</p>
-          <p>Customer Name: {selectedOrder.user.name}</p>
-          <p>Total: ${selectedOrder.total.toFixed(2)}</p>
-          <p>Payment Method: {selectedOrder.payment.method}</p>
-          <p>Status: {selectedOrder.status}</p>
-          <p>Note: {selectedOrder.note}</p>
-
-          <div className="status-update">
-            <label>Update Status:</label>
-            <select
-              value={statusUpdate}
-              onChange={(e) => setStatusUpdate(e.target.value)}
-            >
-              <option value="">Select Status</option>
-              <option value="processing">Processing</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-            </select>
-            <button onClick={handleUpdateStatus}>Update Status</button>
-          </div>
-
-          <div className="cancel-order">
-            <label>Cancel Reason:</label>
-            <input
-              type="text"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              placeholder="Enter reason for cancellation"
-            />
-            <button onClick={handleCancelOrder}>Cancel Order</button>
+      {/* Modal Form for Order */}
+      {showModal && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog modal-lg modal-dialog-scrollable">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {selectedOrder ? "Edit Order" : "Add New Order"}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <OrderForm
+                  order={selectedOrder}
+                  onSuccess={handleSaveOrder}
+                  onCancel={() => setShowModal(false)}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}
-    </div>
+
+      {/* Toast Notification */}
+      <ToastNotification
+        show={toast.show}
+        message={toast.message}
+        variant={toast.variant}
+        onClose={() => setToast({ ...toast, show: false })}
+      />
+    </>
   );
 };
 
-export default OrderManagement;
+export default ManageOrders;

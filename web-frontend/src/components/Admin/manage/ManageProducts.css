@@ -3,32 +3,98 @@
   margin-top: 2rem;
 }
 
+.filter-container .row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  align-items: center;
+}
+
+.filter-container .filter-form {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin: 0;
+}
 .table-responsive {
   margin-top: 1rem;
 }
 
-.table th {
-  vertical-align: top;
-  text-align: left;
-  padding: 8px;
-  white-space: nowrap;
+.filter-form .btn-clear {
+  height: 50px;
+  font-size: 16px;
+  padding: 0px 3px 0px 3px;
+}
+.filter-form .btn-apply {
+  height: 50px;
+  font-size: 16px;
+  padding: 0px 3px 0px 3px;
 }
 
-.table td {
+.container .btn-filter {
+  height: 50px;
+  font-size: 16px;
+  padding: 0px 3px 0px 3px;
+}
+
+.container .btn-add-product {
+  height: 50px;
+  font-size: 16px;
+  padding: 0px 3px 0px 3px;
+}
+.filter-container.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0; /* Remove any gap between the elements */
+}
+.filter-form .form-code,
+.form-name,
+.form-category,
+.form-price,
+.form-trademark {
+  width: 100px;
+  height: 40px;
+}
+.filter-form .one-div-filter {
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.filter-form .col-md-2 {
+  padding: 0px;
+  margin: 0px;
+}
+
+.table {
   vertical-align: top;
   text-align: left;
   padding: 3px;
 }
 
-.Actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .btn-edit,
 .btn-delete {
   margin: 0 5px; /* Adjust the margin as needed */
+}
+.table-responsive .action-buttons {
+  padding-left: 0;
+}
+.action-buttons .btn-edit {
+  width: 45px;
+  height: 30px;
+  font-size: 14px;
+  border: 1px solid #007bff;
+  margin-right: 0px;
+  padding: 0px;
+}
+
+.action-buttons .btn-delete {
+  width: 45px;
+  height: 30px;
+  font-size: 14px;
+  border: 1px solid #007bff;
+  padding: 0px;
 }
 
 .table img {
@@ -83,16 +149,9 @@
     padding: 1rem;
   }
 
-  .btn {
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .form-label {
-    font-size: 0.875rem;
-  }
-
-  .form-control {
+  .filter-form .form-control {
+    height: 50px;
+    width: 50px;
     font-size: 0.875rem;
     padding: 0.5rem;
   }
@@ -122,17 +181,14 @@
     width: 30px;
   }
 
-  .btn {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-  }
-
   .form-label {
     font-size: 0.75rem;
   }
 
   .form-control {
-    font-size: 0.75rem;
-    padding: 0.25rem;
+    height: 50px;
+    width: 50px;
+    font-size: 0.875rem;
+    padding: 0.5rem;
   }
 }

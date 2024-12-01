@@ -1,18 +1,12 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-const Discount = require("../models/Discount"); // Thêm dòng này
+const Discount = require("../models/Discount");
 const paymentService = require("../services/paymentService");
-
-// ... phần code còn lại
 
 exports.createOrder = async (req, res) => {
   try {
-    const {
-      shippingAddress,
-      products,
-      paymentMethod,
-      cartDiscountCode, // Include this
-    } = req.body;
+    const { shippingAddress, products, paymentMethod, cartDiscountCode, note } =
+      req.body;
 
     if (!shippingAddress || !products || products.length === 0) {
       return res.status(400).json({ message: "Invalid order information." });
@@ -23,7 +17,6 @@ exports.createOrder = async (req, res) => {
       shippingAddress.phone = shippingAddress.phone[0];
     }
 
-    // Initialize total amount before cart-level discount
     let totalAmount = 0;
     let cartDiscount = null;
 
@@ -35,7 +28,7 @@ exports.createOrder = async (req, res) => {
           throw new Error(`Product with ID: ${item.product} not found`);
         }
 
-        let price = product.price; // Original price
+        let price = product.price;
         let discount = null;
 
         // Process product discount if available
@@ -45,7 +38,7 @@ exports.createOrder = async (req, res) => {
             const discountValue = discount.isPercentage
               ? (price * discount.value) / 100
               : discount.value;
-            price -= discountValue; // Apply discount
+            price -= discountValue;
           }
         }
 
@@ -53,9 +46,9 @@ exports.createOrder = async (req, res) => {
 
         return {
           product: product._id,
-          name: product.name, // Sử dụng product.name thay vì product.title
+          name: product.name,
           quantity: item.quantity,
-          price: price, // Giá đã áp dụng giảm giá
+          price: price,
           discount: discount ? discount._id : null,
         };
       })
@@ -82,6 +75,13 @@ exports.createOrder = async (req, res) => {
       paymentStatus: "pending",
       shippingStatus: "processing",
       discountCode: cartDiscount ? cartDiscount._id : null,
+      note: note || "",
+      refund: {
+        refundId: null,
+        mRefundId: null,
+        status: null,
+        amount: null,
+      },
     });
 
     if (paymentMethod === "zalopay") {
@@ -99,7 +99,7 @@ exports.createOrder = async (req, res) => {
 
     await order.save();
 
-    res.status(201).json({ message: "Order created successfully." });
+    res.status(201).json({ message: "Order created successfully.", order });
   } catch (error) {
     console.error("Error creating order:", error);
     if (!res.headersSent) {
@@ -130,7 +130,8 @@ exports.getUserOrders = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
-      .populate("products.product", "title price images");
+      .populate("products.product", "name price images")
+      .populate("discountCode", "code value isPercentage");
 
     res.status(200).json(orders);
   } catch (error) {
@@ -144,7 +145,9 @@ exports.getOrderDetails = async (req, res) => {
     const order = await Order.findOne({
       _id: req.params.orderId,
       user: req.user.id,
-    }).populate("products.product", "title price images");
+    })
+      .populate("products.product", "name price images")
+      .populate("discountCode", "code value isPercentage");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -156,14 +159,11 @@ exports.getOrderDetails = async (req, res) => {
     res.status(500).json({ message: "Error fetching order details" });
   }
 };
+
 exports.cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const userId = req.user.id;
-
-    console.log(
-      `Attempting to cancel order with ID: ${orderId} for user ID: ${userId}`
-    );
 
     const order = await Order.findOne({
       _id: orderId,
@@ -171,9 +171,6 @@ exports.cancelOrder = async (req, res) => {
     });
 
     if (!order) {
-      console.error(
-        `Order with ID: ${orderId} not found for user ID: ${userId}`
-      );
       return res.status(404).json({ message: "Order not found" });
     }
 
@@ -186,18 +183,23 @@ exports.cancelOrder = async (req, res) => {
       const refundResult = await paymentService.refundZaloPayOrder(order);
 
       if (!refundResult.success) {
-        console.error("Refund failed:", refundResult.message);
         return res.status(500).json({
           message: "Refund failed",
           error: refundResult.message,
         });
       }
 
-      // Cập nhật trạng thái đơn hàng
+      // Update order status
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
+      order.refund = {
+        refundId: refundResult.refundId,
+        mRefundId: refundResult.mRefundId,
+        status: "processing",
+        amount: refundResult.amount,
+      };
+      order.orderTimestamps.cancellation = new Date();
 
-      // Lưu order một lần duy nhất
       await order.save();
 
       return res.status(200).json({
@@ -209,6 +211,8 @@ exports.cancelOrder = async (req, res) => {
       // For unpaid orders or COD payment method
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
+      order.orderTimestamps.cancellation = new Date();
+
       await order.save();
 
       return res.status(200).json({ message: "Order cancelled successfully" });
@@ -218,6 +222,7 @@ exports.cancelOrder = async (req, res) => {
     res.status(500).json({ message: "Error cancelling order" });
   }
 };
+
 exports.requestSupport = async (req, res) => {
   try {
     const { message } = req.body;
@@ -268,7 +273,6 @@ exports.leaveReview = async (req, res) => {
     res.status(500).json({ message: "Error submitting review" });
   }
 };
-// orderController.js
 
 exports.getRefundStatus = async (req, res) => {
   try {
@@ -284,17 +288,16 @@ exports.getRefundStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    if (!order.refundId || !order.mRefundId) {
+    if (!order.refund || !order.refund.mRefundId) {
       return res
         .status(400)
         .json({ message: "Order has no refund information" });
     }
 
     const refundStatusResponse = await paymentService.getRefundStatus(
-      order.mRefundId
+      order.refund.mRefundId
     );
 
-    // Xử lý returncode để hiển thị trạng thái dễ hiểu
     let refundStatusText = "";
     switch (refundStatusResponse.returncode) {
       case 1:
@@ -304,28 +307,127 @@ exports.getRefundStatus = async (req, res) => {
         refundStatusText = "processing";
         break;
       case 0:
-        refundStatusText = "failed";
-        break;
       case -1:
         refundStatusText = "failed";
         break;
       default:
-        refundStatusText = "Không xác định";
+        refundStatusText = "unknown";
     }
 
-    // Cập nhật trạng thái hoàn tiền trong cơ sở dữ liệu
-    order.refundStatus = refundStatusText;
+    // Update refund status in the database
+    order.refund.status = refundStatusText;
     await order.save();
 
     res.status(200).json({
       orderId: order._id,
       refundStatus: refundStatusText,
       message: refundStatusResponse.returnmessage,
-      mRefundId: order.mRefundId,
+      mRefundId: order.refund.mRefundId,
       rawData: refundStatusResponse,
     });
   } catch (error) {
     console.error("Error getting refund status:", error);
     res.status(500).json({ message: "Error getting refund status" });
+  }
+};
+
+// New Admin Controllers
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const { status, startDate, endDate, page = 1, limit = 10 } = req.query;
+
+    const query = {};
+
+    if (status) {
+      query.shippingStatus = status;
+    }
+
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .populate("user", "name email")
+      .populate("products.product", "name price images")
+      .populate("discountCode", "code value isPercentage");
+
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching all orders:", error);
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+};
+
+exports.updateOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const updateData = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Update shippingStatus and paymentStatus timestamps
+    if (
+      updateData.shippingStatus &&
+      updateData.shippingStatus !== order.shippingStatus
+    ) {
+      order.shippingStatus = updateData.shippingStatus;
+      if (updateData.shippingStatus === "shipping") {
+        order.orderTimestamps.shipping = new Date();
+      } else if (updateData.shippingStatus === "shipped") {
+        order.orderTimestamps.delivery = new Date();
+      }
+    }
+
+    if (
+      updateData.paymentStatus &&
+      updateData.paymentStatus !== order.paymentStatus
+    ) {
+      order.paymentStatus = updateData.paymentStatus;
+      if (updateData.paymentStatus === "paid") {
+        order.orderTimestamps.payment = new Date();
+      }
+    }
+
+    // Ensure refund.status is not null
+    if (updateData.refund && updateData.refund.status === null) {
+      updateData.refund.status = "processing"; // Set a default value
+    }
+
+    // Update other fields
+    Object.assign(order, updateData);
+
+    await order.save();
+
+    res.status(200).json({ message: "Order updated successfully", order });
+  } catch (error) {
+    console.error("Error updating order:", error);
+    res.status(500).json({ message: "Error updating order" });
+  }
+};
+
+exports.deleteOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findByIdAndDelete(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({ message: "Order deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    res.status(500).json({ message: "Error deleting order" });
   }
 };

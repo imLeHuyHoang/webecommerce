@@ -154,10 +154,16 @@ const ManageProducts = () => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1>Quản lý sản phẩm</h1>
           <div>
-            <button className="btn btn-secondary me-2" onClick={toggleFilters}>
+            <button
+              className="btn btn-secondary me-2 btn-filter"
+              onClick={toggleFilters}
+            >
               {showFilters ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
             </button>
-            <button className="btn btn-primary" onClick={handleAddProduct}>
+            <button
+              className="btn btn-primary btn-add-product"
+              onClick={handleAddProduct}
+            >
               Thêm sản phẩm mới
             </button>
           </div>
@@ -165,14 +171,14 @@ const ManageProducts = () => {
 
         {/* Filter Section */}
         {showFilters && (
-          <div className="mb-4">
-            <form className="row g-3">
-              <div className="col-md-2">
-                <label className="form-label" htmlFor="filterCode">
+          <div className="mb-4 filter-container">
+            <form className="row filter-form">
+              <div className="col-md-2 one-div-filter ">
+                <label className="form-label " htmlFor="filterCode">
                   Mã
                 </label>
                 <input
-                  className="form-control"
+                  className="form-control form-code"
                   id="filterCode"
                   type="text"
                   name="code"
@@ -180,12 +186,12 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2">
-                <label className="form-label" htmlFor="filterName">
+              <div className="col-md-2 one-div-filter">
+                <label className="form-label " htmlFor="filterName">
                   Tên
                 </label>
                 <input
-                  className="form-control"
+                  className="form-control form-name"
                   id="filterName"
                   type="text"
                   name="name"
@@ -193,12 +199,15 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2">
-                <label className="form-label" htmlFor="filterBrand">
+              <div className="col-md-2 one-div-filter">
+                <label
+                  className="form-label form-trademark-filter "
+                  htmlFor="filterBrand"
+                >
                   Thương hiệu
                 </label>
                 <input
-                  className="form-control"
+                  className="form-control form-trademark"
                   id="filterBrand"
                   type="text"
                   name="brand"
@@ -206,12 +215,12 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2">
-                <label className="form-label" htmlFor="filterPrice">
+              <div className="col-md-2 one-div-filter">
+                <label className="form-label " htmlFor="filterPrice">
                   Giá
                 </label>
                 <input
-                  className="form-control"
+                  className="form-control form-price"
                   id="filterPrice"
                   type="number"
                   name="price"
@@ -219,12 +228,12 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2">
+              <div className="col-md-2 one-div-filter">
                 <label className="form-label" htmlFor="filterCategory">
                   Danh mục
                 </label>
                 <input
-                  className="form-control"
+                  className="form-control form-category"
                   id="filterCategory"
                   type="text"
                   name="category"
@@ -232,29 +241,16 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2">
-                <label className="form-label" htmlFor="filterAttributes">
-                  Thuộc tính
-                </label>
-                <input
-                  className="form-control"
-                  id="filterAttributes"
-                  type="text"
-                  name="attributes"
-                  value={filters.attributes}
-                  onChange={handleFilterChange}
-                />
-              </div>
-              <div className="col-md-12 d-flex justify-content-end">
+              <div className="col-md-2 d-flex ">
                 <button
-                  className="btn btn-secondary me-2"
+                  className="btn btn-secondary me-2 btn-clear"
                   type="button"
                   onClick={clearFilters}
                 >
                   Xóa bộ lọc
                 </button>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-apply"
                   type="button"
                   onClick={applyFilters}
                 >
@@ -310,15 +306,15 @@ const ManageProducts = () => {
                         />
                       ))}
                     </td>
-                    <td className="Actions">
+                    <td className="action-buttons">
                       <button
-                        className="btn btn-warning btn-sm me-2 btn-edit"
+                        className="btn  btn-edit"
                         onClick={() => handleEditProduct(product)}
                       >
                         Sửa
                       </button>
                       <button
-                        className="btn btn-danger btn-sm btn-delete"
+                        className="btn  btn-delete"
                         onClick={() => handleDeleteProduct(product._id)}
                       >
                         Xóa
