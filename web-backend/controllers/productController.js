@@ -81,8 +81,6 @@ exports.getAllProducts = async (req, res) => {
  */
 exports.getProductById = async (req, res) => {
   try {
-    console.log("Received request for product ID:", req.params.id);
-
     const product = await Product.findById(req.params.id).populate(
       "category",
       "name"
@@ -92,17 +90,12 @@ exports.getProductById = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    console.log("Product found:", product);
-
     const inventory = await Inventory.findOne({ product: product._id });
-    console.log("Inventory found:", inventory);
 
     const productWithInventory = {
       ...product.toObject(),
       stock: inventory ? inventory.quantity : 0,
     };
-
-    console.log("Product with inventory:", productWithInventory);
     res.json(productWithInventory);
   } catch (error) {
     console.error("Error fetching product by ID:", error);

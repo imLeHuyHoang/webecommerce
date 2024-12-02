@@ -135,8 +135,6 @@ exports.updateInventory = async (req, res) => {
 
 exports.deleteInventory = async (req, res) => {
   try {
-    console.log("ID nhận được từ frontend:", req.params.id);
-
     const inventory = await Inventory.findByIdAndDelete(req.params.id);
     if (!inventory) {
       return res.status(404).json({ message: "Tồn kho không tồn tại." });

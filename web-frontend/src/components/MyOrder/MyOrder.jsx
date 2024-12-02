@@ -101,14 +101,14 @@ function MyOrders() {
       return;
     }
     try {
-      setRefundCheckError("");
-      setRefundCheckResult(null);
+      setRefundCheckError(""); // Clear previous error
+      setRefundCheckResult(null); // Reset refund check result
       const response = await apiClient.get(
         `/order/${refundCheckOrderId}/refund-status`
       );
       setRefundCheckResult(response.data);
 
-      // Cập nhật trạng thái đơn hàng trong danh sách orders
+      // Cập nhật trạng thái hoàn tiền cho tất cả đơn hàng nếu có
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === refundCheckOrderId

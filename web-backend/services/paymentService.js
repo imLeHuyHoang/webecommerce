@@ -115,11 +115,24 @@ exports.refundZaloPayOrder = async (order) => {
       order
     );
 
-    order.mRefundId = mRefundId; // Đảm bảo mRefundId được cập nhật
-    order.refundId = refundResult.refundid;
-    order.refundStatus =
-      refundResult.returncode === 1 ? "success" : "processing";
-    return { success: true, message: "Refund initiated", order };
+    // Update refund information in the order
+    order.refund = {
+      refundId: refundResult.refundid,
+      mRefundId: mRefundId,
+      status: "processing",
+      amount: parseInt(order.total, 10),
+    };
+
+    // Save the order with updated refund information
+    await order.save();
+
+    return {
+      success: true,
+      refundId: refundResult.refundid,
+      mRefundId: mRefundId,
+      amount: parseInt(order.total, 10),
+      message: "Refund initiated",
+    };
   } catch (error) {
     console.error("Error refunding ZaloPay order:", error);
     return { success: false, message: error.message };
@@ -151,8 +164,6 @@ exports.refundOrder = async (
   const dataString = `${data.appid}|${data.zptransid}|${data.amount}|${data.description}|${data.timestamp}`;
   data.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
 
-  console.log("Refund data:", data); // Log the refund data
-
   try {
     const response = await axios.post(
       zalopayConfig.refundUrl,
@@ -163,7 +174,7 @@ exports.refundOrder = async (
         },
       }
     );
-
+    console.log("ZaloPay Refund Response:", response.data); // Thêm log để kiểm tra
     // Lưu mrefundid vào đơn hàng
     order.mRefundId = mRefundId;
 
@@ -192,21 +203,15 @@ exports.getRefundStatus = async (mRefundId) => {
   };
 
   const dataString = `${params.appid}|${params.mrefundid}|${params.timestamp}`;
-
-  // Sử dụng key1 để tính toán MAC
   params.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
 
   try {
     const response = await axios.get(zalopayConfig.getRefundStatusUrl, {
       params,
     });
-
     return response.data;
   } catch (error) {
-    console.error(
-      "Error getting refund status:",
-      error.response ? error.response.data : error.message
-    );
+    console.error("Error getting refund status:", error);
     throw new Error(
       error.response ? error.response.data.returnmessage : error.message
     );

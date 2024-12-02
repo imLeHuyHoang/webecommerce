@@ -2,6 +2,8 @@ const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Discount = require("../models/Discount");
 const paymentService = require("../services/paymentService");
+const Inventory = require("../models/Inventory");
+const mongoose = require("mongoose");
 
 exports.createOrder = async (req, res) => {
   try {
@@ -162,51 +164,52 @@ exports.getOrderDetails = async (req, res) => {
 };
 
 exports.cancelOrder = async (req, res) => {
+  const session = await mongoose.startSession();
   try {
+    session.startTransaction();
+
     const { orderId } = req.params;
     const userId = req.user.id;
 
     const order = await Order.findOne({
       _id: orderId,
       user: userId,
-    });
+    }).session(session); // Use session to ensure transaction consistency
 
     if (!order) {
+      await session.abortTransaction();
       return res.status(404).json({ message: "Order not found" });
     }
 
     if (order.shippingStatus !== "processing") {
+      await session.abortTransaction();
       return res.status(400).json({ message: "Cannot cancel this order" });
     }
 
+    // Process ZaloPay Refund if payment is done via ZaloPay
     if (order.paymentStatus === "paid" && order.payment.method === "zalopay") {
-      // Initiate refund process with ZaloPay
       const refundResult = await paymentService.refundZaloPayOrder(order);
-
       if (!refundResult.success) {
+        await session.abortTransaction();
         return res.status(500).json({
           message: "Refund failed",
           error: refundResult.message,
         });
       }
 
-      // Update order status
+      // Update order refund status
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
-      order.refund = {
-        refundId: refundResult.refundId,
-        mRefundId: refundResult.mRefundId,
-        status: "null",
-        amount: refundResult.amount,
-      };
+      // order.refund đã được cập nhật trong refundZaloPayOrder, không cần cập nhật lại
       order.orderTimestamps.cancellation = new Date();
 
-      await order.save();
+      // Lưu đơn hàng với các thay đổi
+      await order.save({ session });
+
+      await session.commitTransaction();
 
       return res.status(200).json({
-        message:
-          refundResult.message ||
-          "Order cancelled and refund initiated successfully",
+        message: "Order cancelled and refund initiated successfully",
       });
     } else {
       // For unpaid orders or COD payment method
@@ -214,13 +217,20 @@ exports.cancelOrder = async (req, res) => {
       order.shippingStatus = "cancelled";
       order.orderTimestamps.cancellation = new Date();
 
-      await order.save();
+      // Step 2: Update Inventory (since no ZaloPay refund is involved)
+      await updateInventoryAfterRefund(order);
 
+      await order.save({ session });
+
+      await session.commitTransaction();
       return res.status(200).json({ message: "Order cancelled successfully" });
     }
   } catch (error) {
     console.error("Error cancelling order:", error);
+    await session.abortTransaction();
     res.status(500).json({ message: "Error cancelling order" });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -432,3 +442,24 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ message: "Error deleting order" });
   }
 };
+async function updateInventoryAfterRefund(order) {
+  // Get product details from the order
+  const productDetails = order.products; // Assuming 'items' contains product details
+
+  for (const item of productDetails) {
+    // Find the product in the inventory
+    const inventory = await Inventory.findOne({ product: item.product });
+
+    if (inventory) {
+      // Increase the inventory by the quantity of the cancelled order
+      inventory.quantity += item.quantity; // Refund means we restock the products
+
+      // Update the last updated timestamp
+      inventory.lastUpdated = new Date();
+
+      await inventory.save();
+    } else {
+      console.error(`Inventory not found for product ${item.product}`);
+    }
+  }
+}

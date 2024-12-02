@@ -220,8 +220,6 @@ exports.googleLogin = async (req, res) => {
     const { email, sub: googleId, name } = payload;
     const password = googleId; // Sử dụng googleId làm mật khẩu
 
-    console.log("Google ID Token payload:", payload);
-
     let user = await User.findOne({ email });
 
     if (!user) {

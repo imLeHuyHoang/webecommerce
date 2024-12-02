@@ -63,7 +63,7 @@ const orderSchema = new mongoose.Schema(
         enum: ["processing", "success", "failed", "null"],
         default: "null",
       },
-      amount: { type: Number, min: 0, default: null },
+      amount: { type: Number, default: null },
     },
     orderTimestamps: {
       payment: { type: Date, default: null },
