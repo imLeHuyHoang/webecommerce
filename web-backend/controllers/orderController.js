@@ -278,6 +278,8 @@ exports.leaveReview = async (req, res) => {
       { upsert: true, new: true }
     );
 
+    console.log("Review submitted:", review);
+
     res.status(200).json({ message: "Review submitted successfully", review });
   } catch (error) {
     console.error("Error submitting review:", error);

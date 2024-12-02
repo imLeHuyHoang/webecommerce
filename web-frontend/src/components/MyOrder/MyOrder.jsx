@@ -266,7 +266,7 @@ function MyOrders() {
 
         {/* Refund Status Checker */}
         <div className="my-5">
-          <h2>Kiểm tra tình trạng hoàn tiền</h2>
+          <h2>Kiểm tra tình trạng hoàn tiền </h2>
           <div className="input-group mb-3">
             <input
               className="form-control"
