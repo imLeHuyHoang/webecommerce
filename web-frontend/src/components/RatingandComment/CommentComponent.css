@@ -1,0 +1,46 @@
+/* components/RatingandComment/RatingComponent.css */
+
+.rating-component .stars span {
+  transition: color 0.2s;
+}
+
+.rating-component .reviews-list .review-item .stars span {
+  cursor: default;
+}
+
+/* components/RatingandComment/CommentComponent.css */
+
+.comment-component .comment-item.depth-0::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -10px;
+  width: 2px;
+  height: 100%;
+  background-color: #dee2e6;
+}
+
+.comment-component .comment-item.depth-1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -10px;
+  width: 2px;
+  height: 100%;
+  background-color: #6c757d;
+}
+
+.comment-component .comment-content {
+  position: relative;
+}
+
+.comment-component .reply-button {
+  color: #0d6efd;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.comment-component .reply-button:hover {
+  text-decoration: underline;
+}

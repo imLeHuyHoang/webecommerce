@@ -22,6 +22,8 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const attributeRoutes = require("./routes/attributeRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const discountRoutes = require("./routes/discountRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 
 // Middleware setup
 app.use(morgan("dev"));
@@ -42,6 +44,8 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/attributes", attributeRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/discounts", discountRoutes);
+app.use("/api/products", reviewRoutes);
+app.use("/api/products", commentRoutes);
 
 // Static file serving
 app.use("/category", express.static(__dirname + "/upload/category"));

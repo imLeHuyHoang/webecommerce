@@ -1,8 +1,11 @@
+// components/SingleProductPage/SingleProductPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import apiClient from "../../../utils/api-client";
 import { useCart } from "../../../context/CartContext";
 import ToastNotification from "../../ToastNotification/ToastNotification";
+import RatingComponent from "../../RatingandComment/RatingComponent";
+import CommentComponent from "../../RatingandComment/CommentComponent";
 import "./SingleProductPage.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -82,22 +85,27 @@ const SingleProductPage = () => {
 
   return (
     <div className="main-page">
-      <div className="container single-product-page">
+      <div className="container single-product-page mt-5">
+        {/* Toast Notification */}
         <ToastNotification
           message={toastMessage}
           show={showToast}
           onClose={() => setShowToast(false)}
         />
+
         <div className="row">
           <div className="col-md-12">
+            {/* Back Button */}
             <button
-              className="btn btn-outline-secondary button-back"
+              className="btn btn-outline-secondary mb-3"
               onClick={() => window.history.back()}
             >
-              <i className="fas fa-arrow-left"></i> Quay lại sản phẩm
+              <i className="fas fa-arrow-left"></i> Quay lại
             </button>
           </div>
+
           <div className="col-md-7">
+            {/* Image Gallery */}
             <div className="image-container mb-4">
               <div className="main-image-container text-center mb-3">
                 <img
@@ -155,7 +163,9 @@ const SingleProductPage = () => {
               </div>
             </div>
           </div>
+
           <div className="col-md-5">
+            {/* Product Details */}
             <div className="product-details">
               <h2 id="productName">{product.name}</h2>
               <p>
@@ -169,13 +179,14 @@ const SingleProductPage = () => {
               </p>
               <p>
                 Đánh giá:{" "}
-                <span id="productRating">{product.reviews?.rate || 0}</span> (
-                <span id="productReviews">{product.reviews?.counts || 0}</span>{" "}
-                đánh giá)
+                <span id="productRating">{product.averageRating || 0}</span> (
+                <span id="productReviews">{product.reviewCount || 0}</span> đánh
+                giá)
               </p>
               <div className="product-description">
                 <p id="productDescription">{product.description}</p>
               </div>
+              {/* Quantity Controls */}
               <div className="quantity-controls my-3">
                 <button
                   id="decreaseQuantityBtn"
@@ -197,6 +208,7 @@ const SingleProductPage = () => {
                   +
                 </button>
               </div>
+              {/* Add to Cart & Show Attributes Buttons */}
               <div className="d-flex align-items-center two-button">
                 <button
                   id="addToCartBtn"
@@ -217,7 +229,21 @@ const SingleProductPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Rating và Comment Components */}
+        <div className="row mt-5">
+          <div className="col-md-6">
+            {/* Container Đánh Giá */}
+            <RatingComponent productId={id} />
+          </div>
+          <div className="col-md-6">
+            {/* Container Bình Luận */}
+            <CommentComponent productId={id} />
+          </div>
+        </div>
       </div>
+
+      {/* Attributes Modal */}
       {showAttributes && (
         <div
           className="modal-overlay"
