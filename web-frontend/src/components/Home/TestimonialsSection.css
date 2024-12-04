@@ -1,19 +1,30 @@
-/* TestimonialsSection.css */
+/* src/components/HomePage/TestimonialsSection.css */
+
 .testimonials-section {
-  background-color: #343a40;
-  color: white;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.testimonials-section h2 {
+  color: #000000;
 }
 
 .testimonial-card {
-  background-color: #495057;
-  border: none;
-  margin-bottom: 20px;
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  transition: transform 0.2s;
 }
 
-.testimonial-card .card-body {
-  position: relative;
+.testimonial-card:hover {
+  transform: scale(1.05);
 }
 
 .testimonial-card .card-text {
   font-style: italic;
+}
+
+.testimonial-card .card-title {
+  margin-top: 15px;
+  font-weight: bold;
 }

@@ -1,5 +1,6 @@
-// ProductSidebar.jsx
+// src/components/ProductPage/ProductSidebar.jsx
 import React, { useEffect, useState } from "react";
+import { Form, Button, ListGroup, Alert, InputGroup } from "react-bootstrap";
 import "./ProductSidebar.css";
 import apiClient from "../../utils/api-client";
 import ProductSidebarSkeleton from "./Skeleton/ProductSidebarSkeleton";
@@ -24,6 +25,9 @@ function ProductSidebar({
   const [selectedCategory, setSelectedCategory] = useState(
     filters.category || ""
   );
+
+  // State để quản lý việc hiển thị sidebar trên thiết bị di động
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
   useEffect(() => {
     apiClient
@@ -60,128 +64,176 @@ function ProductSidebar({
     }
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    onFilterChange("search", searchTerm);
+    // Đóng sidebar trên thiết bị di động sau khi áp dụng bộ lọc
+    setIsSidebarVisible(false);
+  };
+
+  const handleBrandSubmit = (e) => {
+    e.preventDefault();
+    onFilterChange("brand", brand);
+    // Đóng sidebar trên thiết bị di động sau khi áp dụng bộ lọc
+    setIsSidebarVisible(false);
+  };
+
+  // Hàm để đóng sidebar khi nhấn vào overlay
+  const handleCloseSidebar = () => {
+    setIsSidebarVisible(false);
+  };
+
   return (
-    <div className={`product-sidebar ${showFilters ? "show" : ""}`}>
-      <h4 className="sidebar-title">Danh mục</h4>
-      <ul className="category-list">
-        {error && <em className="text-danger">{error}</em>}
+    <>
+      {/* Nút Bộ lọc chỉ hiển thị trên thiết bị di động */}
+      <Button
+        className="filter-toggle-button d-md-none"
+        onClick={() => setIsSidebarVisible(true)}
+      >
+        Bộ lọc
+      </Button>
+
+      {/* Overlay khi sidebar mở trên thiết bị di động */}
+      <div
+        className={`sidebar-overlay ${isSidebarVisible ? "active" : ""}`}
+        onClick={handleCloseSidebar}
+      ></div>
+
+      <div
+        className={`product-sidebar ${showFilters ? "show" : ""} ${
+          isSidebarVisible ? "show" : ""
+        }`}
+      >
+        {/* Categories */}
+        <h4 className="sidebar-title">Danh mục</h4>
+        {error && <Alert variant="danger">{error}</Alert>}
         {loading ? (
-          Array(5)
-            .fill(0)
-            .map((_, index) => <ProductSidebarSkeleton key={index} />)
-        ) : categories.length > 0 ? (
-          categories.map((cat) => (
-            <li
-              key={cat._id}
-              className={`category-item ${
-                selectedCategory === cat.name ? "active" : ""
-              }`}
-              onClick={() => handleCategoryClick(cat.name)}
-            >
-              <img
-                src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                  "/api",
-                  ""
-                )}/category/${cat.images[0]}`}
-                alt={cat.name}
-                className="category-image"
-                width="20"
-                height="20"
-              />
-              {cat.name}
-            </li>
-          ))
+          <ListGroup>
+            {Array(5)
+              .fill(0)
+              .map((_, index) => (
+                <ProductSidebarSkeleton key={index} />
+              ))}
+          </ListGroup>
         ) : (
-          <p>Không có danh mục nào.</p>
+          <ListGroup>
+            {categories.length > 0 ? (
+              categories.map((cat) => (
+                <ListGroup.Item
+                  key={cat._id}
+                  action
+                  active={selectedCategory === cat.name}
+                  onClick={() => handleCategoryClick(cat.name)}
+                  className="d-flex align-items-center"
+                >
+                  <img
+                    src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                      "/api",
+                      ""
+                    )}/category/${cat.images[0]}`}
+                    alt={cat.name}
+                    className="category-image me-2"
+                    width="20"
+                    height="20"
+                  />
+                  {cat.name}
+                </ListGroup.Item>
+              ))
+            ) : (
+              <p>Không có danh mục nào.</p>
+            )}
+          </ListGroup>
         )}
-      </ul>
-      {/*thêm 1 dòng để cho người dùng biết đang ở category nào */}
-      <p className="selected-category">
-        Bạn đang ở danh mục: {selectedCategory}
-      </p>
 
-      <div className="filters">
-        <h4 className="sidebar-title">Bộ lọc</h4>
+        {/* Selected Category */}
+        {selectedCategory && (
+          <p className="selected-category mt-3">
+            Bạn đang ở danh mục: <strong>{selectedCategory}</strong>
+          </p>
+        )}
 
-        {/* Search Filter */}
-        <div className="filter-group">
-          <label htmlFor="search">Tìm kiếm</label>
-          <input
-            type="text"
-            id="search"
-            className="form-control"
-            placeholder="Nhập từ khóa..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onBlur={() => onFilterChange("search", searchTerm)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                onFilterChange("search", searchTerm);
-              }
-            }}
-          />
-        </div>
+        {/* Filters */}
+        <div className="filters mt-4">
+          <h4 className="sidebar-title">Bộ lọc</h4>
 
-        {/* Brand Filter */}
-        <div className="filter-group">
-          <label htmlFor="brand">Thương hiệu</label>
-          <input
-            type="text"
-            id="brand"
-            placeholder="Nhập thương hiệu..."
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            onBlur={() => onFilterChange("brand", brand)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                onFilterChange("brand", brand);
-              }
-            }}
-            className="form-control"
-          />
-        </div>
+          {/* Search Filter */}
+          <Form onSubmit={handleSearchSubmit} className="mb-3">
+            <Form.Group controlId="search">
+              <Form.Label>Tìm kiếm</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type="text"
+                  placeholder="Nhập từ khóa..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Button variant="outline-secondary" type="submit">
+                  Tìm
+                </Button>
+              </InputGroup>
+            </Form.Group>
+          </Form>
 
-        {/* Price Range Filter */}
-        <div className="filter-group">
-          <label htmlFor="price">Khoảng giá</label>
-          <select
-            id="price"
-            value={priceRange}
-            onChange={(e) => {
-              setPriceRange(e.target.value);
-              onFilterChange("price", e.target.value);
-            }}
-            className="form-control"
-          >
-            <option value="">Tất cả</option>
-            <option value="0-5000000">Dưới 5 triệu</option>
-            <option value="5000000-10000000">5 - 10 triệu</option>
-            <option value="10000000-20000000">10 - 20 triệu</option>
-            <option value="20000000-">Trên 20 triệu</option>
-          </select>
-        </div>
+          {/* Brand Filter */}
+          <Form onSubmit={handleBrandSubmit} className="mb-3">
+            <Form.Group controlId="brand">
+              <Form.Label>Thương hiệu</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type="text"
+                  placeholder="Nhập thương hiệu..."
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                />
+                <Button variant="outline-secondary" type="submit">
+                  Áp dụng
+                </Button>
+              </InputGroup>
+            </Form.Group>
+          </Form>
 
-        {/* Rating Filter */}
-        <div className="filter-group">
-          <label htmlFor="rating">Đánh giá</label>
-          <select
-            id="rating"
-            value={rating}
-            onChange={(e) => {
-              setRating(e.target.value);
-              onFilterChange("rating", e.target.value);
-            }}
-            className="form-control"
-          >
-            <option value="">Tất cả</option>
-            <option value="4">4 sao trở lên</option>
-            <option value="3">3 sao trở lên</option>
-            <option value="2">2 sao trở lên</option>
-            <option value="1">1 sao trở lên</option>
-          </select>
+          {/* Price Range Filter */}
+          <Form.Group controlId="price" className="mb-3">
+            <Form.Label>Khoảng giá</Form.Label>
+            <Form.Select
+              value={priceRange}
+              onChange={(e) => {
+                setPriceRange(e.target.value);
+                onFilterChange("price", e.target.value);
+                // Đóng sidebar trên thiết bị di động khi thay đổi bộ lọc
+                setIsSidebarVisible(false);
+              }}
+            >
+              <option value="">Tất cả</option>
+              <option value="0-5000000">Dưới 5 triệu</option>
+              <option value="5000000-10000000">5 - 10 triệu</option>
+              <option value="10000000-20000000">10 - 20 triệu</option>
+              <option value="20000000-">Trên 20 triệu</option>
+            </Form.Select>
+          </Form.Group>
+
+          {/* Rating Filter */}
+          <Form.Group controlId="rating" className="mb-3">
+            <Form.Label>Đánh giá</Form.Label>
+            <Form.Select
+              value={rating}
+              onChange={(e) => {
+                setRating(e.target.value);
+                onFilterChange("rating", e.target.value);
+                // Đóng sidebar trên thiết bị di động khi thay đổi bộ lọc
+                setIsSidebarVisible(false);
+              }}
+            >
+              <option value="">Tất cả</option>
+              <option value="4">4 sao trở lên</option>
+              <option value="3">3 sao trở lên</option>
+              <option value="2">2 sao trở lên</option>
+              <option value="1">1 sao trở lên</option>
+            </Form.Select>
+          </Form.Group>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

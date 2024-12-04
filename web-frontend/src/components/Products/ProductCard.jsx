@@ -1,21 +1,20 @@
+// src/components/ProductPage/ProductCard.jsx
 import React from "react";
+import { Card, Button, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import apiClient from "../../utils/api-client";
 import { useCart } from "../../context/CartContext";
 import { ToastContext } from "../ToastNotification/ToastContext";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./ProductCard.css";
 
-function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
+function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
   const { incrementCartCount } = useCart();
   const { addToast } = React.useContext(ToastContext);
 
   const addToCart = async () => {
     const product = { productId: id, quantity: 1 };
     try {
-      //kiểm tra localstorage có token hay không
       const token = localStorage.getItem("accessToken");
-
       if (token) {
         await apiClient.post("/cart/add", product, {
           headers: { Authorization: `Bearer ${token}` },
@@ -37,47 +36,64 @@ function ProductCard({ id, title, price, stock, rating, ratingCount, image }) {
     });
   };
 
+  const renderTooltip = (props) => (
+    <Tooltip id={`tooltip-${id}`} {...props}>
+      {stock > 0 ? "Thêm vào giỏ hàng" : "Sản phẩm đã hết hàng"}
+    </Tooltip>
+  );
+
   return (
-    <div className="product-card">
-      <NavLink to={`/product/${id}`}>
-        <img
-          src={`${import.meta.env.VITE_API_BASE_URL.replace(
-            "/api",
-            ""
-          )}/products/${image}`}
-          alt={title}
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "/images/default-image.png";
-          }}
-        />
+    <Card className="product-card h-100 shadow-sm">
+      <NavLink to={`/product/${id}`} className="text-decoration-none">
+        <div className="image-container">
+          <Card.Img
+            variant="top"
+            src={`${import.meta.env.VITE_API_BASE_URL.replace(
+              "/api",
+              ""
+            )}/products/${image}`}
+            alt={title}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/images/default-image.png";
+            }}
+            className="product-image"
+          />
+          {stock === 0 && (
+            <Badge bg="danger" className="stock-badge">
+              Hết hàng
+            </Badge>
+          )}
+        </div>
       </NavLink>
-      <div className="card-body card-body-information">
-        <h5 className="card-title">{title}</h5>
-        <p className="card-price">Giá: {formatPrice(price)}</p>
-        <p className="card-stock">{stock > 0 ? "Còn hàng" : "Hết hàng"}</p>
-        <div className="card-rating">
+      <Card.Body className="d-flex flex-column">
+        <Card.Title className="product-title">{title}</Card.Title>
+        <Card.Text className="product-price">{formatPrice(price)}</Card.Text>
+        <div className="product-rating mb-2">
           {Array.from({ length: 5 }, (_, i) => (
             <i
               key={i}
               className={`fas fa-star${
                 i < Math.round(rating) ? "" : "-half-alt"
-              }`}
+              } text-warning`}
             ></i>
           ))}
-          <span>
-            {rating.toFixed(1)} ({ratingCount} đánh giá)
+          <span className="ms-2">
+            ({rating.toFixed(1)}-{reviewCount} đánh giá)
           </span>
         </div>
-        <button
-          onClick={addToCart}
-          className={`add-to-cart-button ${stock > 0 ? "" : "disabled"}`}
-          disabled={stock === 0}
-        >
-          {stock > 0 ? "Thêm vào giỏ hàng" : "Hết hàng"}
-        </button>
-      </div>
-    </div>
+        <OverlayTrigger placement="top" overlay={renderTooltip}>
+          <Button
+            variant={stock > 0 ? "primary" : "secondary"}
+            onClick={addToCart}
+            disabled={stock === 0}
+            className="mt-auto add-to-cart-btn"
+          >
+            {stock > 0 ? "Thêm vào giỏ hàng" : "Hết hàng"}
+          </Button>
+        </OverlayTrigger>
+      </Card.Body>
+    </Card>
   );
 }
 

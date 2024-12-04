@@ -100,6 +100,16 @@ exports.createOrder = async (req, res) => {
       }
     }
 
+    if (paymentMethod === "cod") {
+      //chuyển trạng thái thanh toán sang unpaid
+      order.paymentStatus = "unpaid";
+
+      await order.save();
+      return res
+        .status(201)
+        .json({ message: "Order created successfully.", order });
+    }
+
     await order.save();
 
     res.status(201).json({ message: "Order created successfully.", order });
@@ -117,7 +127,10 @@ exports.getUserOrders = async (req, res) => {
   try {
     const { status, startDate, endDate, page = 1, limit = 10 } = req.query;
 
-    const query = { user: req.user.id };
+    const query = {
+      user: req.user.id,
+      paymentStatus: { $ne: "pending" },
+    };
 
     if (status) {
       query.shippingStatus = status;
@@ -348,7 +361,9 @@ exports.getAllOrders = async (req, res) => {
   try {
     const { status, startDate, endDate, page = 1, limit = 10 } = req.query;
 
-    const query = {};
+    const query = {
+      paymentStatus: { $ne: "pending" }, // Exclude orders with payment status "pending"
+    };
 
     if (status) {
       query.shippingStatus = status;
@@ -374,49 +389,102 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ message: "Error fetching orders" });
   }
 };
+// controllers/orderController.js
 
+// ... other imports
+
+// Existing controller functions...
+
+// Update Order Controller
 exports.updateOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const updateData = req.body;
 
+    // Validate the orderId
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+
+    // Find the order by ID
     const order = await Order.findById(orderId);
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Update shippingStatus and paymentStatus timestamps
+    // Handle shippingStatus update
     if (
       updateData.shippingStatus &&
       updateData.shippingStatus !== order.shippingStatus
     ) {
+      // Validate shippingStatus value
+      const validStatuses = ["processing", "shipping", "shipped", "cancelled"];
+      if (!validStatuses.includes(updateData.shippingStatus)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid shipping status value" });
+      }
+
+      // Update shippingStatus and set corresponding timestamp
       order.shippingStatus = updateData.shippingStatus;
       if (updateData.shippingStatus === "shipping") {
         order.orderTimestamps.shipping = new Date();
       } else if (updateData.shippingStatus === "shipped") {
         order.orderTimestamps.delivery = new Date();
+      } else if (updateData.shippingStatus === "cancelled") {
+        order.orderTimestamps.cancellation = new Date();
       }
+
+      // Additional logic can be added here if needed
     }
 
+    // Handle paymentStatus update
     if (
       updateData.paymentStatus &&
       updateData.paymentStatus !== order.paymentStatus
     ) {
+      // Validate paymentStatus value
+      const validPaymentStatuses = ["unpaid", "paid", "pending", "cancelled"];
+      if (!validPaymentStatuses.includes(updateData.paymentStatus)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid payment status value" });
+      }
+
+      // Update paymentStatus and set corresponding timestamp
       order.paymentStatus = updateData.paymentStatus;
       if (updateData.paymentStatus === "paid") {
         order.orderTimestamps.payment = new Date();
       }
     }
 
-    // Ensure refund.status is not null
-    if (updateData.refund && updateData.refund.status === null) {
-      updateData.refund.status = "processing"; // Set a default value
+    // Handle refund status
+    if (updateData.refund && updateData.refund.status) {
+      const validRefundStatuses = ["processing", "success", "failed", "null"];
+      if (!validRefundStatuses.includes(updateData.refund.status)) {
+        return res.status(400).json({ message: "Invalid refund status value" });
+      }
+
+      order.refund.status = updateData.refund.status;
+      if (updateData.refund.amount !== undefined) {
+        order.refund.amount = updateData.refund.amount;
+      }
+      if (updateData.refund.refundId !== undefined) {
+        order.refund.refundId = updateData.refund.refundId;
+      }
+      if (updateData.refund.mRefundId !== undefined) {
+        order.refund.mRefundId = updateData.refund.mRefundId;
+      }
     }
 
-    // Update other fields
-    Object.assign(order, updateData);
+    // Handle other fields if necessary
+    // For example, updating notes or other non-status fields
+    if (updateData.note !== undefined) {
+      order.note = updateData.note;
+    }
 
+    // Save the updated order
     await order.save();
 
     res.status(200).json({ message: "Order updated successfully", order });

@@ -1,46 +1,124 @@
-/* components/RatingandComment/RatingComponent.css */
+/* RatingComponent.css */
 
-.rating-component .stars span {
-  transition: color 0.2s;
+.rating-component {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  border-radius: 10px; /* Bo góc cho toàn bộ component */
+  background-color: #f9f9f9; /* Màu nền nhẹ nhàng */
+  padding: 20px; /* Thêm khoảng cách xung quanh */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm shadow nhẹ */
 }
 
-.rating-component .reviews-list .review-item .stars span {
-  cursor: default;
+.stars {
+  display: flex;
 }
 
-/* components/RatingandComment/CommentComponent.css */
-
-.comment-component .comment-item.depth-0::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -10px;
-  width: 2px;
-  height: 100%;
-  background-color: #dee2e6;
+.star-rating {
+  cursor: pointer;
+  font-size: 28px; /* Tăng kích thước một chút để dễ nhìn */
+  margin-right: 8px; /* Tăng khoảng cách giữa các sao */
+  transition: transform 0.2s ease-in-out; /* Hiệu ứng khi hover vào sao */
 }
 
-.comment-component .comment-item.depth-1::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -10px;
-  width: 2px;
-  height: 100%;
-  background-color: #6c757d;
+.star-rating.filled {
+  color: #ffc107;
 }
 
-.comment-component .comment-content {
-  position: relative;
+.star-rating.unfilled {
+  color: #e4e5e9;
 }
 
-.comment-component .reply-button {
-  color: #0d6efd;
-  padding: 0;
-  border: none;
-  background: none;
+.star-rating:hover {
+  transform: scale(1.2); /* Hiệu ứng phóng to nhẹ khi hover */
 }
 
-.comment-component .reply-button:hover {
-  text-decoration: underline;
+.comment-container {
+  width: 100%;
+  margin-top: 0px;
+}
+.text-reviews {
+  padding: 10px;
+}
+
+.review-list {
+  max-height: 200px; /* Set a fixed height for the review list */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 15px; /* Add some padding to avoid scrollbar overlap */
+}
+.review-list::-webkit-scrollbar {
+  width: 8px; /* Adjust the width of the scrollbar */
+  /* Adjust the height of the scrollbar for horizontal scrolling */
+}
+
+.review-list::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Background of the scrollbar track */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+.review-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.review-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.comment-box {
+  padding: 15px;
+  border-radius: 8px; /* Bo góc cho mỗi review */
+  border: 1px solid #ddd; /* Thêm đường viền nhẹ */
+  margin-bottom: 10px; /* Khoảng cách giữa các review */
+  background-color: #fff; /* Nền trắng cho các comment */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Thêm shadow nhẹ */
+  transition: transform 0.2s ease-in-out; /* Hiệu ứng khi hover vào comment */
+}
+
+.comment-box:hover {
+  transform: translateY(-5px); /* Hiệu ứng nhấc lên nhẹ khi hover */
+}
+
+.comment-box h5 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333; /* Màu chữ nhẹ nhàng */
+}
+
+.text-warning .fas.fa-star.filled {
+  color: #ffc107;
+}
+
+.text-warning .fas.fa-star.unfilled {
+  color: #e4e5e9;
+}
+
+button {
+  border-radius: 8px; /* Bo góc cho nút */
+  padding: 10px 20px; /* Thêm khoảng cách xung quanh chữ */
+  transition: background-color 0.2s ease, transform 0.2s ease; /* Hiệu ứng mượt khi hover */
+}
+
+button:hover {
+  background-color: #0056b3; /* Màu nền khi hover */
+  transform: translateY(-3px); /* Nhấc nút lên khi hover */
+}
+
+/* Alert Styles */
+.alert {
+  border-radius: 8px; /* Bo góc cho cảnh báo */
+  margin-top: 15px;
+  padding: 15px;
+  font-size: 14px; /* Giảm kích thước chữ cho thông báo */
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
 }

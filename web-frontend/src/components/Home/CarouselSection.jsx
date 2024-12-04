@@ -1,15 +1,16 @@
+// src/components/HomePage/CarouselSection.jsx
 import React from "react";
 import { Carousel } from "react-bootstrap";
 import iphone16 from "../../assets/iphone16-6.webp";
 import iphone16_1 from "../../assets/iphone16-2.png";
 import macbook from "../../assets/macbook-1.jpg";
 import ios17 from "../../assets/iOS-17.webp";
-import "./CarouselSection.css"; // Import CSS
+import "./CarouselSection.css"; // Import CSS truyền thống
 
 function CarouselSection() {
   return (
     <Carousel className="carousel-section">
-      <Carousel.Item>
+      <Carousel.Item className="carousel-items">
         <img
           className="d-block w-100 carousel-image"
           src={ios17}
@@ -17,7 +18,6 @@ function CarouselSection() {
         />
         <Carousel.Caption>
           <h3>iOS 17</h3>
-          <br />
           <p>
             Khám phá hàng loạt tính năng mới với iOS 17, nâng tầm trải nghiệm
             của bạn.
@@ -33,7 +33,6 @@ function CarouselSection() {
         />
         <Carousel.Caption>
           <h3>iPhone 16</h3>
-          <br />
           <p>
             Sở hữu công nghệ đột phá với iPhone 16, biến ước mơ của bạn thành
             hiện thực.
@@ -49,7 +48,6 @@ function CarouselSection() {
         />
         <Carousel.Caption>
           <h3>MacBook</h3>
-          <br />
           <p>
             Hiệu suất vượt trội, thiết kế sang trọng - MacBook là người bạn đồng
             hành lý tưởng.
@@ -65,7 +63,6 @@ function CarouselSection() {
         />
         <Carousel.Caption>
           <h3>iPhone 16</h3>
-          <br />
           <p>
             Thể hiện phong cách cùng iPhone 16 với công nghệ vượt trội và nhiều
             đổi mới đột phá.

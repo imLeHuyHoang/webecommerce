@@ -1,59 +1,62 @@
-// ServicesSection.js
+// src/components/HomePage/ServicesSection.jsx
 import React from "react";
-import "./ServicesSection.css";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import "./ServicesSection.css"; // Import CSS truyền thống
 
 function ServicesSection() {
+  const services = [
+    {
+      icon: "fas fa-shipping-fast",
+      title: "Giao Hàng Nhanh",
+      description: "Sản phẩm được giao nhanh chóng đến tận nhà.",
+    },
+    {
+      icon: "fas fa-headset",
+      title: "Hỗ Trợ 24/7",
+      description: "Chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc, mọi nơi.",
+    },
+    {
+      icon: "fas fa-sync-alt",
+      title: "Đổi Trả Dễ Dàng",
+      description: "Không hài lòng? Đổi trả sản phẩm dễ dàng.",
+    },
+    {
+      icon: "fas fa-lock",
+      title: "Thanh Toán An Toàn",
+      description: "Mọi giao dịch đều được mã hóa và bảo mật tuyệt đối.",
+    },
+    {
+      icon: "fas fa-gift",
+      title: "Ưu Đãi Đặc Biệt",
+      description: "Nhận ngay các ưu đãi và giảm giá đặc biệt",
+    },
+    {
+      icon: "fas fa-certificate",
+      title: "Chất Lượng Đảm Bảo",
+      description: "Sản phẩm luôn đạt chất lượng cao nhất.",
+    },
+  ];
+
   return (
     <section className="services-section py-5 bg-light">
-      <div className="container services">
+      <Container>
         <h2 className="text-center text-services mb-5">
           Dịch Vụ Của Chúng Tôi
         </h2>
-        <div className="row">
-          <div className="col-md-4 text-center mb-4">
-            <div className="service-card">
-              <i className="fas fa-shipping-fast fa-3x mb-3"></i>
-              <h4>Giao Hàng Nhanh</h4>
-              <p>Sản phẩm sẽ được giao nhanh chóng đến tận nhà của bạn.</p>
-            </div>
-          </div>
-          <div className="col-md-4 text-center mb-4">
-            <div className="service-card">
-              <i className="fas fa-headset fa-3x mb-3"></i>
-              <h4>Hỗ Trợ 24/7</h4>
-              <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc, mọi nơi.</p>
-            </div>
-          </div>
-          <div className="col-md-4 text-center mb-4">
-            <div className="service-card">
-              <i className="fas fa-sync-alt fa-3x mb-3"></i>
-              <h4>Đổi Trả Dễ Dàng</h4>
-              <p>Không hài lòng? Hãy đổi trả sản phẩm một cách dễ dàng.</p>
-            </div>
-          </div>
-          <div className="col-md-4 text-center mb-4">
-            <div className="service-card">
-              <i className="fas fa-lock fa-3x mb-3"></i>
-              <h4>Thanh Toán An Toàn</h4>
-              <p>Mọi giao dịch đều được mã hóa và bảo mật tuyệt đối.</p>
-            </div>
-          </div>
-          <div className="col-md-4 text-center mb-4">
-            <div className="service-card">
-              <i className="fas fa-gift fa-3x mb-3"></i>
-              <h4>Ưu Đãi Đặc Biệt</h4>
-              <p>Nhận ngay các ưu đãi và giảm giá đặc biệt cho sản phẩm.</p>
-            </div>
-          </div>
-          <div className="col-md-4 text-center mb-4">
-            <div className="service-card">
-              <i className="fas fa-certificate fa-3x mb-3"></i>
-              <h4>Chất Lượng Đảm Bảo</h4>
-              <p>Sản phẩm luôn đạt chất lượng cao nhất.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        <Row>
+          {services.map((service, index) => (
+            <Col key={index} md={4} className="text-center mb-4">
+              <Card className="service-card">
+                <Card.Body>
+                  <i className={`${service.icon} fa-3x mb-3 service-icon`}></i>
+                  <Card.Title>{service.title}</Card.Title>
+                  <Card.Text>{service.description}</Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Container>
     </section>
   );
 }

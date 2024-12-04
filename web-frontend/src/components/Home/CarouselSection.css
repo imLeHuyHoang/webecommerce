@@ -1,74 +1,33 @@
+/* CarouselSection.css */
+
 .carousel-image {
-  object-fit: cover; /* Ensure the image fits within the frame */
-  height: 400px; /* Fixed height for the image */
+  height: 65vh;
+  object-fit: cover;
 }
-
-@media (max-width: 768px) {
-  .carousel-image {
-    height: 300px; /* Height for smaller screens */
-  }
-  .carousel-caption {
-    max-width: 60%; /* Reduce caption size */
-    font-size: 16px;
-  }
+.carousel-items {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .carousel-caption {
-  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
 }
 
-.carousel-caption h3,
+.carousel-caption h3 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
 .carousel-caption p {
-  color: #000000; /* White text color */
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
+  font-size: 1.2rem;
+  color: #ddd;
 }
 
-.carousel-caption h3::before,
-.carousel-caption p::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.5),
-    transparent
-  );
-  animation: shine 2s infinite;
-}
-
-@keyframes shine {
-  0% {
-    left: -100%;
-  }
-  25% {
-    left: 100%;
-  }
-  50% {
-    left: 100%;
-  }
-  75% {
-    left: -100%;
-  }
-  100% {
-    left: -100%;
-  }
-}
-
-.carousel-caption {
-  background-color: rgba(27, 27, 27, 0.199);
-  padding: 10px;
-  border-radius: 8px;
-  display: inline-block;
-}
-
-.carousel-caption h3,
-.carousel-caption p {
-  color: #ffffff;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+.carousel-image {
+  border: solid #ddd;
+  border-radius: 10px;
 }

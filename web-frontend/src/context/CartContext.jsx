@@ -24,7 +24,7 @@ const CartProvider = ({ children }) => {
           0
         );
       } catch (error) {
-        console.error("Error fetching cart:", error);
+        console.error("Failed to fetch cart count:", error);
       }
     } else {
       const localCart = JSON.parse(localStorage.getItem("cart")) || [];

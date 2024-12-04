@@ -1,7 +1,8 @@
-// components/RatingandComment/CommentComponent.jsx
+// src/components/RatingandComment/CommentComponent.jsx
 import React, { useState, useEffect } from "react";
+import { Spinner, Form, Button, Collapse } from "react-bootstrap";
 import apiClient from "../../utils/api-client";
-import "./CommentComponent.css"; // Import CSS riêng cho component
+import "./CommentComponent.css";
 
 const CommentComponent = ({ productId }) => {
   const [comments, setComments] = useState([]);
@@ -9,6 +10,7 @@ const CommentComponent = ({ productId }) => {
   const [replyingTo, setReplyingTo] = useState(null); // ID của comment đang được trả lời
   const [replyText, setReplyText] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Fetch tất cả các bình luận và trả lời
   const fetchComments = async () => {
@@ -22,6 +24,8 @@ const CommentComponent = ({ productId }) => {
     } catch (error) {
       console.error("Error fetching comments:", error);
       setMessage("Có lỗi xảy ra khi tải bình luận.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,51 +141,61 @@ const CommentComponent = ({ productId }) => {
     return commentsList.map((comment) => (
       <div key={comment._id} className={`comment-item depth-${depth}`}>
         <div className="comment-content position-relative">
-          <div className="comment-header">
-            <strong>{comment.user.name}</strong>{" "}
-            <small className="text-muted">
+          <div className="comment-header d-flex align-items-center">
+            <strong>{comment.user.name}</strong>
+            <small className="text-muted ms-2">
               {new Date(comment.createdAt).toLocaleString()}
             </small>
           </div>
           <div className="comment-body">{comment.comment}</div>
-          <button
-            className="btn btn-sm btn-link reply-button"
+          <Button
+            variant="link"
+            size="sm"
+            className="reply-button p-0"
             onClick={() => handleReply(comment._id)}
           >
             Trả lời
-          </button>
+          </Button>
         </div>
 
         {/* Form trả lời dưới từng bình luận */}
-        {replyingTo === comment._id && (
-          <div className="reply-form">
-            <textarea
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Viết trả lời"
-              className="form-control mb-2"
-            ></textarea>
-            <button
-              className="btn btn-primary btn-sm me-2"
-              onClick={handleSubmitReply}
-            >
-              Gửi trả lời
-            </button>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                setReplyingTo(null);
-                setReplyText("");
-              }}
-            >
-              Hủy
-            </button>
+        <Collapse in={replyingTo === comment._id}>
+          <div className="reply-form mt-2">
+            <Form>
+              <Form.Group controlId={`reply-${comment._id}`} className="mb-2">
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  placeholder="Viết trả lời"
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                />
+              </Form.Group>
+              <Button
+                variant="primary"
+                size="sm"
+                className="me-2"
+                onClick={handleSubmitReply}
+              >
+                Gửi trả lời
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setReplyingTo(null);
+                  setReplyText("");
+                }}
+              >
+                Hủy
+              </Button>
+            </Form>
           </div>
-        )}
+        </Collapse>
 
         {/* Render các trả lời của bình luận hiện tại */}
         {comment.replies && comment.replies.length > 0 && (
-          <div className="replies">
+          <div className="replies mt-3">
             {renderComments(comment.replies, depth + 1)}
           </div>
         )}
@@ -189,27 +203,48 @@ const CommentComponent = ({ productId }) => {
     ));
   };
 
-  return (
-    <div className="comment-component my-4">
-      <h4>Bình luận</h4>
-      <div className="mb-3">
-        <textarea
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          placeholder="Viết bình luận"
-          className="form-control mb-2"
-        ></textarea>
-        <button className="btn btn-primary" onClick={handleAddComment}>
-          Gửi bình luận
-        </button>
+  if (loading)
+    return (
+      <div className="text-center">
+        <Spinner animation="border" variant="primary" />
       </div>
-      {message && <p className="mt-2 text-success">{message}</p>}
-      <div>
-        {comments.length === 0 ? (
-          <p>Chưa có bình luận nào.</p>
-        ) : (
-          renderComments(comments)
-        )}
+    );
+
+  return (
+    <div className="comment-component">
+      <h4 className="ml-10px">Bình luận về sản phẩm</h4>
+
+      <div className="comments-list-container">
+        {message && <p className="text-danger">{message}</p>}
+        <div className="comments-list">
+          {comments.length === 0 ? (
+            <p>Chưa có bình luận nào.</p>
+          ) : (
+            renderComments(comments)
+          )}
+        </div>
+      </div>
+
+      <div className="add-comment-form">
+        <Form className="ml-10px">
+          <Form.Group controlId="newComment" className="mb-2">
+            <Form.Label>Thêm bình luận</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              placeholder="Nhập bình luận của bạn..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+            />
+          </Form.Group>
+          <Button
+            className="ml-10px"
+            variant="primary"
+            onClick={handleAddComment}
+          >
+            Gửi bình luận
+          </Button>
+        </Form>
       </div>
     </div>
   );

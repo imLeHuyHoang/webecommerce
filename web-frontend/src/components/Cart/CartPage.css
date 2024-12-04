@@ -1,195 +1,186 @@
-.cartpage .container {
-  max-width: 1200px;
-}
-.avatar-lg {
-  width: 100px;
-  height: 100px;
+/* src/components/CartPage/CartPage.css */
+
+.cartpage {
+  background-color: #f8f9fa;
 }
 
-.text-truncate {
+.product-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.input-group .form-control {
-  flex: 0 0 100%;
-}
-
-.input-group .btn {
-  flex: 0 0 100%;
-}
-
-.font-size-16 {
-  font-size: 16px;
-}
-
-.font-size-15 {
-  font-size: 15px;
-}
-
-.font-size-18 {
-  font-size: 18px;
-}
-
-.btn-link {
-  text-decoration: none;
-}
-
-.btn-link:hover {
-  text-decoration: underline;
 }
 
 .card-body {
   padding: 1.5rem;
 }
 
-.table td,
-.table th {
-  vertical-align: middle;
+.card-body .product-name {
+  margin-bottom: 0.5rem;
 }
 
-.table .bg-light {
-  background-color: #f8f9fa;
-}
-.input-group .form-control {
-  max-width: 200px;
-  height: 40px;
-  margin: 0px;
-  padding: 0px;
-  font-size: 12px;
-  text-align: center;
-}
-.input-group .btn {
-  max-width: 70px;
-  height: 40px;
-  margin: 0px;
-  padding: 0px;
-  font-size: 12px;
+.card-body .text-muted {
+  margin-bottom: 0.5rem;
 }
 
-.button-quantity .btn-outline-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: none;
-  border: 1px solid #007bff;
-  color: #007bff;
+.button-minus,
+.button-plus {
+  height: 100%;
+  width: 50px;
+  font-size: 14px; /* Giảm kích thước chữ */
+  border-radius: 4px; /* Làm tròn các góc */
   padding: 0;
-  cursor: pointer;
-}
-
-.row .text-muted {
-  margin: 0px;
-}
-
-.card .card-header {
-  margin: 0px;
-}
-.btn.usecode {
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid black;
-  font-size: 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-.btn.usecode:hover {
-  background-color: #0026ff;
-  color: #ffffff;
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn.usecode:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-#continue-shopping {
-  background-color: transparent;
-  color: #6c757d;
-  border: 1px solid #6c757d;
-  font-size: 12px;
+  transition: background-color 0.3s ease; /* Thêm hiệu ứng hover */
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.3s ease-in-out;
-  margin: 0px;
+}
+.text-quantity {
+  width: 50px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#continue-shopping:hover {
-  color: #0d1e4c;
+/* Thêm hiệu ứng khi hover */
+.button-minus:hover,
+.button-plus:hover {
+  background-color: #e0e0e0;
+}
+
+/* Nếu bạn muốn nút nhỏ hơn nữa, bạn có thể điều chỉnh padding thêm */
+.quantity {
+  height: 30px;
+}
+
+/* Tùy chọn cho màu nền, có thể thay đổi tùy theo yêu cầu */
+button:disabled {
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.card .badge {
+  font-size: 0.9rem;
+}
+
+.d-grid {
+  display: grid;
+}
+
+.usecode {
+  background-color: #28a745;
+  color: white;
+}
+
+.usecode:hover {
+  background-color: #218838;
+  color: white;
+}
+
+.text-discount-cart {
+  background-color: #28a745;
+  color: white;
+}
+
+.text-discount-cart:hover {
+  background-color: #218838;
+  color: white;
+}
+
+.btn-link.text-muted {
+  text-decoration: none;
+}
+
+.btn-link.text-muted:hover {
   text-decoration: underline;
 }
 
-#apply-cart-discount {
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid #007bff;
-  font-size: 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+.btn-link.text-danger {
+  text-decoration: none;
 }
 
-#apply-cart-discount:hover {
-  background-color: #003cff;
-  color: #ffffff;
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.btn-link.text-danger:hover {
+  text-decoration: underline;
 }
 
-#apply-cart-discount:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .product-name {
+    font-size: 1rem;
+  }
 }
 
-#proceed-to-checkout {
+@media (max-width: 768px) {
+  .product-image {
+    height: 150px;
+  }
+
+  .product-name {
+    font-size: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-body .text-muted {
+    margin-bottom: 0.3rem;
+  }
+
+  .badge {
+    font-size: 0.8rem;
+  }
+}
+
+/* Hover Effects */
+.btn-outline-secondary:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-success {
   background-color: #28a745;
-  color: #fff;
-  border: none;
-  font-size: 12px;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  border-color: #28a745;
 }
 
-#proceed-to-checkout:hover {
+.btn-success:hover {
   background-color: #218838;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
+  border-color: #1e7e34;
 }
 
-#continue-shopping:active,
-#proceed-to-checkout:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
 }
 
-@media (max-width: 575.98px) {
-  .avatar-lg {
-    width: 80px;
-    height: 80px;
-  }
-  .input-group .form-control {
-    font-size: 14px;
-  }
-  .input-group .btn {
-    font-size: 14px;
-  }
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+.Form-Control {
+  width: 60%; /* Thay đổi chiều rộng của ô nhập */
+}
 
-  .input-group .form-control,
-  .input-group .btn {
-    flex: 1 1 auto;
-  }
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
 }

@@ -1,3 +1,4 @@
+// src/components/LoginPage/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -17,6 +18,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Reset error message
     try {
       const response = await apiClient.post("/user/login", formData);
       const { accessToken, id, user } = response.data;
@@ -31,22 +33,46 @@ const Login = () => {
       navigate("/");
       window.location.reload();
     } catch (error) {
-      setError("Email hoặc mật khẩu không đúng!");
+      // **Enhanced Error Handling: Display specific error messages from the backend**
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("Email hoặc mật khẩu không đúng!");
+      }
     }
   };
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     const { credential } = credentialResponse;
+    setError(""); // Reset error message
     try {
       const response = await apiClient.post("/user/google-login", {
         credential,
       });
       const { accessToken, user } = response.data;
 
+      if (!user) {
+        setError("Không nhận được thông tin người dùng từ máy chủ.");
+        return;
+      }
+
       login(user, accessToken);
       navigate("/");
     } catch (error) {
-      setError("Đăng nhập với Google thất bại!");
+      // **Enhanced Error Handling for Google Login**
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("Đăng nhập với Google thất bại!");
+      }
     }
   };
 

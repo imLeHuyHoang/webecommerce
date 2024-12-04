@@ -46,6 +46,7 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success"); // New state for variant
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -69,9 +70,13 @@ const UserManagement = () => {
         },
       });
       setUsers(response.data);
+      setToastMessage("Users fetched successfully");
+      setToastVariant("success");
+      setShowToast(true);
     } catch (error) {
       console.error("Error fetching users:", error);
       setToastMessage("Error fetching users");
+      setToastVariant("danger");
       setShowToast(true);
     } finally {
       setLoading(false);
@@ -107,10 +112,12 @@ const UserManagement = () => {
       });
       setUsers(users.filter((user) => user._id !== userId));
       setToastMessage("User deleted successfully");
+      setToastVariant("success");
       setShowToast(true);
     } catch (error) {
       console.error("Error deleting user:", error);
       setToastMessage("Error deleting user");
+      setToastVariant("danger");
       setShowToast(true);
     }
   };
@@ -138,10 +145,12 @@ const UserManagement = () => {
       // Update users state
       setUsers(users.map((u) => (u._id === userId ? response.data : u)));
       setToastMessage("User status updated successfully");
+      setToastVariant("success");
       setShowToast(true);
     } catch (error) {
       console.error("Error updating user status:", error);
       setToastMessage("Error updating user status");
+      setToastVariant("danger");
       setShowToast(true);
     }
   };
@@ -180,6 +189,7 @@ const UserManagement = () => {
           )
         );
         setToastMessage("User updated successfully");
+        setToastVariant("success");
       } else {
         // Add new user
         const response = await apiClient.post(
@@ -193,6 +203,7 @@ const UserManagement = () => {
         );
         setUsers((prevUsers) => [...prevUsers, response.data]);
         setToastMessage("User added successfully");
+        setToastVariant("success");
       }
       setShowToast(true);
       setShowModal(false);
@@ -208,10 +219,12 @@ const UserManagement = () => {
       } else if (e.response && e.response.data && e.response.data.message) {
         // Handle server validation errors
         setToastMessage(e.response.data.message);
+        setToastVariant("danger");
         setShowToast(true);
       } else {
         console.error("Error saving user:", e);
         setToastMessage("Error saving user");
+        setToastVariant("danger");
         setShowToast(true);
       }
     }
@@ -402,6 +415,7 @@ const UserManagement = () => {
         message={toastMessage}
         show={showToast}
         onClose={() => setShowToast(false)}
+        variant={toastVariant} // Pass the variant here
       />
     </Container>
   );

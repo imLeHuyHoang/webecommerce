@@ -1,4 +1,29 @@
-.app {
-  display: grid;
-  grid-template-rows: 80px auto;
+/* index.css or App.css */
+
+/* Reset margin and padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure html and body take full height */
+html,
+body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+/* Set up flexbox on the root container */
+#root,
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+}
+
+/* Main content should expand to fill available space */
+.main-content {
+  flex: 1;
+  padding: 1rem; /* Optional padding */
 }

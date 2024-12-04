@@ -1,0 +1,21 @@
+/* src/components/HomePage/NewsletterSection.css */
+
+.newsletter-section {
+  background-color: #f8f9fa;
+}
+
+.newsletter-section h2 {
+  color: #343a40;
+}
+
+.newsletter-section p {
+  color: #6c757d;
+}
+
+.newsletter-section .form-control {
+  border-radius: 0.25rem 0 0 0.25rem;
+}
+
+.newsletter-section .btn {
+  border-radius: 0 0.25rem 0.25rem 0;
+}

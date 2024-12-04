@@ -1,45 +1,41 @@
-// TestimonialsSection.js
+// src/components/HomePage/TestimonialsSection.jsx
 import React from "react";
-import "./TestimonialsSection.css";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import "./TestimonialsSection.css"; // Import CSS truyền thống
 
 function TestimonialsSection() {
+  const testimonials = [
+    {
+      text: "Sản phẩm chất lượng và giá thành tốt.",
+      author: "John Doe",
+    },
+    {
+      text: "Dịch vụ giao hàng nhanh chóng và chuyên nghiệp.",
+      author: "Jane Smith",
+    },
+    {
+      text: "Rất hài lòng với chất lượng sản phẩm",
+      author: "Bob Johnson",
+    },
+  ];
+
   return (
     <section className="testimonials-section py-5">
-      <div className="container">
-        <h2 className="text-center mb-5 text-white">What Our Customers Say</h2>
-        <div className="row">
-          <div className="col-md-4">
-            <div className="card testimonial-card">
-              <div className="card-body">
-                <p className="card-text">
-                  "Great products and amazing customer service!"
-                </p>
-                <h5 className="card-title">- John Doe</h5>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card testimonial-card">
-              <div className="card-body">
-                <p className="card-text">
-                  "Fast delivery and excellent quality."
-                </p>
-                <h5 className="card-title">- Jane Smith</h5>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card testimonial-card">
-              <div className="card-body">
-                <p className="card-text">
-                  "I love shopping here! Highly recommended."
-                </p>
-                <h5 className="card-title">- Bob Johnson</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Container>
+        <h2 className="text-center mb-3 ">What Our Customers Say</h2>
+        <Row>
+          {testimonials.map((testimonial, index) => (
+            <Col key={index} md={4} className="mb-4">
+              <Card className="testimonial-card">
+                <Card.Body>
+                  <p className="card-text">"{testimonial.text}"</p>
+                  <h5 className="card-title">- {testimonial.author}</h5>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Container>
     </section>
   );
 }

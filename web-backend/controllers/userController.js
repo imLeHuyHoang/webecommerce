@@ -68,6 +68,8 @@ exports.registerUser = async (req, res) => {
 };
 
 // Đăng nhập và tạo JWT token
+// controllers/userController.js
+
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   const isProduction = process.env.NODE_ENV === "production";
@@ -83,6 +85,14 @@ exports.loginUser = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Tài khoản không tồn tại." });
+    }
+
+    // **New Check: Verify if the user's account is active**
+    if (!user.isActive) {
+      return res.status(403).json({
+        message:
+          "Tài khoản của bạn hiện đang bị cấm, hãy liên hệ với đội ngũ admin để được tư vấn.",
+      });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -346,11 +356,13 @@ exports.updateUser = async (req, res) => {
 };
 exports.getAllUsers = async (req, res) => {
   try {
-    // Check if the requester is an admin
-    if (!req.user.roles.includes("admin")) {
+    // Check if the requester has the 'admin' role
+    console.log(req.user);
+    if (!req.user.roles || !req.user.roles.includes("admin")) {
       return res.status(403).json({ message: "Access denied." });
     }
 
+    // Fetch all users, excluding sensitive fields
     const users = await User.find().select("-password -refreshToken");
     res.status(200).json(users);
   } catch (error) {

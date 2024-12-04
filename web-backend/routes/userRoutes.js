@@ -18,7 +18,8 @@ const {
 } = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/auth");
-const authAdmin = require("../middleware/authAdmin");
+const authAdminMiddleware = require("../middleware/authAdmin");
+
 // Public routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
@@ -31,10 +32,9 @@ router.put("/profile", verifyToken, updateUser);
 router.get("/refreshToken", refreshToken);
 router.post("/logout", logoutUser);
 
-// Admin routes
-router.get("/users", verifyToken, authAdmin, getAllUsers);
-router.post("/admin", verifyToken, authAdmin, createUserByAdmin);
-router.put("/:id", verifyToken, authAdmin, updateUserByAdmin);
-router.delete("/:id", verifyToken, authAdmin, deleteUser);
+router.get("/users", authAdminMiddleware, getAllUsers);
+router.post("/admin", authAdminMiddleware, createUserByAdmin);
+router.put("/:id", authAdminMiddleware, updateUserByAdmin);
+router.delete("/:id", authAdminMiddleware, deleteUser);
 
 module.exports = router;

@@ -381,7 +381,7 @@ function MyOrders() {
                   <tbody>
                     {selectedOrder.products.map((item) => (
                       <tr key={item.product._id}>
-                        <td>{item.product.title}</td>
+                        <td>{item.product.name}</td>
                         <td>{item.quantity}</td>
                         <td>{item.price.toLocaleString()} đ</td>
                       </tr>

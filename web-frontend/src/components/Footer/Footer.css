@@ -1,18 +1,18 @@
-/* Footer Component Styles */
+/* src/components/Footer/Footer.css */
 
 .footer-section {
-  background-color: #343a40;
+  background-color: #343a40; /* Bootstrap dark background */
   color: #ffffff;
-  padding: 50px 0;
+  padding: 2rem 0;
+  width: 100%;
 }
 
-.footer-description {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #cccccc;
+.footer-section h5 {
+  margin-bottom: 1rem;
 }
 
-.footer-links {
+.footer-links,
+.footer-contact {
   list-style: none;
   padding: 0;
 }
@@ -20,88 +20,37 @@
 .footer-link {
   color: #ffffff;
   text-decoration: none;
-  font-size: 0.95rem;
-  transition: color 0.3s ease;
 }
 
 .footer-link:hover {
-  color: #007bff;
-}
-
-.footer-contact {
-  list-style: none;
-  padding: 0;
-  font-size: 0.9rem;
-  line-height: 1.8;
+  text-decoration: underline;
 }
 
 .footer-contact li {
-  margin-bottom: 10px;
-}
-
-.footer-contact i {
-  color: #007bff;
-  margin-right: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .footer-social-links {
   display: flex;
-  gap: 15px;
+  gap: 1rem;
 }
 
 .social-link {
   color: #ffffff;
-  font-size: 1.2rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-size: 1.5rem;
+  text-decoration: none;
 }
 
-.social-link.facebook:hover {
-  background-color: #3b5998;
-  transform: translateY(-3px);
-}
-
-.social-link.twitter:hover {
-  background-color: #55acee;
-  transform: translateY(-3px);
-}
-
-.social-link.instagram:hover {
-  background-color: #ac2bac;
-  transform: translateY(-3px);
+.social-link:hover {
+  color: #adb5bd; /* Bootstrap secondary color */
 }
 
 .footer-divider {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-top: 1px solid #495057; /* Bootstrap dark border */
+  margin: 1.5rem 0;
 }
 
-.footer-copyright {
-  font-size: 0.85rem;
-  color: #cccccc;
-}
-
+.footer-copyright,
 .footer-design {
-  font-size: 0.85rem;
-  color: #cccccc;
-  text-align: right;
-}
-
-@media (max-width: 768px) {
-  .footer-section {
-    text-align: center;
-  }
-
-  .footer-design {
-    text-align: center;
-    margin-top: 20px;
-  }
-
-  .footer-social-links {
-    justify-content: center;
-  }
+  margin: 0;
 }

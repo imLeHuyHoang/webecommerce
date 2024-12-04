@@ -1,46 +1,81 @@
-/* components/RatingandComment/RatingComponent.css */
+/* src/components/RatingandComment/CommentComponent.css */
 
-.rating-component .stars span {
-  transition: color 0.2s;
+.comment-component {
 }
 
-.rating-component .reviews-list .review-item .stars span {
-  cursor: default;
+.comments-list-container {
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: auto;
+  padding-right: 10px; /* To prevent content hiding behind scrollbar */
+  border: 1px solid #e0e0e0; /* Optional: Add a border for distinction */
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
 }
 
-/* components/RatingandComment/CommentComponent.css */
-
-.comment-component .comment-item.depth-0::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -10px;
-  width: 2px;
-  height: 100%;
-  background-color: #dee2e6;
+.comments-list {
+  /* Optional: Add padding or margin if needed */
 }
 
-.comment-component .comment-item.depth-1::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -10px;
-  width: 2px;
-  height: 100%;
-  background-color: #6c757d;
+.comment-item {
+  margin-bottom: 15px;
 }
 
-.comment-component .comment-content {
-  position: relative;
+.comment-item.depth-1 {
+  margin-left: 20px;
 }
 
-.comment-component .reply-button {
-  color: #0d6efd;
-  padding: 0;
-  border: none;
-  background: none;
+.comment-item.depth-2 {
+  margin-left: 40px;
 }
 
-.comment-component .reply-button:hover {
-  text-decoration: underline;
+.comment-header {
+  font-size: 0.9rem;
+}
+
+.comment-body {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.reply-button {
+  font-size: 0.8rem;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.reply-form textarea {
+  resize: vertical;
+}
+
+.add-comment-form {
+  margin-top: 20px;
+}
+
+/* Scrollbar Styling (Optional) */
+.comments-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.comments-list-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.comments-list-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 767px) {
+  .comments-list-container {
+    max-height: 300px; /* Adjust for smaller screens */
+  }
+
+  .comment-item.depth-1 {
+    margin-left: 15px;
+  }
+
+  .comment-item.depth-2 {
+    margin-left: 30px;
+  }
 }

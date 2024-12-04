@@ -1,13 +1,17 @@
 // middleware/authAdmin.js
+const jwt = require("jsonwebtoken");
 
-module.exports = function (req, res, next) {
-  // Kiểm tra xem môi trường có yêu cầu xác thực hay không
-  if (!process.env.AUTH) return next();
-
-  // Kiểm tra xem người dùng có quyền admin hay không
-  if (!req.user || !req.user.isAdmin) {
-    return res.status(403).send("Access denied (Admin Only)");
+module.exports = (req, res, next) => {
+  const token = req.header("Authorization").replace("Bearer ", "");
+  if (!token) {
+    return res.status(401).json({ message: "Authentication required." });
   }
 
-  next();
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Assuming the token contains user information
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Invalid token." });
+  }
 };
