@@ -1,0 +1,34 @@
+/* Snowfall.css */
+.snow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Cho phép tương tác với các thành phần phía dưới */
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.snowflake {
+  position: absolute;
+  top: -10px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation-name: fall, drift;
+  animation-timing-function: linear, linear;
+  animation-iteration-count: infinite, infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: translateX(var(--drift)) translateY(100vh);
+  }
+}
