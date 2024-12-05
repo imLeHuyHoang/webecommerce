@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import { z } from "zod";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 
@@ -30,7 +30,7 @@ const ManageAttributes = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/category`);
+      const response = await apiClient.get(`${API_BASE_URL}/category`);
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -48,7 +48,7 @@ const ManageAttributes = () => {
 
   const fetchAttributes = async () => {
     try {
-      const response = await axios.get(
+      const response = await apiClient.get(
         `${API_BASE_URL}/attributes/category/${selectedCategoryId}`
       );
       setAttributes(response.data || []);
@@ -73,7 +73,7 @@ const ManageAttributes = () => {
     if (!window.confirm("Are you sure you want to delete this attribute?"))
       return;
     try {
-      await axios.delete(`${API_BASE_URL}/attributes/${attributeId}`);
+      await apiClient.delete(`${API_BASE_URL}/attributes/${attributeId}`);
       setToast({
         show: true,
         message: "Attribute deleted successfully",
@@ -103,7 +103,7 @@ const ManageAttributes = () => {
 
       if (selectedAttribute) {
         // Update attribute
-        await axios.put(
+        await apiClient.put(
           `${API_BASE_URL}/attributes/${selectedAttribute._id}`,
           attributeData
         );
@@ -114,7 +114,7 @@ const ManageAttributes = () => {
         });
       } else {
         // Add new attribute
-        await axios.post(`${API_BASE_URL}/attributes`, attributeData);
+        await apiClient.post(`${API_BASE_URL}/attributes`, attributeData);
         setToast({
           show: true,
           message: "Attribute added successfully",

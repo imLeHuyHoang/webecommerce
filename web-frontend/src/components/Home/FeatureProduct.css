@@ -1,20 +1,63 @@
 /* FeatureProduct.css */
 .featured-product {
   padding: 60px 0;
-  background-color: #f8f9fa;
+  background-color: #778ca150;
+  background-image: url("../../../public/giangsinh2.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  color: white;
+  justify-content: center;
+  align-items: center;
 }
 
 .featured-product-container {
   max-width: 1200px;
   margin: 0 auto;
+  background-color: rgba(
+    220,
+    216,
+    216,
+    0.3
+  ); /* 50% transparent white background */
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
 }
 
 .text-feature {
-  font-size: 2.5rem;
+  display: inline-block;
+  position: relative;
+  font-size: 2rem; /* You can adjust the size as needed */
   font-weight: bold;
-  color: #343a40;
-}
+  background: linear-gradient(90deg, white 50%, rgb(0, 0, 0) 50%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: ledEffect 3s linear infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
 
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+@keyframes ledEffect {
+  0% {
+    color: white;
+    background-position: -100%;
+  }
+  50% {
+    color: rgb(0, 0, 0);
+    background-position: 100%;
+  }
+  100% {
+    color: white;
+    background-position: -100%;
+  }
+}
 .row-product {
   display: flex;
   flex-wrap: wrap;

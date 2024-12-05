@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import CategoryForm from "../form/CategoryForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import "./ManageCategories.css"; // Import file CSS
@@ -19,7 +19,7 @@ const ManageCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(API_BASE_URL);
+      const response = await apiClient.get(API_BASE_URL);
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -45,7 +45,7 @@ const ManageCategories = () => {
     if (!window.confirm("Are you sure you want to delete this category?"))
       return;
     try {
-      await axios.delete(`${API_BASE_URL}/${categoryId}`);
+      await apiClient.delete(`${API_BASE_URL}/${categoryId}`);
       setToast({
         show: true,
         message: "Category deleted successfully",

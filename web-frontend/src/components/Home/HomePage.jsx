@@ -13,7 +13,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <HeroSection
         title="Chào mừng đến với Tech Store"
-        subtitle="Cung cấp các sản phẩm công nghệ hàng đầu với chất lượng và giá thành tốt nhất"
+        subtitle="Cung cấp các sản phẩm công nghệ với chất lượng và giá thành tốt nhất"
         link="/product"
         image={imgBackground}
       />

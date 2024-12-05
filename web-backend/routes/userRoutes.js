@@ -32,6 +32,7 @@ router.put("/profile", verifyToken, updateUser);
 router.get("/refreshToken", refreshToken);
 router.post("/logout", logoutUser);
 
+// Admin routes
 router.get("/users", authAdminMiddleware, getAllUsers);
 router.post("/admin", authAdminMiddleware, createUserByAdmin);
 router.put("/:id", authAdminMiddleware, updateUserByAdmin);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import { z } from "zod";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/category`;
@@ -61,12 +61,12 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
 
       if (category) {
         // Update category
-        await axios.put(`${API_BASE_URL}/${category._id}`, data, {
+        await apiClient.put(`${API_BASE_URL}/${category._id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
         // Create category
-        await axios.post(API_BASE_URL, data, {
+        await apiClient.post(API_BASE_URL, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }

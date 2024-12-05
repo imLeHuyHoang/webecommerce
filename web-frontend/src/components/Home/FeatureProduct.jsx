@@ -3,6 +3,7 @@ import { Container, Row, Col, Spinner, Alert } from "react-bootstrap";
 import ProductCard from "../Products/ProductCard";
 import apiClient from "../../utils/api-client";
 import "./FeatureProduct.css"; // Import CSS truyền thống
+import imgBackground from "../../../public/anhbia1.jpg";
 
 function FeatureProduct() {
   const [randomProducts, setRandomProducts] = useState([]);
