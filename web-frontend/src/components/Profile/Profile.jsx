@@ -1,52 +1,65 @@
+// src/components/Profile.jsx
+
 import React, { useEffect, useState, useRef } from "react";
 import apiClient from "../../utils/api-client";
-import { useNavigate } from "react-router-dom";
-import UserInfoForm from "./UserInforForm"; // Reusing the UserInfoForm component
+import UserInfoForm from "./UserInforForm";
 import ToastNotification from "../ToastNotification/ToastNotification";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    gender: "",
     addresses: [{ province: "", district: "", ward: "", street: "" }],
-  });
-  const [newAddress, setNewAddress] = useState({
-    province: "",
-    district: "",
-    ward: "",
-    street: "",
   });
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [orderStatusCounts, setOrderStatusCounts] = useState({
+    processing: 0,
+    shipping: 0,
+    shipped: 0,
+    cancelled: 0,
+  });
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const navigate = useNavigate();
 
-  // Reference for detecting outside clicks
+  // Reference for detecting outside clicks (optional, nếu bạn sử dụng thêm các form pop-up)
   const newAddressFormRef = useRef(null);
 
-  // Fetch user profile data
+  // Fetch user profile data and order status counts
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchData = async () => {
       try {
-        const response = await apiClient.get("/user/profile");
-        setUser(response.data);
+        const [userResponse, ordersResponse] = await Promise.all([
+          apiClient.get("/user/profile"),
+          apiClient.get("/order/status-counts"), // Sửa thành số nhiều
+        ]);
+        setUser(userResponse.data);
         setFormData({
-          addresses: response.data.addresses.length
-            ? response.data.addresses
+          name: userResponse.data.name || "",
+          phone: userResponse.data.phone || "",
+          gender: userResponse.data.gender || "",
+          addresses: userResponse.data.addresses.length
+            ? userResponse.data.addresses
             : [{ province: "", district: "", ward: "", street: "" }],
         });
+        setOrderStatusCounts(ordersResponse.data);
       } catch (error) {
-        setToastMessage("Lỗi khi tải thông tin người dùng.");
+        console.error("Error fetching data:", error);
+        setToastMessage("Lỗi khi tải thông tin.");
         setShowToast(true);
       } finally {
         setLoading(false);
       }
     };
-    fetchUserProfile();
+    fetchData();
   }, []);
 
   // Update individual address fields for editing
@@ -65,10 +78,13 @@ const Profile = () => {
   const handleAddNewAddress = () => {
     setFormData((prevData) => ({
       ...prevData,
-      addresses: [...prevData.addresses, { ...newAddress }],
+      addresses: [
+        ...prevData.addresses,
+        { province: "", district: "", ward: "", street: "" },
+      ],
     }));
-    setNewAddress({ province: "", district: "", ward: "", street: "" });
-    setShowNewAddressForm(false);
+    setToastMessage("Đã thêm địa chỉ mới. Vui lòng chỉnh sửa và lưu.");
+    setShowToast(true);
   };
 
   // Delete an address
@@ -78,6 +94,8 @@ const Profile = () => {
       ...prevData,
       addresses: updatedAddresses,
     }));
+    setToastMessage("Đã xóa địa chỉ.");
+    setShowToast(true);
   };
 
   // Submit profile changes
@@ -85,18 +103,21 @@ const Profile = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      // Update addresses
+      // Tạo payload chỉ chứa các trường cần cập nhật
       const updatedData = {
-        ...user,
+        name: formData.name,
+        phone: formData.phone,
+        gender: formData.gender,
         addresses: formData.addresses,
+        // password: formData.password, // Nếu có cập nhật mật khẩu
       };
       const response = await apiClient.put("/user/profile", updatedData);
       setUser(response.data);
       setIsEditing(false);
-      setShowNewAddressForm(false);
       setToastMessage("Cập nhật thông tin thành công.");
       setShowToast(true);
     } catch (error) {
+      console.error("Update error:", error);
       setToastMessage("Lỗi khi cập nhật thông tin người dùng.");
       setShowToast(true);
     } finally {
@@ -104,7 +125,7 @@ const Profile = () => {
     }
   };
 
-  // Handle outside click to close new address form
+  // Handle outside click to close new address form (nếu bạn có sử dụng form pop-up)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -121,19 +142,11 @@ const Profile = () => {
     };
   }, [showNewAddressForm]);
 
-  // Handle user info save from UserInfoForm
-  const handleUserInfoSave = (updatedUserInfo) => {
-    setUser(updatedUserInfo);
-    setIsEditing(false);
-    setToastMessage("Cập nhật thông tin thành công.");
-    setShowToast(true);
-  };
-
   if (loading) return <p>Đang tải thông tin người dùng...</p>;
 
   return (
     <div className="bg-light py-5">
-      <div className=" profile-container bg-white p-5 rounded shadow-sm">
+      <div className="profile-container bg-white p-5 rounded shadow-sm">
         {/* Welcome Message */}
         <div className="mb-4">
           <h1 className="h2 font-weight-bold">Xin chào, {user.name}!</h1>
@@ -144,22 +157,36 @@ const Profile = () => {
         <div className="mb-4">
           <h2 className="h4 font-weight-bold mb-3">Tình trạng đơn hàng</h2>
           <div className="row">
-            <div className="col-md-4 mb-3">
+            <div className="col-md-3 mb-3">
               <div className="bg-light p-3 rounded shadow-sm text-center">
                 <h3 className="h5 font-weight-bold">Đơn hàng chờ xác nhận</h3>
-                <p className="display-4 font-weight-bold">3</p>
+                <p className="display-4 font-weight-bold">
+                  {orderStatusCounts.processing}
+                </p>
               </div>
             </div>
-            <div className="col-md-4 mb-3">
+            <div className="col-md-3 mb-3">
               <div className="bg-light p-3 rounded shadow-sm text-center">
                 <h3 className="h5 font-weight-bold">Đơn hàng đang giao</h3>
-                <p className="display-4 font-weight-bold">5</p>
+                <p className="display-4 font-weight-bold">
+                  {orderStatusCounts.shipping}
+                </p>
               </div>
             </div>
-            <div className="col-md-4 mb-3">
+            <div className="col-md-3 mb-3">
+              <div className="bg-light p-3 rounded shadow-sm text-center">
+                <h3 className="h5 font-weight-bold">Đơn hàng đã giao</h3>
+                <p className="display-4 font-weight-bold">
+                  {orderStatusCounts.shipped}
+                </p>
+              </div>
+            </div>
+            <div className="col-md-3 mb-3">
               <div className="bg-light p-3 rounded shadow-sm text-center">
                 <h3 className="h5 font-weight-bold">Đơn hàng đã hủy</h3>
-                <p className="display-4 font-weight-bold">1</p>
+                <p className="display-4 font-weight-bold">
+                  {orderStatusCounts.cancelled}
+                </p>
               </div>
             </div>
           </div>
@@ -189,6 +216,16 @@ const Profile = () => {
                     <label className="text-muted">Số điện thoại</label>
                     <p className="bg-light p-2 rounded">{user.phone}</p>
                   </div>
+                  <div className="col-md-6">
+                    <label className="text-muted">Giới tính</label>
+                    <p className="bg-light p-2 rounded">
+                      {user.gender === "male"
+                        ? "Nam"
+                        : user.gender === "female"
+                        ? "Nữ"
+                        : "Khác"}
+                    </p>
+                  </div>
                 </div>
                 <div className="mt-3"></div>
                 <button
@@ -201,6 +238,7 @@ const Profile = () => {
 
               {/* Addresses */}
               <div>
+                <h3 className="h5 font-weight-bold mb-2">Địa chỉ</h3>
                 <div className="row">
                   {user.addresses.map((address, index) => (
                     <div key={index} className="col-md-6 mb-3">
@@ -208,10 +246,10 @@ const Profile = () => {
                         <h4 className="font-weight-bold">
                           Địa chỉ {index + 1}
                         </h4>
-                        <p>{address.street}</p>
-                        <p>{address.ward}</p>
-                        <p> {address.district}</p>
-                        <p>{address.province}</p>
+                        <p>Số nhà, tên đường: {address.street}</p>
+                        <p>Phường/Xã: {address.ward}</p>
+                        <p>Quận/Huyện: {address.district}</p>
+                        <p>Tỉnh/Thành phố: {address.province}</p>
                         <div className="mt-2">
                           <button
                             className="btn btn-dark mr-2"
@@ -234,7 +272,7 @@ const Profile = () => {
                   className="btn btn-dark mt-3"
                   onClick={() => {
                     setIsEditing(true);
-                    setShowNewAddressForm(true);
+                    handleAddNewAddress();
                   }}
                 >
                   Thêm địa chỉ mới
@@ -248,7 +286,7 @@ const Profile = () => {
                 <h3 className="h5 font-weight-bold mb-2">
                   Chỉnh sửa thông tin cá nhân
                 </h3>
-                <UserInfoForm initialData={user} onSave={handleUserInfoSave} />
+                <UserInfoForm formData={formData} setFormData={setFormData} />
               </div>
 
               {/* Edit Addresses */}
@@ -315,110 +353,19 @@ const Profile = () => {
                   ))}
                 </div>
 
-                {/* Add New Address Form */}
-                {showNewAddressForm && (
-                  <div
-                    className="bg-light p-3 rounded shadow-sm mt-3"
-                    ref={newAddressFormRef}
-                  >
-                    <h4 className="font-weight-bold">Thêm địa chỉ mới</h4>
-                    <div className="form-group">
-                      <label>Tỉnh/Thành phố</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="province"
-                        value={newAddress.province}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            province: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Quận/Huyện</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="district"
-                        value={newAddress.district}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            district: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Phường/Xã</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="ward"
-                        value={newAddress.ward}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            ward: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Số nhà, tên đường</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="street"
-                        value={newAddress.street}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            street: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={handleAddNewAddress}
-                    >
-                      Lưu địa chỉ
-                    </button>
-                  </div>
-                )}
-
-                {!showNewAddressForm && (
+                {/* Save and Cancel Buttons */}
+                <div className="text-right mt-4">
                   <button
                     type="button"
-                    className="btn btn-dark mt-3"
-                    onClick={() => setShowNewAddressForm(true)}
+                    className="btn btn-secondary mr-2"
+                    onClick={() => setIsEditing(false)}
                   >
-                    Thêm địa chỉ mới
+                    Hủy
                   </button>
-                )}
-              </div>
-
-              {/* Save and Cancel Buttons */}
-              <div className="text-right mt-4">
-                <button
-                  type="button"
-                  className="btn btn-secondary mr-2"
-                  onClick={() => setIsEditing(false)}
-                >
-                  Hủy
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  {saving ? "Đang lưu..." : "Lưu thay đổi"}
-                </button>
+                  <button type="submit" className="btn btn-primary">
+                    {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                  </button>
+                </div>
               </div>
             </form>
           )}

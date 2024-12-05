@@ -101,7 +101,7 @@ exports.createOrder = async (req, res) => {
     }
 
     if (paymentMethod === "cod") {
-      //chuyển trạng thái thanh toán sang unpaid
+      // Chuyển trạng thái thanh toán sang unpaid
       order.paymentStatus = "unpaid";
 
       await order.save();
@@ -122,7 +122,35 @@ exports.createOrder = async (req, res) => {
     }
   }
 };
+exports.getOrderStatusCounts = async (req, res) => {
+  try {
+    const counts = await Order.aggregate([
+      {
+        $group: {
+          _id: "$shippingStatus",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
 
+    // Chuyển đổi kết quả thành một đối tượng dễ sử dụng
+    const statusCounts = {
+      processing: 0,
+      shipping: 0,
+      shipped: 0,
+      cancelled: 0,
+    };
+
+    counts.forEach((item) => {
+      statusCounts[item._id] = item.count;
+    });
+
+    res.status(200).json(statusCounts);
+  } catch (error) {
+    console.error("Error fetching order status counts:", error);
+    res.status(500).json({ message: "Lỗi khi lấy thông tin đơn hàng." });
+  }
+};
 exports.getUserOrders = async (req, res) => {
   try {
     const { status, startDate, endDate, page = 1, limit = 10 } = req.query;
@@ -176,6 +204,10 @@ exports.getOrderDetails = async (req, res) => {
   }
 };
 
+// controllers/orderController.js
+
+// controllers/orderController.js
+
 exports.cancelOrder = async (req, res) => {
   const session = await mongoose.startSession();
   try {
@@ -184,25 +216,35 @@ exports.cancelOrder = async (req, res) => {
     const { orderId } = req.params;
     const userId = req.user.id;
 
+    console.log(`Cancelling Order ID: ${orderId} for User ID: ${userId}`);
+
     const order = await Order.findOne({
       _id: orderId,
       user: userId,
-    }).session(session); // Use session to ensure transaction consistency
+    }).session(session);
 
     if (!order) {
+      console.log("Order not found during cancellation.");
       await session.abortTransaction();
       return res.status(404).json({ message: "Order not found" });
     }
 
+    console.log("Order found:", order);
+
     if (order.shippingStatus !== "processing") {
+      console.log("Order cannot be cancelled due to its shipping status.");
       await session.abortTransaction();
       return res.status(400).json({ message: "Cannot cancel this order" });
     }
 
     // Process ZaloPay Refund if payment is done via ZaloPay
     if (order.paymentStatus === "paid" && order.payment.method === "zalopay") {
+      console.log("Processing ZaloPay refund...");
       const refundResult = await paymentService.refundZaloPayOrder(order);
+      console.log("Refund Result:", refundResult);
+
       if (!refundResult.success) {
+        console.log("Refund failed:", refundResult.message);
         await session.abortTransaction();
         return res.status(500).json({
           message: "Refund failed",
@@ -213,8 +255,16 @@ exports.cancelOrder = async (req, res) => {
       // Update order refund status
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
-      // order.refund đã được cập nhật trong refundZaloPayOrder, không cần cập nhật lại
+      // Cập nhật thông tin hoàn tiền từ refundResult
+      order.refund = {
+        refundId: refundResult.refundId, // ID hoàn tiền từ ZaloPay
+        mRefundId: refundResult.mRefundId, // Mã hoàn tiền bổ sung nếu có
+        status: "processing", // Trạng thái ban đầu
+        amount: refundResult.amount, // Số tiền hoàn lại
+      };
       order.orderTimestamps.cancellation = new Date();
+
+      console.log("Updated Order with Refund Information:", order);
 
       // Lưu đơn hàng với các thay đổi
       await order.save({ session });
@@ -226,6 +276,7 @@ exports.cancelOrder = async (req, res) => {
       });
     } else {
       // For unpaid orders or COD payment method
+      console.log("Cancelling order without refund (unpaid or COD).");
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
       order.orderTimestamps.cancellation = new Date();
@@ -298,6 +349,10 @@ exports.leaveReview = async (req, res) => {
   }
 };
 
+// controllers/orderController.js
+
+// controllers/orderController.js
+
 exports.getRefundStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -309,18 +364,26 @@ exports.getRefundStatus = async (req, res) => {
     });
 
     if (!order) {
+      console.error("Order not found");
       return res.status(404).json({ message: "Order not found" });
     }
 
+    console.log("Order Refund Information:", order.refund);
+
     if (!order.refund || !order.refund.mRefundId) {
+      console.log("Order has no refund information");
       return res
         .status(400)
         .json({ message: "Order has no refund information" });
     }
 
+    // Gọi paymentService để lấy tình trạng hoàn tiền
     const refundStatusResponse = await paymentService.getRefundStatus(
+      order._id, // Truyền đúng ID đơn hàng
       order.refund.mRefundId
     );
+
+    console.log("Refund Status Response:", refundStatusResponse);
 
     let refundStatusText = "";
     switch (refundStatusResponse.returncode) {
@@ -335,8 +398,10 @@ exports.getRefundStatus = async (req, res) => {
         refundStatusText = "failed";
         break;
       default:
-        refundStatusText = "unknown";
+        refundStatusText = "failed"; // Chuyển 'unknown' thành 'failed'
     }
+
+    console.log("Refund Status Text:", refundStatusText);
 
     // Update refund status in the database
     order.refund.status = refundStatusText;
@@ -389,11 +454,6 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ message: "Error fetching orders" });
   }
 };
-// controllers/orderController.js
-
-// ... other imports
-
-// Existing controller functions...
 
 // Update Order Controller
 exports.updateOrder = async (req, res) => {
@@ -510,9 +570,10 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ message: "Error deleting order" });
   }
 };
+
 async function updateInventoryAfterRefund(order) {
   // Get product details from the order
-  const productDetails = order.products; // Assuming 'items' contains product details
+  const productDetails = order.products; // Assuming 'products' chứa thông tin sản phẩm
 
   for (const item of productDetails) {
     // Find the product in the inventory

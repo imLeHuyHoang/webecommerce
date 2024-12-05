@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import ProductForm from "../form/ProductForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import "./ManageProducts.css";
@@ -39,7 +39,7 @@ const ManageProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(API_BASE_URL);
+      const response = await apiClient.get(API_BASE_URL);
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -65,7 +65,7 @@ const ManageProducts = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?"))
       return;
     try {
-      await axios.delete(`${API_BASE_URL}/${productId}`);
+      await apiClient.delete(`${API_BASE_URL}/${productId}`);
       setToast({
         show: true,
         message: "Xóa sản phẩm thành công",

@@ -1,15 +1,8 @@
-// UserInfoForm.jsx
-import React, { useState } from "react";
-import apiClient from "../../utils/api-client";
+// src/components/UserInfoForm.jsx
 
-const UserInfoForm = ({ initialData, onSave }) => {
-  const [formData, setFormData] = useState({
-    name: initialData.name || "",
-    phone: initialData.phone || "",
-    gender: initialData.gender || "male",
-  });
-  const [saving, setSaving] = useState(false);
+import React from "react";
 
+const UserInfoForm = ({ formData, setFormData }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -18,23 +11,8 @@ const UserInfoForm = ({ initialData, onSave }) => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      // Gọi API để cập nhật thông tin
-      const response = await apiClient.put("/user/profile", formData);
-      onSave(response.data);
-    } catch (error) {
-      console.error("Error updating user info:", error);
-      alert("Lỗi khi cập nhật thông tin người dùng.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
-    <form onSubmit={handleSubmit}>
+    <>
       {/* Các trường thông tin người dùng */}
       <div className="form-group">
         <label>Họ tên</label>
@@ -58,10 +36,22 @@ const UserInfoForm = ({ initialData, onSave }) => {
           required
         />
       </div>
-      <button type="submit" className="btn btn-primary">
-        {saving ? "Đang lưu..." : "Lưu thông tin"}
-      </button>
-    </form>
+      <div className="form-group">
+        <label>Giới tính</label>
+        <select
+          className="form-control"
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          required
+        >
+          <option value="">-- Chọn giới tính --</option>
+          <option value="male">Nam</option>
+          <option value="female">Nữ</option>
+          <option value="other">Khác</option>
+        </select>
+      </div>
+    </>
   );
 };
 

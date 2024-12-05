@@ -12,16 +12,12 @@ function MyOrders() {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [filterStatus, setFilterStatus] = useState("processing"); // Default to "processing"
+  const [filterStatus, setFilterStatus] = useState(""); // Default to "all" statuses
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [orderIdToCancel, setOrderIdToCancel] = useState("");
   const [confirmOrderId, setConfirmOrderId] = useState("");
   const [cancelError, setCancelError] = useState("");
-  const [refundStatus, setRefundStatus] = useState(null);
-  const [refundCheckOrderId, setRefundCheckOrderId] = useState("");
   const [refundCheckResult, setRefundCheckResult] = useState(null);
-  const [refundCheckError, setRefundCheckError] = useState("");
-  const [isRefundOrder, setIsRefundOrder] = useState(false);
 
   useEffect(() => {
     if (auth.user) {
@@ -58,6 +54,7 @@ function MyOrders() {
       const response = await apiClient.get(`/order/${orderId}`);
       setSelectedOrder(response.data);
       setShowModal(true);
+      setRefundCheckResult(null); // Reset previous refund status
     } catch (error) {
       console.error("Error fetching order details:", error);
     }
@@ -67,7 +64,6 @@ function MyOrders() {
     setOrderIdToCancel(order._id);
     setConfirmOrderId("");
     setCancelError("");
-    setIsRefundOrder(order.payment.method === "zalopay");
     setShowCancelModal(true);
   };
 
@@ -80,15 +76,21 @@ function MyOrders() {
       await apiClient.patch(`/order/${orderIdToCancel}/cancel`);
       setShowCancelModal(false);
       fetchOrders();
+
+      // Fetch the updated order details to include refund information
+      const updatedOrderResponse = await apiClient.get(
+        `/order/${orderIdToCancel}`
+      );
+      setSelectedOrder(updatedOrderResponse.data);
+
       if (selectedOrder && selectedOrder._id === orderIdToCancel) {
         setSelectedOrder(null);
         setShowModal(false);
       }
-      if (isRefundOrder) {
-        alert(
-          "Yêu cầu hoàn tiền đang được xử lý. Bạn có thể kiểm tra tình trạng refund bằng cách nhập mã đơn hàng ở phần kiểm tra refund."
-        );
-      }
+
+      alert(
+        "Yêu cầu hoàn tiền đang được xử lý. Bạn có thể kiểm tra tình trạng refund trong chi tiết đơn hàng."
+      );
     } catch (error) {
       console.error("Error cancelling order:", error);
       setCancelError("Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.");
@@ -96,39 +98,39 @@ function MyOrders() {
   };
 
   const checkRefundStatus = async () => {
-    if (!refundCheckOrderId) {
-      setRefundCheckError("Vui lòng nhập mã đơn hàng.");
+    if (!selectedOrder || !selectedOrder._id) {
       return;
     }
     try {
-      setRefundCheckError(""); // Clear previous error
-      setRefundCheckResult(null); // Reset refund check result
+      setRefundCheckResult(null); // Reset previous refund status
       const response = await apiClient.get(
-        `/order/${refundCheckOrderId}/refund-status`
+        `/order/${selectedOrder._id}/refund-status`
       );
       setRefundCheckResult(response.data);
 
-      // Cập nhật trạng thái hoàn tiền cho tất cả đơn hàng nếu có
+      // Cập nhật trạng thái hoàn tiền cho đơn hàng trong danh sách orders
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order._id === refundCheckOrderId
-            ? { ...order, refundStatus: response.data.refundStatus }
+          order._id === selectedOrder._id
+            ? {
+                ...order,
+                refund: { ...order.refund, status: response.data.refundStatus },
+              }
             : order
         )
       );
 
-      // Nếu đơn hàng đang được xem chi tiết, cập nhật trạng thái
-      if (selectedOrder && selectedOrder._id === refundCheckOrderId) {
-        setSelectedOrder((prevOrder) => ({
-          ...prevOrder,
-          refundStatus: response.data.refundStatus,
-        }));
-      }
+      // Cập nhật trạng thái hoàn tiền trong selectedOrder
+      setSelectedOrder((prevOrder) => ({
+        ...prevOrder,
+        refund: { ...prevOrder.refund, status: response.data.refundStatus },
+      }));
     } catch (error) {
       console.error("Error checking refund status:", error);
-      setRefundCheckError(
-        "Có lỗi xảy ra khi kiểm tra tình trạng refund. Vui lòng thử lại."
-      );
+      setRefundCheckResult({
+        error:
+          "Có lỗi xảy ra khi kiểm tra tình trạng refund. Vui lòng thử lại.",
+      });
     }
   };
 
@@ -190,7 +192,8 @@ function MyOrders() {
             <option value="">Tất cả trạng thái</option>
             <option value="processing">Đang xử lý</option>
             <option value="shipping">Đang giao hàng</option>
-            <option value="delivered">Đã giao</option>
+            <option value="shipped">Đã giao</option>
+            <option value="delivered">Đã nhận</option>
             <option value="cancelled">Đã hủy</option>
           </select>
         </div>
@@ -228,15 +231,15 @@ function MyOrders() {
                         <strong>Tổng tiền: </strong>
                         {order.total.toLocaleString()} đ
                       </p>
-                      {order.refundStatus && (
+                      {order.refund && order.refund.status && (
                         <p className="card-text">
                           <strong>Tình trạng hoàn tiền: </strong>
                           <span
                             className={`badge bg-${getStatusBadgeVariant(
-                              order.refundStatus
+                              order.refund.status
                             )}`}
                           >
-                            {order.refundStatus}
+                            {order.refund.status}
                           </span>
                         </p>
                       )}
@@ -264,42 +267,7 @@ function MyOrders() {
           </div>
         )}
 
-        {/* Refund Status Checker */}
-        <div className="my-5">
-          <h2>Kiểm tra tình trạng hoàn tiền </h2>
-          <div className="input-group mb-3">
-            <input
-              className="form-control"
-              placeholder="Nhập mã đơn hàng"
-              value={refundCheckOrderId}
-              onChange={(e) => setRefundCheckOrderId(e.target.value)}
-            />
-            <button className="btn btn-primary" onClick={checkRefundStatus}>
-              Kiểm tra
-            </button>
-          </div>
-          {refundCheckError && (
-            <div className="alert alert-danger">{refundCheckError}</div>
-          )}
-          {refundCheckResult && (
-            <div className="alert alert-info">
-              <p>
-                <strong>Mã đơn hàng:</strong> {refundCheckResult.orderId}
-              </p>
-              <p>
-                <strong>Tình trạng hoàn tiền:</strong>{" "}
-                {refundCheckResult.refundStatus}
-              </p>
-              <p>
-                <strong>Thông báo:</strong> {refundCheckResult.message}
-              </p>
-              <p>
-                <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
-                {refundCheckResult.mRefundId}
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Refund Status Checker Removed */}
       </div>
 
       {/* Order Details Modal */}
@@ -340,32 +308,59 @@ function MyOrders() {
                   <strong>Tổng tiền:</strong>{" "}
                   {selectedOrder.total.toLocaleString()} đ
                 </p>
-                {selectedOrder.refundStatus && (
+                {selectedOrder.refund && selectedOrder.refund.status && (
                   <>
                     <h5>Thông tin hoàn tiền:</h5>
                     <p>
                       <strong>Tình trạng hoàn tiền:</strong>{" "}
                       <span
                         className={`badge bg-${getStatusBadgeVariant(
-                          selectedOrder.refundStatus
+                          selectedOrder.refund.status
                         )}`}
                       >
-                        {selectedOrder.refundStatus}
+                        {selectedOrder.refund.status}
                       </span>
                     </p>
-                    <p>
-                      <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
-                      {selectedOrder.mRefundId}
-                    </p>
+                    {selectedOrder.refund.mRefundId && (
+                      <p>
+                        <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
+                        {selectedOrder.refund.mRefundId}
+                      </p>
+                    )}
                     <button
                       className="btn btn-info"
-                      onClick={() => {
-                        setRefundCheckOrderId(selectedOrder._id);
-                        checkRefundStatus();
-                      }}
+                      onClick={checkRefundStatus}
                     >
                       Kiểm tra tình trạng refund
                     </button>
+                    {refundCheckResult && (
+                      <div className="mt-3">
+                        {refundCheckResult.error ? (
+                          <div className="alert alert-danger">
+                            {refundCheckResult.error}
+                          </div>
+                        ) : (
+                          <div className="alert alert-info">
+                            <p>
+                              <strong>Mã đơn hàng:</strong>{" "}
+                              {refundCheckResult.orderId}
+                            </p>
+                            <p>
+                              <strong>Tình trạng hoàn tiền:</strong>{" "}
+                              {refundCheckResult.refundStatus}
+                            </p>
+                            <p>
+                              <strong>Thông báo:</strong>{" "}
+                              {refundCheckResult.message}
+                            </p>
+                            <p>
+                              <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
+                              {refundCheckResult.mRefundId}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </>
                 )}
 

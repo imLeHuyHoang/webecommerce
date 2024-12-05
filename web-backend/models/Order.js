@@ -60,7 +60,7 @@ const orderSchema = new mongoose.Schema(
       mRefundId: { type: String, default: null },
       status: {
         type: String,
-        enum: ["processing", "success", "failed", "null"],
+        enum: ["processing", "success", "failed", "null", "unknown"],
         default: "null",
       },
       amount: { type: Number, default: null },

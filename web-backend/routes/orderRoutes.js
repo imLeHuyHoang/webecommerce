@@ -7,6 +7,11 @@ const authAdminMiddleware = require("../middleware/authAdmin");
 router.post("/create", authMiddleware.verifyToken, orderController.createOrder);
 
 // User routes
+router.get(
+  "/status-counts",
+  authMiddleware.verifyToken,
+  orderController.getOrderStatusCounts
+);
 router.get("/", authMiddleware.verifyToken, orderController.getUserOrders);
 router.get(
   "/:orderId",

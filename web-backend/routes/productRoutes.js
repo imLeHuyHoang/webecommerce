@@ -3,6 +3,7 @@ const router = express.Router();
 const productController = require("../controllers/productController");
 const { uploadProduct } = require("../middleware/uploadMiddleware"); // Import multer middleware
 const authAdmin = require("../middleware/authAdmin"); // Import middleware authAdmin
+const { verifyToken } = require("../middleware/auth");
 
 /**
  * @route   GET /api/products
@@ -23,12 +24,7 @@ router.get("/:id", productController.getProductById);
  * @desc    Tạo sản phẩm mới
  * @access  Private (Admin Only)
  */
-router.post(
-  "/",
-  authAdmin,
-  uploadProduct.any(),
-  productController.createProduct
-);
+router.post("/", authAdmin, productController.createProduct);
 
 /**
  * @route   PUT /api/products/:id
@@ -37,6 +33,7 @@ router.post(
  */
 router.put(
   "/:id",
+  verifyToken,
   authAdmin,
   uploadProduct.any(),
   productController.updateProduct

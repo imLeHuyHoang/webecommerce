@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import "./ManageInventory.css"; // Import CSS
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -32,7 +32,7 @@ const ManageInventory = () => {
   const fetchInventories = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/inventory`);
+      const response = await apiClient.get(`${API_BASE_URL}/inventory`);
       setInventories(response.data);
       setLoading(false);
     } catch (error) {
@@ -44,7 +44,7 @@ const ManageInventory = () => {
   // Fetch products from server
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/product`);
+      const response = await apiClient.get(`${API_BASE_URL}/product`);
       setProducts(response.data);
     } catch (error) {
       setError(error.message);
@@ -81,7 +81,7 @@ const ManageInventory = () => {
   const handleDeleteInventory = async (inventoryId) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa tồn kho này không?")) return;
     try {
-      await axios.delete(`${API_BASE_URL}/inventory/${inventoryId}`);
+      await apiClient.delete(`${API_BASE_URL}/inventory/${inventoryId}`);
       fetchInventories();
     } catch (error) {
       setError(error.message);
@@ -96,13 +96,13 @@ const ManageInventory = () => {
     try {
       if (selectedInventory) {
         // Update existing inventory
-        await axios.put(
+        await apiClient.put(
           `${API_BASE_URL}/inventory/${selectedInventory._id}`,
           form
         );
       } else {
         // Add new inventory
-        await axios.post(`${API_BASE_URL}/inventory`, form);
+        await apiClient.post(`${API_BASE_URL}/inventory`, form);
       }
       setShowModal(false);
       fetchInventories();

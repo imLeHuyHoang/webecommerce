@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, InputGroup } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import { z } from "zod";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -40,7 +40,7 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/category`);
+        const response = await apiClient.get(`${API_BASE_URL}/category`);
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -54,7 +54,7 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
     if (formData.category) {
       const fetchAttributes = async () => {
         try {
-          const response = await axios.get(
+          const response = await apiClient.get(
             `${API_BASE_URL}/attributes/category/${formData.category}`
           );
           setAttributeOptions(response.data || []);
@@ -142,12 +142,12 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
 
       if (product) {
         // Cập nhật sản phẩm
-        await axios.put(`${API_BASE_URL}/product/${product._id}`, data, {
+        await apiClient.put(`${API_BASE_URL}/product/${product._id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
         // Tạo sản phẩm mới
-        await axios.post(`${API_BASE_URL}/product`, data, {
+        await apiClient.post(`${API_BASE_URL}/product`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }

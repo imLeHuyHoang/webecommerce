@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../utils/api-client";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -58,10 +58,13 @@ const OrderForm = ({ order, onSuccess, onCancel }) => {
     try {
       if (order) {
         // Update order
-        await axios.patch(`${API_BASE_URL}/order/admin/${order._id}`, formData);
+        await apiClient.patch(
+          `${API_BASE_URL}/order/admin/${order._id}`,
+          formData
+        );
       } else {
         // Create new order
-        await axios.post(`${API_BASE_URL}/order/create`, formData);
+        await apiClient.post(`${API_BASE_URL}/order/create`, formData);
       }
       onSuccess();
     } catch (error) {

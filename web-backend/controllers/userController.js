@@ -324,7 +324,7 @@ exports.loginUserAdmin = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { name, phone, gender, addresses, password } = req.body;
-
+    console.log(req.body);
     const updates = {};
 
     // Thêm các trường cần cập nhật nếu chúng tồn tại trong request body
