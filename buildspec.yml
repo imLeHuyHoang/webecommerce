@@ -11,7 +11,6 @@ phases:
   install:
     runtime-versions:
       docker: 20
-      nodejs: latest
     commands:
       - echo "Installing dependencies and preparing the environment..."
       - printenv
@@ -34,28 +33,47 @@ phases:
       - FRONTEND_IMAGE_TAG=${COMMIT_HASH:-latest}
       - echo "Backend Image Tag: $BACKEND_IMAGE_TAG"
       - echo "Frontend Image Tag: $FRONTEND_IMAGE_TAG"
+      - echo "Listing root directory:"
+      - ls -la
 
   build:
     commands:
       - echo "Build started on $(date)"
+
+      # Xây dựng Docker image cho Backend
       - echo "Building the backend Docker image..."
-      - docker build -t $BACKEND_REPO_URI:latest -f web-backend/Dockerfile.dev web-backend
-      - docker tag $BACKEND_REPO_URI:latest $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
+      - docker build -t $BACKEND_REPO_NAME:latest --target backend -f Dockerfile .
+      - docker tag $BACKEND_REPO_NAME:latest $BACKEND_REPO_URI:latest
+      - docker tag $BACKEND_REPO_NAME:latest $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
+
+      # Xây dựng Docker image cho Frontend
       - echo "Building the frontend Docker image..."
-      - docker build -t $FRONTEND_REPO_URI:latest -f web-frontend/Dockerfile.dev web-frontend
-      - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
+      - docker build -t $FRONTEND_REPO_NAME:latest --target frontend -f Dockerfile .
+      - docker tag $FRONTEND_REPO_NAME:latest $FRONTEND_REPO_URI:latest
+      - docker tag $FRONTEND_REPO_NAME:latest $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
+
+      # Kiểm tra các image đã được build thành công
+      - echo "Listing Docker images:"
+      - docker images
 
   post_build:
     commands:
       - echo "Build completed on $(date)"
+
+      # Đẩy Docker image của Backend lên ECR
       - echo "Pushing the backend Docker image to ECR..."
       - docker push $BACKEND_REPO_URI:latest
       - docker push $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
+
+      # Đẩy Docker image của Frontend lên ECR
       - echo "Pushing the frontend Docker image to ECR..."
       - docker push $FRONTEND_REPO_URI:latest
       - docker push $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
+
+      # Tạo file imagedefinitions.json cho ECS (nếu bạn sử dụng ECS)
       - echo "Writing image definitions file..."
       - printf '[{"name":"web-backend","imageUri":"%s"},{"name":"web-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG > imagedefinitions.json
+      - ls -la
 
 artifacts:
   files:
