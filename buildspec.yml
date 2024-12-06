@@ -9,6 +9,12 @@ env:
 
 phases:
   install:
+<<<<<<< HEAD
+=======
+    runtime-versions:
+      docker: 20
+      nodejs: latest
+>>>>>>> parent of a3e9373 (22)
     commands:
       - echo "Installing dependencies and preparing the environment..."
       - printenv
@@ -24,12 +30,18 @@ phases:
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - BACKEND_IMAGE_TAG=${COMMIT_HASH:-latest}
       - FRONTEND_IMAGE_TAG=${COMMIT_HASH:-latest}
+<<<<<<< HEAD
       - echo "Listing root directory:"
       - ls -la
+=======
+      - echo "Backend Image Tag: $BACKEND_IMAGE_TAG"
+      - echo "Frontend Image Tag: $FRONTEND_IMAGE_TAG"
+>>>>>>> parent of a3e9373 (22)
 
   build:
     commands:
       - echo "Build started on $(date)"
+<<<<<<< HEAD
 
       - echo "Building the backend Docker image..."
       - docker build -t $BACKEND_REPO_NAME:latest --target backend -f Dockerfile .
@@ -43,10 +55,19 @@ phases:
 
       - echo "Listing Docker images:"
       - docker images
+=======
+      - echo "Building the backend Docker image..."
+      - docker build -t $BACKEND_REPO_URI:latest -f web-backend/Dockerfile.dev web-backend
+      - docker tag $BACKEND_REPO_URI:latest $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
+      - echo "Building the frontend Docker image..."
+      - docker build -t $FRONTEND_REPO_URI:latest -f web-frontend/Dockerfile.dev web-frontend
+      - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
+>>>>>>> parent of a3e9373 (22)
 
   post_build:
     commands:
       - echo "Build completed on $(date)"
+<<<<<<< HEAD
 
       - echo "Pushing the backend Docker image to ECR..."
       - docker push $BACKEND_REPO_URI:latest
@@ -56,9 +77,16 @@ phases:
       - docker push $FRONTEND_REPO_URI:latest
       - docker push $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
 
+=======
+      - echo "Pushing the backend Docker image to ECR..."
+      - docker push $BACKEND_REPO_URI:latest
+      - docker push $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
+      - echo "Pushing the frontend Docker image to ECR..."
+      - docker push $FRONTEND_REPO_URI:latest
+      - docker push $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
+>>>>>>> parent of a3e9373 (22)
       - echo "Writing image definitions file..."
       - printf '[{"name":"web-backend","imageUri":"%s"},{"name":"web-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG > imagedefinitions.json
-      - ls -la
 
 artifacts:
   files:
