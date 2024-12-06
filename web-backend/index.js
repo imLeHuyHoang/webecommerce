@@ -9,6 +9,7 @@ const cronJobs = require("./services/cronJobs");
 
 const app = express();
 const PORT = process.env.PORT;
+const CorsOrigin = process.env.CorsOrigin;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -29,7 +30,7 @@ const commentRoutes = require("./routes/commentRoutes");
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: process.env.CorsOrigin,
+    origin: CorsOrigin,
     credentials: true,
   })
 );
