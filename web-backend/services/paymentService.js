@@ -76,7 +76,7 @@ exports.processZaloPayPayment = async (order, productDetails) => {
     amount: parseInt(order.total, 10),
     items: productDetails.map((item) => ({
       itemid: item.product.toString(),
-      itemname: item.title,
+      itemname: item.name, // Đảm bảo trường này khớp với schema
       itemprice: parseInt(item.price, 10),
       itemquantity: parseInt(item.quantity, 10),
     })),
@@ -89,8 +89,9 @@ exports.processZaloPayPayment = async (order, productDetails) => {
     const zaloPayResponse = await this.createOrder(orderInfo);
 
     if (zaloPayResponse.return_code === 1) {
-      order.payment.transactionId = zaloPayResponse.zp_trans_token;
+      // Lưu appTransId để tra cứu trong callback
       order.payment.appTransId = appTransId;
+      // Không lưu zp_trans_token vào transactionId
       await order.save();
 
       return { success: true, orderUrl: zaloPayResponse.order_url };
@@ -109,10 +110,9 @@ exports.refundZaloPayOrder = async (order) => {
     console.log("Using zptransid for refund:", order.payment.transactionId);
 
     const { refundResult, mRefundId } = await this.refundOrder(
-      order.payment.transactionId,
+      order.payment.transactionId, // Đây phải là zp_trans_id từ callback
       parseInt(order.total, 10),
-      "Order Cancellation Refund",
-      order
+      "Order Cancellation Refund"
     );
 
     // Update refund information in the order
@@ -142,8 +142,7 @@ exports.refundZaloPayOrder = async (order) => {
 exports.refundOrder = async (
   zpTransId,
   amount,
-  description = "Customer Refund",
-  order
+  description = "Customer Refund"
 ) => {
   const timestamp = Date.now();
 
@@ -152,10 +151,13 @@ exports.refundOrder = async (
     zalopayConfig.appid
   }_${uid}`;
 
+  // Đảm bảo rằng zpTransId là chuỗi
+  const zpTransIdStr = String(zpTransId);
+
   const data = {
     appid: parseInt(zalopayConfig.appid, 10),
     mrefundid: mRefundId,
-    zptransid: zpTransId,
+    zptransid: zpTransIdStr, // Sử dụng chuỗi
     amount: parseInt(amount, 10),
     timestamp: parseInt(timestamp, 10),
     description: description,
@@ -163,6 +165,8 @@ exports.refundOrder = async (
 
   const dataString = `${data.appid}|${data.zptransid}|${data.amount}|${data.description}|${data.timestamp}`;
   data.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
+
+  console.log("Refund Request Data:", data); // Thêm log để kiểm tra
 
   try {
     const response = await axios.post(
@@ -175,13 +179,9 @@ exports.refundOrder = async (
       }
     );
     console.log("ZaloPay Refund Response:", response.data); // Thêm log để kiểm tra
-    // Lưu mrefundid vào đơn hàng
-    order.mRefundId = mRefundId;
 
     // Trả về mRefundId cùng với refundResult
     return { refundResult: response.data, mRefundId };
-
-    return response.data;
   } catch (error) {
     console.error(
       "Error refunding ZaloPay order:",
@@ -205,10 +205,13 @@ exports.getRefundStatus = async (mRefundId) => {
   const dataString = `${params.appid}|${params.mrefundid}|${params.timestamp}`;
   params.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
 
+  console.log("Get Refund Status Request Params:", params); // Thêm log để kiểm tra
+
   try {
     const response = await axios.get(zalopayConfig.getRefundStatusUrl, {
       params,
     });
+    console.log("ZaloPay Get Refund Status Response:", response.data); // Thêm log để kiểm tra
     return response.data;
   } catch (error) {
     console.error("Error getting refund status:", error);

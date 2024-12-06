@@ -23,6 +23,8 @@ exports.paymentCallback = async (req, res) => {
     }
 
     const data = JSON.parse(dataStr);
+    console.log("Parsed Data from Callback:", data);
+
     const { app_id, app_trans_id, zp_trans_id } = data;
 
     if (!app_id || !app_trans_id || !zp_trans_id) {
@@ -39,8 +41,15 @@ exports.paymentCallback = async (req, res) => {
       return res.sendStatus(404);
     }
 
-    // Lưu mã giao dịch Zalopay vào đơn hàng
-    order.payment.transactionId = zp_trans_id;
+    // Chuyển đổi zp_trans_id thành chuỗi
+    const zpTransIdStr = String(zp_trans_id);
+
+    // Lưu mã giao dịch Zalopay vào đơn hàng dưới dạng chuỗi
+    order.payment.transactionId = zpTransIdStr;
+
+    console.log(
+      `Order found: ${order._id}, transactionId: ${order.payment.transactionId}`
+    );
 
     // Nếu đơn hàng thanh toán thành công (type === 1)
     if (type === 1) {

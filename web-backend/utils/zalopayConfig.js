@@ -9,7 +9,7 @@ module.exports = {
   getRefundStatusUrl:
     "https://sandbox.zalopay.com.vn/v001/tpe/getpartialrefundstatus",
   callbackUrl:
-    "https://8aea-2001-ee0-41c1-992d-5db4-1cbe-1f1f-6ab6.ngrok-free.app/api/payment/callback",
+    "https://f6a1-2001-ee0-41c1-992d-8958-3924-840b-e5bf.ngrok-free.app/api/payment/callback",
   redirectUrl:
-    "https://8aea-2001-ee0-41c1-992d-5db4-1cbe-1f1f-6ab6.ngrok-free.app/api/payment-result",
+    "https://f6a1-2001-ee0-41c1-992d-8958-3924-840b-e5bf.ngrok-free.app/api/payment-result",
 };

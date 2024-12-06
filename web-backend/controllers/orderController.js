@@ -379,8 +379,7 @@ exports.getRefundStatus = async (req, res) => {
 
     // Gọi paymentService để lấy tình trạng hoàn tiền
     const refundStatusResponse = await paymentService.getRefundStatus(
-      order._id, // Truyền đúng ID đơn hàng
-      order.refund.mRefundId
+      order.refund.mRefundId // Truyền đúng mRefundId
     );
 
     console.log("Refund Status Response:", refundStatusResponse);
