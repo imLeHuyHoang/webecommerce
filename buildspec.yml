@@ -1,0 +1,29 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_REPO_NAME: "my-app"
+    IMAGE_TAG: "latest" # Hoặc bạn có thể dùng build number hoặc commit id
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      # Lấy password và login vào ECR trong region ap-southeast-1
+      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com
+  build:
+    commands:
+      - echo "Building the Docker image..."
+      # Giả sử Dockerfile nằm ở root source code
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+  post_build:
+    commands:
+      - echo "Pushing the Docker image to ECR..."
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "Build, tag, and push completed."
+
+artifacts:
+  files:
+    - "**/*"
+  discard-paths: yes
