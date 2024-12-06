@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   variables:
-    BACKEND_IMAGE_REPO_NAME: "my-app-backend"
-    FRONTEND_IMAGE_REPO_NAME: "my-app-frontend"
+    BACKEND_IMAGE_REPO_NAME: "web-backend"
+    FRONTEND_IMAGE_REPO_NAME: "web-frontend"
     IMAGE_TAG: "latest"
 
 phases:
