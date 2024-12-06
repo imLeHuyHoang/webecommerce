@@ -1,10 +1,7 @@
 # Ignore node_modules directories
-node_modules/
+**node_modules/
 
 # Ignore Docker-related files (Dockerfile is fine but Docker image files are not)
-**/Dockerfile
-**/docker-compose.yml
-
 # Ignore .env files (contains sensitive information like secrets)
 **/.env
 
@@ -16,7 +13,6 @@ node_modules/
 .idea/
 
 # Ignore build directories (if applicable)
-build/
 dist/
 
 # Ignore OS-specific files (e.g., macOS, Windows)
