@@ -7,27 +7,37 @@ env:
     IMAGE_TAG: "latest"
 
 phases:
+  install:
+    runtime-versions:
+      docker: 20
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com
-
+      - echo "Listing root directory:"
+      - ls -la
   build:
     commands:
+      - echo "Listing web-backend directory:"
+      - ls -la web-backend
       - echo "Building the backend Docker image..."
       - docker build -t $BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG -f web-backend/Dockerfile.dev .
 
+      - echo "Listing web-frontend directory:"
+      - ls -la web-frontend
       - echo "Building the frontend Docker image..."
       - docker build -t $FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG -f web-frontend/Dockerfile.dev .
 
   post_build:
     commands:
-      - echo "Pushing the backend Docker image to ECR..."
+      - echo "Tagging the backend Docker image..."
       - docker tag $BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "Pushing the backend Docker image to ECR..."
       - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG
 
-      - echo "Pushing the frontend Docker image to ECR..."
+      - echo "Tagging the frontend Docker image..."
       - docker tag $FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "Pushing the frontend Docker image to ECR..."
       - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG
 
       - echo "Build, tag, and push for both images completed."
