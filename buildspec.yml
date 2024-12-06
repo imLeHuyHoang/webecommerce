@@ -26,8 +26,6 @@ phases:
       - echo "Setting repository URIs..."
       - BACKEND_REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME
       - FRONTEND_REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME
-      - echo "Backend Repository URI: $BACKEND_REPO_URI"
-      - echo "Frontend Repository URI: $FRONTEND_REPO_URI"
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - BACKEND_IMAGE_TAG=${COMMIT_HASH:-latest}
       - FRONTEND_IMAGE_TAG=${COMMIT_HASH:-latest}
