@@ -26,3 +26,8 @@
   font-size: 1.2rem;
   color: #ddd;
 }
+
+.carousel-image {
+  border: solid #ddd;
+  border-radius: 10px;
+}

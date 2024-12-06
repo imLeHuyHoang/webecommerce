@@ -9,7 +9,6 @@ exports.createOrder = async (req, res) => {
   try {
     const { shippingAddress, products, paymentMethod, cartDiscountCode, note } =
       req.body;
-    console.log(req.body);
 
     if (!shippingAddress || !products || products.length === 0) {
       return res.status(400).json({ message: "Invalid order information." });
