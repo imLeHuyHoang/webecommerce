@@ -2,26 +2,35 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_REPO_NAME: "my-app"
-    IMAGE_TAG: "latest" # Hoặc bạn có thể dùng build number hoặc commit id
+    BACKEND_IMAGE_REPO_NAME: "my-app-backend"
+    FRONTEND_IMAGE_REPO_NAME: "my-app-frontend"
+    IMAGE_TAG: "latest"
 
 phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      # Lấy password và login vào ECR trong region ap-southeast-1
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com
+
   build:
     commands:
-      - echo "Building the Docker image..."
-      # Giả sử Dockerfile nằm ở root source code
-      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - echo "Building the backend Docker image..."
+      - docker build -t $BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG -f web-backend/Dockerfile.dev .
+
+      - echo "Building the frontend Docker image..."
+      - docker build -t $FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG -f web-frontend/Dockerfile.dev .
+
   post_build:
     commands:
-      - echo "Pushing the Docker image to ECR..."
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
-      - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
-      - echo "Build, tag, and push completed."
+      - echo "Pushing the backend Docker image to ECR..."
+      - docker tag $BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG
+
+      - echo "Pushing the frontend Docker image to ECR..."
+      - docker tag $FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG
+
+      - echo "Build, tag, and push for both images completed."
 
 artifacts:
   files:
