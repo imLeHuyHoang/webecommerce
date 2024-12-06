@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ./web-backend
+      dockerfile: Dockerfile.dev
+    container_name: backend-dev
+    command: nodemon index.js
+    volumes:
+      - ./web-backend:/app
+      - /app/node_modules
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./web-backend/.env
+    # Nếu không cần DB local, bỏ depends_on và service db
+    # depends_on:
+    #   - db
+
+  frontend:
+    build:
+      context: ./web-frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend-dev
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./web-frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    env_file:
+      - ./web-frontend/.env
+# Xoá hẳn db service nếu không cần
+
+# volumes:
+#   mongo-data:
