@@ -29,8 +29,6 @@ phases:
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - BACKEND_IMAGE_TAG=${COMMIT_HASH:-latest}
       - FRONTEND_IMAGE_TAG=${COMMIT_HASH:-latest}
-      - echo "Backend Image Tag: $BACKEND_IMAGE_TAG"
-      - echo "Frontend Image Tag: $FRONTEND_IMAGE_TAG"
       - echo "Listing root directory:"
       - ls -la
 
