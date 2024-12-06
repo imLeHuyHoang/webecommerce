@@ -9,14 +9,9 @@ env:
 
 phases:
   install:
-    runtime-versions:
-      nodejs: 18
     commands:
       - echo "Installing dependencies and preparing the environment..."
       - printenv
-      # Nếu cần thiết, bạn có thể bỏ comment các lệnh sau để khởi động Docker daemon
-      # - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
-      # - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
 
   pre_build:
     commands:
@@ -36,19 +31,16 @@ phases:
     commands:
       - echo "Build started on $(date)"
 
-      # Xây dựng Docker image cho Backend
       - echo "Building the backend Docker image..."
       - docker build -t $BACKEND_REPO_NAME:latest --target backend -f Dockerfile .
       - docker tag $BACKEND_REPO_NAME:latest $BACKEND_REPO_URI:latest
       - docker tag $BACKEND_REPO_NAME:latest $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
 
-      # Xây dựng Docker image cho Frontend
       - echo "Building the frontend Docker image..."
       - docker build -t $FRONTEND_REPO_NAME:latest --target frontend -f Dockerfile .
       - docker tag $FRONTEND_REPO_NAME:latest $FRONTEND_REPO_URI:latest
       - docker tag $FRONTEND_REPO_NAME:latest $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
 
-      # Kiểm tra các image đã được build thành công
       - echo "Listing Docker images:"
       - docker images
 
@@ -56,17 +48,14 @@ phases:
     commands:
       - echo "Build completed on $(date)"
 
-      # Đẩy Docker image của Backend lên ECR
       - echo "Pushing the backend Docker image to ECR..."
       - docker push $BACKEND_REPO_URI:latest
       - docker push $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
 
-      # Đẩy Docker image của Frontend lên ECR
       - echo "Pushing the frontend Docker image to ECR..."
       - docker push $FRONTEND_REPO_URI:latest
       - docker push $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
 
-      # Tạo file imagedefinitions.json cho ECS (nếu bạn sử dụng ECS)
       - echo "Writing image definitions file..."
       - printf '[{"name":"web-backend","imageUri":"%s"},{"name":"web-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG > imagedefinitions.json
       - ls -la
