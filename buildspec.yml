@@ -2,47 +2,67 @@ version: 0.2
 
 env:
   variables:
-    BACKEND_IMAGE_REPO_NAME: "web-backend"
-    FRONTEND_IMAGE_REPO_NAME: "web-frontend"
+    AWS_REGION: "ap-southeast-1"
+    AWS_ACCOUNT_ID: "654654447255"
+    BACKEND_REPO_NAME: "web-backend"
+    FRONTEND_REPO_NAME: "web-frontend"
     IMAGE_TAG: "latest"
 
 phases:
   install:
     runtime-versions:
-      nodejs: 20
+      docker: 20
+      nodejs: latest
+    commands:
+      - echo "Installing dependencies and preparing the environment..."
+
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com
-      - echo "Listing root directory:"
-      - ls -la
+      - aws --version
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - echo "Setting repository URIs..."
+      - BACKEND_REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME
+      - FRONTEND_REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME
+      - echo "Backend Repository URI: $BACKEND_REPO_URI"
+      - echo "Frontend Repository URI: $FRONTEND_REPO_URI"
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - BACKEND_IMAGE_TAG=${COMMIT_HASH:-latest}
+      - FRONTEND_IMAGE_TAG=${COMMIT_HASH:-latest}
+      - echo "Backend Image Tag: $BACKEND_IMAGE_TAG"
+      - echo "Frontend Image Tag: $FRONTEND_IMAGE_TAG"
+
   build:
     commands:
-      - echo "Listing web-backend directory:"
-      - ls -la web-backend
-      - echo "Building the backend Docker image..."
-      - docker build -t $BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG -f web-backend/Dockerfile.dev .
+      - echo "Build started on $(date)"
 
-      - echo "Listing web-frontend directory:"
-      - ls -la web-frontend
+      # Build Backend Image
+      - echo "Building the backend Docker image..."
+      - docker build -t $BACKEND_REPO_URI:latest -f web-backend/Dockerfile.dev web-backend
+      - docker tag $BACKEND_REPO_URI:latest $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
+
+      # Build Frontend Image
       - echo "Building the frontend Docker image..."
-      - docker build -t $FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG -f web-frontend/Dockerfile.dev .
+      - docker build -t $FRONTEND_REPO_URI:latest -f web-frontend/Dockerfile.dev web-frontend
+      - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
 
   post_build:
     commands:
-      - echo "Tagging the backend Docker image..."
-      - docker tag $BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "Build completed on $(date)"
+
+      # Push Backend Images
       - echo "Pushing the backend Docker image to ECR..."
-      - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$BACKEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $BACKEND_REPO_URI:latest
+      - docker push $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
 
-      - echo "Tagging the frontend Docker image..."
-      - docker tag $FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      # Push Frontend Images
       - echo "Pushing the frontend Docker image to ECR..."
-      - docker push 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/$FRONTEND_IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $FRONTEND_REPO_URI:latest
+      - docker push $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
 
-      - echo "Build, tag, and push for both images completed."
+      # Create imagedefinitions.json for ECS (nếu bạn sử dụng ECS)
+      - echo "Writing image definitions file..."
+      - printf '[{"name":"web-backend","imageUri":"%s"},{"name":"web-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG > imagedefinitions.json
 
 artifacts:
-  files:
-    - "**/*"
-  discard-paths: yes
+  files: imagedefinitions.json
