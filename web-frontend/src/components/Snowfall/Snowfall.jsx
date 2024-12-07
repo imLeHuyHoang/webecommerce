@@ -1,64 +1,88 @@
 // Snowfall.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./Snowfall.css";
 
 const Snowfall = ({
-  snowflakeCount = 2, // Số lượng bông tuyết
-  snowflakeSize = { min: 2, max: 4 }, // Kích thước bông tuyết (tối thiểu và tối đa)
-  fallSpeed = { min: 1, max: 2 }, // Tốc độ rơi của bông tuyết (tối thiểu và tối đa)
-  drift = { min: -50, max: 50 }, // Độ lệch ngang của bông tuyết (tối thiểu và tối đa)
+  snowflakeCount = 20, // Số lượng bông tuyết ban đầu
+  snowflakeSize = { min: 2, max: 6 }, // Kích thước bông tuyết (tối thiểu và tối đa)
+  fallSpeed = { min: 5, max: 10 }, // Tốc độ rơi của bông tuyết (tối thiểu và tối đa)
+  drift = { min: -100, max: 100 }, // Độ lệch ngang của bông tuyết (tối thiểu và tối đa)
+  maxSnowflakes = 100, // Số lượng bông tuyết tối đa trên màn hình
 }) => {
+  const [snowflakes, setSnowflakes] = useState([]);
+  const snowflakeId = useRef(0);
+  const snowflakeCountRef = useRef(0);
+
   useEffect(() => {
-    const snowContainer = document.querySelector(".snow-container"); // Lấy phần tử chứa bông tuyết
+    let isMounted = true;
 
     const createSnowflake = () => {
-      const snowflake = document.createElement("div"); // Tạo phần tử bông tuyết
-      snowflake.classList.add("snowflake"); // Thêm lớp CSS cho bông tuyết
+      if (isMounted && snowflakeCountRef.current < maxSnowflakes) {
+        const size =
+          Math.random() * (snowflakeSize.max - snowflakeSize.min) +
+          snowflakeSize.min;
+        const left = Math.random() * 100; // Vị trí ngang dưới dạng phần trăm
+        const duration =
+          Math.random() * (fallSpeed.max - fallSpeed.min) + fallSpeed.min;
+        const horizontalDrift =
+          Math.random() * (drift.max - drift.min) + drift.min;
 
-      // Kích thước ngẫu nhiên
-      const size =
-        Math.random() * (snowflakeSize.max - snowflakeSize.min) +
-        snowflakeSize.min;
-      snowflake.style.width = `${size}px`;
-      snowflake.style.height = `${size}px`;
+        const newSnowflake = {
+          id: snowflakeId.current++,
+          size,
+          left,
+          duration,
+          drift: horizontalDrift,
+        };
 
-      // Vị trí ngẫu nhiên
-      snowflake.style.left = `${Math.random() * 100}%`;
-
-      // Thời gian hoạt ảnh ngẫu nhiên
-      const duration =
-        Math.random() * (fallSpeed.max - fallSpeed.min) + fallSpeed.min;
-      snowflake.style.animationDuration = `${duration}s`;
-
-      // Độ lệch ngang ngẫu nhiên
-      const horizontalDrift =
-        Math.random() * (drift.max - drift.min) + drift.min;
-      snowflake.style.setProperty("--drift", `${horizontalDrift}px`);
-
-      snowContainer.appendChild(snowflake); // Thêm bông tuyết vào container
-
-      // Xóa bông tuyết sau khi hoạt ảnh kết thúc
-      snowflake.addEventListener("animationend", () => {
-        snowflake.remove();
-      });
+        setSnowflakes((prev) => [...prev, newSnowflake]);
+        snowflakeCountRef.current += 1;
+      }
     };
 
-    // Tạo các bông tuyết ban đầu
+    // Tạo các bông tuyết ban đầu với độ trễ ngẫu nhiên
     for (let i = 0; i < snowflakeCount; i++) {
       setTimeout(createSnowflake, Math.random() * 5000);
     }
 
-    // Liên tục tạo bông tuyết
-    const interval = setInterval(createSnowflake, 200);
+    // Liên tục tạo bông tuyết theo khoảng thời gian
+    const interval = setInterval(() => {
+      createSnowflake();
+    }, 800); // Điều chỉnh khoảng thời gian tạo bông tuyết mới
 
     // Dọn dẹp khi component bị unmount
     return () => {
+      isMounted = false;
       clearInterval(interval);
-      snowContainer.innerHTML = "";
+      setSnowflakes([]);
+      snowflakeCountRef.current = 0;
     };
-  }, [snowflakeCount, snowflakeSize, fallSpeed, drift]);
+  }, [snowflakeCount, snowflakeSize, fallSpeed, drift, maxSnowflakes]);
 
-  return <div className="snow-container"></div>; // Trả về phần tử chứa bông tuyết
+  // Hàm xử lý khi animation kết thúc
+  const handleAnimationEnd = (id) => {
+    setSnowflakes((prev) => prev.filter((snowflake) => snowflake.id !== id));
+    snowflakeCountRef.current -= 1;
+  };
+
+  return (
+    <div className="snow-container">
+      {snowflakes.map((snowflake) => (
+        <div
+          key={snowflake.id}
+          className="snowflake"
+          style={{
+            width: `${snowflake.size}px`,
+            height: `${snowflake.size}px`,
+            left: `${snowflake.left}%`,
+            animationDuration: `${snowflake.duration}s`,
+            "--drift": `${snowflake.drift}px`,
+          }}
+          onAnimationEnd={() => handleAnimationEnd(snowflake.id)}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default Snowfall;

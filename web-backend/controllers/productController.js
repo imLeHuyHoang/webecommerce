@@ -4,6 +4,7 @@ const Product = require("../models/Product");
 const Attribute = require("../models/Attribute");
 const Inventory = require("../models/Inventory");
 const Category = require("../models/Category");
+const mongoose = require("mongoose");
 
 // Lấy tất cả sản phẩm
 /**
@@ -13,49 +14,24 @@ const Category = require("../models/Category");
  */
 exports.getAllProducts = async (req, res) => {
   try {
-    const { category, search, brand, price, rating } = req.query;
-    const query = {};
+    console.log("getAllProducts called with query:", req.query); // Thêm log để kiểm tra
+    const { category, brand, search } = req.query;
 
-    // Lọc theo danh mục
+    // Xây dựng điều kiện lọc
+    let filter = {};
     if (category) {
-      const categoryObj = await Category.findOne({ name: category });
-      if (categoryObj) {
-        query.category = categoryObj._id;
-      } else {
-        return res.status(404).json({ message: "Category not found" });
-      }
+      filter.category = category;
     }
-
-    // Tìm kiếm
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { code: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    // Lọc theo thương hiệu
     if (brand) {
-      query.brand = { $regex: brand, $options: "i" };
+      filter.brand = brand;
+    }
+    if (search) {
+      filter.name = { $regex: search, $options: "i" }; // Tìm kiếm tên sản phẩm
     }
 
-    // Lọc theo khoảng giá
-    if (price) {
-      const [minPrice, maxPrice] = price.split("-");
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
-    }
+    const products = await Product.find(filter).populate("category", "name");
 
-    // Lọc theo đánh giá
-    if (rating) {
-      query.averageRating = { $gte: Number(rating) };
-    }
-
-    const products = await Product.find(query).populate("category", "name");
-
-    // Lấy thông tin kho hàng cho từng sản phẩm
+    // Thêm thông tin tồn kho cho từng sản phẩm
     const productsWithInventory = await Promise.all(
       products.map(async (product) => {
         const inventory = await Inventory.findOne({ product: product._id });
@@ -282,6 +258,51 @@ exports.deleteProduct = async (req, res) => {
       .json({ message: `Product ${product.name} deleted successfully` });
   } catch (error) {
     console.error("Error in deleteProduct:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+exports.compareProducts = async (req, res) => {
+  try {
+    const { productIds } = req.body; // Nhận danh sách ID từ body
+
+    if (!productIds || !Array.isArray(productIds) || productIds.length !== 2) {
+      return res
+        .status(400)
+        .json({ message: "Vui lòng cung cấp đúng hai ID sản phẩm" });
+    }
+
+    // Kiểm tra tính hợp lệ của từng ID
+    productIds.forEach((id) => {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error(`Invalid product ID: ${id}`);
+      }
+    });
+
+    const products = await Product.find({ _id: { $in: productIds } }).populate(
+      "category",
+      "name"
+    );
+
+    if (products.length !== 2) {
+      return res
+        .status(404)
+        .json({ message: "Một hoặc cả hai sản phẩm không tồn tại" });
+    }
+
+    // Lấy thông tin kho hàng cho từng sản phẩm
+    const productsWithInventory = await Promise.all(
+      products.map(async (product) => {
+        const inventory = await Inventory.findOne({ product: product._id });
+        return {
+          ...product.toObject(),
+          stock: inventory ? inventory.quantity : 0,
+        };
+      })
+    );
+
+    res.json(productsWithInventory);
+  } catch (error) {
+    console.error("Error comparing products:", error);
     res.status(500).json({ message: error.message });
   }
 };

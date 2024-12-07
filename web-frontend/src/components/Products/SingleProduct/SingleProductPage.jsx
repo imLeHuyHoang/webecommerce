@@ -1,4 +1,3 @@
-// src/components/SingleProductPage/SingleProductPage.jsx
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -19,6 +18,7 @@ import { useCart } from "../../../context/CartContext";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import RatingComponent from "../../RatingandComment/RatingComponent";
 import CommentComponent from "../../RatingandComment/CommentComponent";
+import CompareModal from "./CompareModel"; // Sửa lại từ "CompareModel" thành "CompareModal"
 import "./SingleProductPage.css";
 
 const SingleProductPage = () => {
@@ -34,11 +34,12 @@ const SingleProductPage = () => {
   const [toastMessage, setToastMessage] = useState(""); // Toast message
   const [showToast, setShowToast] = useState(false); // Show/hide toast
   const [showModal, setShowModal] = useState(false); // Show/hide attributes modal
+  const [showCompareModal, setShowCompareModal] = useState(false); // Show/hide compare modal
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await apiClient.get(`/product/${id}`); // Fetch product details
+        const response = await apiClient.get(`/product/${id}`); // Sửa từ /product/ thành /products/
         setProduct(response.data); // Set product data
         setMainImage(response.data.images[0]); // Set the first image as main
       } catch (err) {
@@ -103,6 +104,10 @@ const SingleProductPage = () => {
   const handleShowAttributes = () => setShowModal(true);
   const handleCloseAttributes = () => setShowModal(false);
 
+  // Show compare modal
+  const handleShowCompareModal = () => setShowCompareModal(true);
+  const handleCloseCompareModal = () => setShowCompareModal(false);
+
   if (loading)
     return (
       <div className="text-center my-5">
@@ -133,7 +138,7 @@ const SingleProductPage = () => {
                 <li className="breadcrumb-item custom-breadcrumb-item ">
                   <button
                     onClick={() => navigate("/product")}
-                    className=" button-74"
+                    className="button-74"
                   >
                     <i className="fas fa-arrow-left"></i> Quay lại
                   </button>
@@ -237,8 +242,8 @@ const SingleProductPage = () => {
               {/* Description */}
               <p>{product.description}</p>
 
-              {/* Quantity Controls */}
-              <InputGroup className="mb-3 quantity-controls">
+              {/* Quantity Controls và Nút So Sánh */}
+              <InputGroup className="mb-3 quantity-controls d-flex align-items-center">
                 <button
                   className="button-minus"
                   variant="outline-secondary"
@@ -248,7 +253,7 @@ const SingleProductPage = () => {
                   -
                 </button>
 
-                <p className="text-quantity">
+                <p className="text-quantity mx-3">
                   <strong>{quantity}</strong>
                 </p>
                 <button
@@ -259,6 +264,15 @@ const SingleProductPage = () => {
                 >
                   +
                 </button>
+
+                {/* Nút So Sánh */}
+                <Button
+                  variant="secondary"
+                  className="ms-3"
+                  onClick={handleShowCompareModal}
+                >
+                  So Sánh
+                </Button>
               </InputGroup>
 
               {/* Add to Cart & Attributes Buttons */}
@@ -311,7 +325,7 @@ const SingleProductPage = () => {
         <Modal.Body>
           <ul className="list-group list-group-flush">
             {product.attributes.map((attr) => (
-              <li key={attr._id} className="list-group-item">
+              <li key={attr.key} className="list-group-item">
                 <strong>{attr.key}:</strong> {attr.value}
               </li>
             ))}
@@ -323,6 +337,13 @@ const SingleProductPage = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Compare Modal */}
+      <CompareModal
+        show={showCompareModal}
+        handleClose={handleCloseCompareModal}
+        currentProduct={product}
+      />
     </div>
   );
 };

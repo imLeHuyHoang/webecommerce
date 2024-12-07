@@ -12,23 +12,49 @@
 
 .snowflake {
   position: absolute;
-  top: -10px;
+  top: -10px; /* Bắt đầu từ ngoài màn hình */
   background: white;
-  border-radius: 50%;
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  ); /* Hình cánh sao */
   opacity: 0.8;
-  animation-name: fall, drift;
-  animation-timing-function: linear, linear;
-  animation-iteration-count: infinite, infinite;
+  animation: fallAndDrift linear forwards;
+  box-shadow: 0 0 10px white; /* Tăng độ sáng */
+  filter: brightness(1.3); /* Làm cho bông tuyết sáng hơn */
 }
 
-@keyframes fall {
-  to {
-    transform: translateY(100vh);
+@keyframes fallAndDrift {
+  0% {
+    transform: translateX(0px) translateY(0px) rotate(0deg) scale(1);
+    opacity: 1;
   }
-}
-
-@keyframes drift {
-  to {
-    transform: translateX(var(--drift)) translateY(100vh);
+  25% {
+    transform: translateX(calc(var(--drift) / 2)) translateY(25vh) rotate(90deg)
+      scale(1.2);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(var(--drift)) translateY(50vh) rotate(180deg)
+      scale(1.3);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateX(calc(var(--drift) * 1.5)) translateY(75vh)
+      rotate(270deg) scale(1.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(var(--drift)) translateY(100vh) rotate(360deg)
+      scale(1);
+    opacity: 0.8;
   }
 }

@@ -1,3 +1,4 @@
+// routes/productRoutes.js
 const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/productController");
@@ -7,10 +8,17 @@ const { verifyToken } = require("../middleware/auth");
 
 /**
  * @route   GET /api/products
- * @desc    Lấy tất cả sản phẩm
+ * @desc    Lấy tất cả sản phẩm (có thể lọc theo category, brand, search)
  * @access  Public
  */
 router.get("/", productController.getAllProducts);
+
+/**
+ * @route   POST /api/products/compare
+ * @desc    So sánh hai sản phẩm
+ * @access  Public
+ */
+router.post("/compare", productController.compareProducts);
 
 /**
  * @route   GET /api/products/:id
