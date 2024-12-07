@@ -42,13 +42,13 @@ const Snowfall = ({
 
     // Tạo các bông tuyết ban đầu với độ trễ ngẫu nhiên
     for (let i = 0; i < snowflakeCount; i++) {
-      setTimeout(createSnowflake, Math.random() * 5000);
+      setTimeout(createSnowflake, Math.random() * 10000);
     }
 
     // Liên tục tạo bông tuyết theo khoảng thời gian
     const interval = setInterval(() => {
       createSnowflake();
-    }, 800); // Điều chỉnh khoảng thời gian tạo bông tuyết mới
+    }, 2000); // Điều chỉnh khoảng thời gian tạo bông tuyết mới
 
     // Dọn dẹp khi component bị unmount
     return () => {

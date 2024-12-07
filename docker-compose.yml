@@ -13,9 +13,6 @@ services:
       - "5000:5000"
     env_file:
       - ./web-backend/.env
-    # Nếu không cần DB local, bỏ depends_on và service db
-    # depends_on:
-    #   - db
 
   frontend:
     build:
@@ -32,7 +29,3 @@ services:
       - backend
     env_file:
       - ./web-frontend/.env
-# Xoá hẳn db service nếu không cần
-
-# volumes:
-#   mongo-data:

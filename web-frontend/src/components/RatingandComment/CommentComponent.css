@@ -1,55 +1,211 @@
 /* src/components/RatingandComment/CommentComponent.css */
 
+/* Overall Comment Component Container */
 .comment-component {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 15px; /* Soft rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for separation */
+  max-width: 800px;
+  margin: 0 auto;
 }
 
+/* Title Styling */
+.comment-title {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+/* Container for the comments list */
 .comments-list-container {
-  max-height: 400px; /* Adjust the height as needed */
+  max-height: 500px; /* Adjust as needed */
   overflow-y: auto;
-  padding-right: 10px; /* To prevent content hiding behind scrollbar */
-  border: 1px solid #e0e0e0; /* Optional: Add a border for distinction */
-  border-radius: 5px;
-  padding: 10px;
+  padding-right: 10px; /* Prevent content hiding behind scrollbar */
+  border: 1px solid #e0e0e0; /* Light border for distinction */
+  border-radius: 10px; /* Rounded corners */
+  padding: 15px;
   background-color: #f9f9f9;
 }
 
-.comments-list {
-  /* Optional: Add padding or margin if needed */
+/* Message Styling */
+.message {
+  color: #d9534f; /* Bootstrap danger color */
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 
+/* Comment Item */
 .comment-item {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 10px; /* Soft rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Light shadow */
+  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
 }
 
+.comment-item:hover {
+  background-color: #f1f1f1; /* Light hover effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly larger shadow on hover */
+}
+
+/* Indentation for nested comments */
 .comment-item.depth-1 {
   margin-left: 20px;
+  border-left: 2px solid #e0e0e0; /* Vertical line for hierarchy */
+  padding-left: 15px;
 }
 
 .comment-item.depth-2 {
   margin-left: 40px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 15px;
 }
 
+/* Comment Header */
 .comment-header {
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
+.comment-header strong {
+  font-size: 1rem;
+  color: #007bff; /* Bootstrap primary color */
+}
+
+.comment-time {
+  font-size: 0.85rem;
+  color: #6c757d; /* Bootstrap secondary color */
+  margin-left: 10px;
+}
+
+/* Comment Body */
 .comment-body {
-  margin-top: 5px;
-  margin-bottom: 5px;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 10px;
 }
 
+/* Reply Button */
 .reply-button {
-  font-size: 0.8rem;
-  color: #007bff;
+  background: none;
+  border: none;
+  color: #007bff; /* Bootstrap primary color */
+  font-size: 0.9rem;
   cursor: pointer;
+  padding: 0;
+  transition: color 0.3s, text-decoration 0.3s;
 }
 
-.reply-form textarea {
-  resize: vertical;
+.reply-button:hover {
+  color: #0056b3; /* Darker blue on hover */
+  text-decoration: underline;
 }
 
+/* Reply Form */
+.reply-form {
+  margin-top: 15px;
+}
+
+.reply-form .form-control {
+  border-radius: 10px; /* Rounded corners */
+  border-color: #ced4da;
+  transition: border-color 0.3s;
+}
+
+.reply-form .form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Reply Buttons */
+.reply-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.reply-buttons .btn {
+  border-radius: 20px; /* Rounded buttons */
+  padding: 5px 15px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.reply-buttons .btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+.reply-buttons .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.reply-buttons .btn-primary:active {
+  transform: scale(0.98);
+}
+
+.reply-buttons .btn-secondary {
+  background-color: #6c757d;
+  border: none;
+}
+
+.reply-buttons .btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.reply-buttons .btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Replies Container */
+.replies {
+  margin-top: 15px;
+}
+
+/* Add Comment Form */
 .add-comment-form {
-  margin-top: 20px;
+  margin-top: 30px;
+}
+
+.add-comment-form .form-control {
+  border-radius: 10px; /* Rounded corners */
+  border-color: #ced4da;
+  transition: border-color 0.3s;
+}
+
+.add-comment-form .form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.add-comment-form .btn {
+  border-radius: 20px; /* Rounded buttons */
+  padding: 10px 20px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.add-comment-form .btn-primary {
+  background-color: #28a745; /* Bootstrap success color */
+  border: none;
+}
+
+.add-comment-form .btn-primary:hover {
+  background-color: #218838;
+}
+
+.add-comment-form .btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* Spinner Container */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* Adjust as needed */
 }
 
 /* Scrollbar Styling (Optional) */
@@ -66,6 +222,7 @@
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+/* Responsive Design */
 @media (max-width: 767px) {
   .comments-list-container {
     max-height: 300px; /* Adjust for smaller screens */
@@ -73,9 +230,41 @@
 
   .comment-item.depth-1 {
     margin-left: 15px;
+    padding-left: 10px;
   }
 
   .comment-item.depth-2 {
     margin-left: 30px;
+    padding-left: 10px;
+  }
+
+  .comment-title {
+    font-size: 1.25rem;
+  }
+
+  .comment-header strong {
+    font-size: 0.95rem;
+  }
+
+  .comment-time {
+    font-size: 0.75rem;
+  }
+
+  .comment-body {
+    font-size: 0.95rem;
+  }
+
+  .reply-button {
+    font-size: 0.85rem;
+  }
+
+  .reply-buttons .btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+
+  .add-comment-form .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
   }
 }

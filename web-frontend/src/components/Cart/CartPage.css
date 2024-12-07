@@ -32,22 +32,13 @@
 
 .button-minus,
 .button-plus {
-  height: 100%;
-  width: 50px;
-  font-size: 14px; /* Giảm kích thước chữ */
-  border-radius: 4px; /* Làm tròn các góc */
-  padding: 0;
-  transition: background-color 0.3s ease; /* Thêm hiệu ứng hover */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.text-quantity {
-  width: 50px;
+  margin: 0px;
   height: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
+  border: 1px solid #ced4da;
+  border-radius: 25px;
 }
 
 /* Thêm hiệu ứng khi hover */
@@ -58,6 +49,9 @@
 
 /* Nếu bạn muốn nút nhỏ hơn nữa, bạn có thể điều chỉnh padding thêm */
 .quantity {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
   height: 30px;
 }
 
@@ -94,6 +88,13 @@ button:disabled {
 .text-discount-cart:hover {
   background-color: #218838;
   color: white;
+}
+.text-quantity {
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn-link.text-muted {

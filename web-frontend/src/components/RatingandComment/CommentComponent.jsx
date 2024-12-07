@@ -1,4 +1,5 @@
 // src/components/RatingandComment/CommentComponent.jsx
+
 import React, { useState, useEffect } from "react";
 import { Spinner, Form, Button, Collapse } from "react-bootstrap";
 import apiClient from "../../utils/api-client";
@@ -7,18 +8,18 @@ import "./CommentComponent.css";
 const CommentComponent = ({ productId }) => {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
-  const [replyingTo, setReplyingTo] = useState(null); // ID của comment đang được trả lời
+  const [replyingTo, setReplyingTo] = useState(null); // ID of the comment being replied to
   const [replyText, setReplyText] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Fetch tất cả các bình luận và trả lời
+  // Fetch all comments and replies
   const fetchComments = async () => {
     try {
       const response = await apiClient.get(`/products/${productId}/comments`);
       const data = response.data;
 
-      // Xây dựng cây phân cấp từ dữ liệu trả về
+      // Build hierarchical tree from flat comment list
       const commentTree = buildCommentTree(data);
       setComments(commentTree);
     } catch (error) {
@@ -33,25 +34,25 @@ const CommentComponent = ({ productId }) => {
     fetchComments();
   }, [productId]);
 
-  // Hàm xây dựng cây phân cấp từ danh sách bình luận phẳng
+  // Function to build hierarchical tree from flat comment list
   const buildCommentTree = (comments) => {
     const commentMap = {};
     const tree = [];
 
-    // Tạo một bản đồ để dễ dàng truy cập các bình luận theo ID
+    // Create a map for easy access to comments by ID
     comments.forEach((comment) => {
-      comment.replies = []; // Khởi tạo mảng replies
+      comment.replies = []; // Initialize replies array
       commentMap[comment._id] = comment;
     });
 
-    // Tạo cây phân cấp
+    // Build the tree
     comments.forEach((comment) => {
       if (comment.parentComment) {
         const parent = commentMap[comment.parentComment];
         if (parent) {
           parent.replies.push(comment);
         } else {
-          // Nếu parentComment không tồn tại, thêm vào cây như bình luận cha
+          // If parentComment doesn't exist, add as a top-level comment
           tree.push(comment);
         }
       } else {
@@ -62,7 +63,7 @@ const CommentComponent = ({ productId }) => {
     return tree;
   };
 
-  // Handle thêm bình luận mới
+  // Handle adding a new comment
   const handleAddComment = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -93,9 +94,9 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Handle trả lời bình luận cụ thể
+  // Handle replying to a specific comment
   const handleReply = (parentId) => {
-    // Nếu đang trả lời cùng một comment, đóng form
+    // If replying to the same comment, toggle off
     if (replyingTo === parentId) {
       setReplyingTo(null);
       setReplyText("");
@@ -104,7 +105,7 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Handle gửi trả lời
+  // Handle submitting a reply
   const handleSubmitReply = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -136,31 +137,29 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Hàm để render từng bình luận và trả lời (nếu có)
+  // Function to render each comment and its replies
   const renderComments = (commentsList, depth = 0) => {
     return commentsList.map((comment) => (
       <div key={comment._id} className={`comment-item depth-${depth}`}>
-        <div className="comment-content position-relative">
-          <div className="comment-header d-flex align-items-center">
+        <div className="comment-content">
+          <div className="comment-header">
             <strong>{comment.user.name}</strong>
-            <small className="text-muted ms-2">
+            <small className="comment-time">
               {new Date(comment.createdAt).toLocaleString()}
             </small>
           </div>
           <div className="comment-body">{comment.comment}</div>
-          <Button
-            variant="link"
-            size="sm"
-            className="reply-button p-0"
+          <button
+            className="reply-button"
             onClick={() => handleReply(comment._id)}
           >
             Trả lời
-          </Button>
+          </button>
         </div>
 
-        {/* Form trả lời dưới từng bình luận */}
+        {/* Reply form under each comment */}
         <Collapse in={replyingTo === comment._id}>
-          <div className="reply-form mt-2">
+          <div className="reply-form">
             <Form>
               <Form.Group controlId={`reply-${comment._id}`} className="mb-2">
                 <Form.Control
@@ -171,31 +170,33 @@ const CommentComponent = ({ productId }) => {
                   onChange={(e) => setReplyText(e.target.value)}
                 />
               </Form.Group>
-              <Button
-                variant="primary"
-                size="sm"
-                className="me-2"
-                onClick={handleSubmitReply}
-              >
-                Gửi trả lời
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  setReplyingTo(null);
-                  setReplyText("");
-                }}
-              >
-                Hủy
-              </Button>
+              <div className="reply-buttons">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="me-2"
+                  onClick={handleSubmitReply}
+                >
+                  Gửi trả lời
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setReplyingTo(null);
+                    setReplyText("");
+                  }}
+                >
+                  Hủy
+                </Button>
+              </div>
             </Form>
           </div>
         </Collapse>
 
-        {/* Render các trả lời của bình luận hiện tại */}
+        {/* Render replies */}
         {comment.replies && comment.replies.length > 0 && (
-          <div className="replies mt-3">
+          <div className="replies">
             {renderComments(comment.replies, depth + 1)}
           </div>
         )}
@@ -205,17 +206,17 @@ const CommentComponent = ({ productId }) => {
 
   if (loading)
     return (
-      <div className="text-center">
+      <div className="spinner-container">
         <Spinner animation="border" variant="primary" />
       </div>
     );
 
   return (
     <div className="comment-component">
-      <h4 className="ml-10px">Bình luận về sản phẩm</h4>
+      <h4 className="comment-title">Bình luận về sản phẩm</h4>
 
       <div className="comments-list-container">
-        {message && <p className="text-danger">{message}</p>}
+        {message && <p className="message">{message}</p>}
         <div className="comments-list">
           {comments.length === 0 ? (
             <p>Chưa có bình luận nào.</p>
@@ -226,7 +227,7 @@ const CommentComponent = ({ productId }) => {
       </div>
 
       <div className="add-comment-form">
-        <Form className="ml-10px">
+        <Form>
           <Form.Group controlId="newComment" className="mb-2">
             <Form.Label>Thêm bình luận</Form.Label>
             <Form.Control
@@ -237,11 +238,7 @@ const CommentComponent = ({ productId }) => {
               onChange={(e) => setCommentText(e.target.value)}
             />
           </Form.Group>
-          <Button
-            className="ml-10px"
-            variant="primary"
-            onClick={handleAddComment}
-          >
+          <Button variant="primary" onClick={handleAddComment}>
             Gửi bình luận
           </Button>
         </Form>

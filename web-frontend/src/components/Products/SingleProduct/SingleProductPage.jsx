@@ -1,3 +1,5 @@
+// src/pages/SingleProductPage/SingleProductPage.js
+
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -9,8 +11,6 @@ import {
   Badge,
   Modal,
   Image,
-  Form,
-  InputGroup,
 } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import apiClient from "../../../utils/api-client";
@@ -18,7 +18,8 @@ import { useCart } from "../../../context/CartContext";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import RatingComponent from "../../RatingandComment/RatingComponent";
 import CommentComponent from "../../RatingandComment/CommentComponent";
-import CompareModal from "./CompareModel"; // Sửa lại từ "CompareModel" thành "CompareModal"
+import CompareModal from "./CompareModel"; // Ensure the path is correct
+import AdditionalContent from "../../AdditionalContent/AddtionalContent"; // Adjust the path
 import "./SingleProductPage.css";
 
 const SingleProductPage = () => {
@@ -39,7 +40,7 @@ const SingleProductPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await apiClient.get(`/product/${id}`); // Sửa từ /product/ thành /products/
+        const response = await apiClient.get(`/product/${id}`); // Ensure endpoint is correct
         setProduct(response.data); // Set product data
         setMainImage(response.data.images[0]); // Set the first image as main
       } catch (err) {
@@ -218,6 +219,9 @@ const SingleProductPage = () => {
                   <i className="fas fa-chevron-right"></i>
                 </Button>
               </div>
+
+              {/* Additional Content */}
+              <AdditionalContent />
             </div>
           </Col>
 
@@ -242,38 +246,34 @@ const SingleProductPage = () => {
               {/* Description */}
               <p>{product.description}</p>
 
-              {/* Quantity Controls và Nút So Sánh */}
-              <InputGroup className="mb-3 quantity-controls d-flex align-items-center">
+              {/* Quantity Controls and Compare Button */}
+              <div className="quantity-controls">
                 <button
-                  className="button-minus"
-                  variant="outline-secondary"
+                  className="button button-minus"
                   onClick={handleDecrease}
                   disabled={quantity <= 1}
                 >
                   -
                 </button>
 
-                <p className="text-quantity mx-3">
-                  <strong>{quantity}</strong>
-                </p>
+                <p className="text-quantity">{quantity}</p>
+
                 <button
-                  className="button-plus"
-                  variant="outline-secondary"
+                  className="button button-plus"
                   onClick={handleIncrease}
                   disabled={quantity >= product.stock}
                 >
                   +
                 </button>
 
-                {/* Nút So Sánh */}
-                <Button
-                  variant="secondary"
-                  className="ms-3"
+                {/* Compare Button */}
+                <button
+                  className="button compare-btn"
                   onClick={handleShowCompareModal}
                 >
                   So Sánh
-                </Button>
-              </InputGroup>
+                </button>
+              </div>
 
               {/* Add to Cart & Attributes Buttons */}
               <div className="d-flex mb-3">

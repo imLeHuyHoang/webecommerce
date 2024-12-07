@@ -1,0 +1,21 @@
+/* src/components/AdditionalContent/AdditionalContent.css */
+
+.additional-content {
+  background-color: #f8f9fa; /* Light gray background */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.additional-carousel-image {
+  height: 300px;
+  object-fit: cover;
+}
+
+.additional-image {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.additional-image:hover {
+  transform: scale(1.05);
+}

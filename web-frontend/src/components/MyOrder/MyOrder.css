@@ -1,0 +1,39 @@
+/* MyOrder.css */
+.small-input {
+  padding: 5px;
+  width: 65%; /* Adjust the width as needed */
+  border: 1px solid #000000;
+  border-radius: 30px;
+  height: 35px;
+  padding-left: 20px;
+}
+
+.search-and-filter .btn-delete {
+  background-color: #ff0019;
+  color: white;
+  width: 70px;
+  height: 35px;
+  padding: 5px;
+  border: 1px solid #000000;
+  border-radius: 25px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.custom-select {
+  padding: 5px;
+  width: 25%; /* Adjust the width as needed */
+  border: 1px solid #000000;
+  border-radius: 30px;
+  height: 35px;
+  padding-left: 10px;
+  background-color: #ffffff;
+  color: #4e4b4b;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.custom-select:focus {
+  border-color: #007bff;
+}

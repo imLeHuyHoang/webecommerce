@@ -168,24 +168,21 @@ function MyOrders() {
         <h1 className="text-center">Đơn hàng của tôi</h1>
 
         {/* Search and Filter */}
-        <div className="d-flex justify-content-between align-items-center my-3">
-          <div className="input-group w-50">
+        <div className=" d-flex justify-content-between align-items-center my-3">
+          <div className="search-and-filter w-50">
             <input
-              className="form-control"
+              className=" input-text small-input"
               placeholder="Tìm kiếm theo mã đơn hàng"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setSearchTerm("")}
-            >
+            <button className="btn-delete" onClick={() => setSearchTerm("")}>
               Xóa
             </button>
           </div>
 
           <select
-            className="form-select w-25"
+            className="custom-select"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
