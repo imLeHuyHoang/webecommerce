@@ -14,7 +14,7 @@ phases:
       - aws --version
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com
       - echo "Setting repository URIs..."
-      - BACKEND_REPO_URI=654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/app-frontend
+      - BACKEND_REPO_URI=654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/app-backend
       - FRONTEND_REPO_URI=654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/app-frontend
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - BACKEND_IMAGE_TAG=${COMMIT_HASH:-latest}
@@ -22,13 +22,15 @@ phases:
 
   build:
     commands:
-      - echo "Build started on $(date)"
-      - echo "Building the backend Docker image..."
+      - echo "Build Docker image với tag latest..."
       - docker build -t $BACKEND_REPO_URI:latest .
-      - docker tag $BACKEND_REPO_URI:latest $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG
-      - echo "Building the frontend Docker image..."
-      - docker build -t $FRONTEND_REPO_URI:latest  .
-      - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
+      - echo "Tag Docker image với tag commit hash..."
+      - docker tag $BACKEND_REPO_URI:latest $BACKEND_REPO_URI:$IMAGE_TAG
+      - echo "Docker images đã được build và tag thành công."
+
+      - echo "Tiến hành build Docker image..."
+      - docker build -t $FRONTEND_REPO_URI:latest .
+      - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$IMAGE_TAG
 
   post_build:
     commands:
