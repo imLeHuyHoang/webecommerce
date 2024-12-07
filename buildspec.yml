@@ -21,14 +21,14 @@ phases:
     commands:
       # Build và tag Backend
       - echo "Build Docker image backend với tag latest..."
-      - docker build -t $REPOSITORY_URI-backend:latest ./web-backend
+      - docker build -t $REPOSITORY_URI-backend:latest ./webecommerce/web-backend
       - echo "Tag Docker image backend với tag commit hash..."
       - docker tag $REPOSITORY_URI-backend:latest $REPOSITORY_URI-backend:$IMAGE_TAG
       - echo "Docker images backend đã được build và tag thành công."
 
       # Build và tag Frontend
       - echo "Build Docker image frontend với tag latest..."
-      - docker build -t $REPOSITORY_URI-frontend:latest ./web-frontend
+      - docker build -t $REPOSITORY_URI-frontend:latest ./webecommerce/web-frontend
       - echo "Tag Docker image frontend với tag commit hash..."
       - docker tag $REPOSITORY_URI-frontend:latest $REPOSITORY_URI-frontend:$IMAGE_TAG
       - echo "Docker images frontend đã được build và tag thành công."
