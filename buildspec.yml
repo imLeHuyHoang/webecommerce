@@ -20,7 +20,6 @@ phases:
       - BACKEND_IMAGE_TAG=${COMMIT_HASH:-latest}
       - FRONTEND_IMAGE_TAG=${COMMIT_HASH:-latest}
 
-
   build:
     commands:
       - echo "Build started on $(date)"
@@ -42,7 +41,7 @@ phases:
       - docker push $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG
       - echo "Writing image definitions file..."
       - printf '[{"name":"web-backend","imageUri":"%s"},{"name":"web-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$BACKEND_IMAGE_TAG $FRONTEND_REPO_URI:$FRONTEND_IMAGE_TAG > imagedefinitions.json
-      -echo "create imagedefinitions.json file"
+      - echo "create imagedefinitions.json file"
 artifacts:
   files:
     - imagedefinitions.json
