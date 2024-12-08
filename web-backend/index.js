@@ -9,10 +9,17 @@ const cronJobs = require("./services/cronJobs");
 
 const app = express();
 const PORT = process.env.PORT;
-const CorsOrigin = process.env.CorsOrigin;
+
+app.use(
+  cors({
+    origin: true, // Phản ánh nguồn của yêu cầu
+    credentials: true, // Cho phép gửi cookies
+  })
+);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 // Import routes
 const userRoutes = require("./routes/userRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -28,12 +35,6 @@ const commentRoutes = require("./routes/commentRoutes");
 
 // Middleware setup
 app.use(morgan("dev"));
-app.use(
-  cors({
-    origin: CorsOrigin,
-    credentials: true,
-  })
-);
 app.use(cookieParser());
 
 app.use("/api/user", userRoutes);
@@ -53,6 +54,7 @@ app.use("/category", express.static(__dirname + "/upload/category"));
 app.use("/products", express.static(__dirname + "/upload/products"));
 
 cronJobs;
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

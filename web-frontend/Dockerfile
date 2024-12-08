@@ -1,5 +1,5 @@
-# Sử dụng Node.js phiên bản 18-alpine làm base image
-FROM node:18-alpine
+# Sử dụng Node.js phiên bản 20-alpine làm base image
+FROM node:20-alpine
 
 # Thiết lập thư mục làm việc
 WORKDIR /app
@@ -7,8 +7,8 @@ WORKDIR /app
 # Sao chép package.json và package-lock.json
 COPY package*.json ./
 
-# Cài đặt các phụ thuộc
-RUN npm install
+# Cài đặt PM2 toàn cầu và các phụ thuộc của ứng dụng
+RUN npm install -g pm2 && npm install
 
 # Sao chép toàn bộ mã nguồn vào container
 COPY . .
@@ -19,4 +19,8 @@ RUN npm run build
 # Expose cổng frontend
 EXPOSE 5173
 
-CMD ["npm", "run", "dev", "--", "--host"]
+# Thiết lập biến môi trường NODE_ENV thành production
+ENV NODE_ENV=production
+
+# Khởi động ứng dụng bằng PM2
+CMD ["pm2-runtime", "npm", "", "run", "start" , "--", "--host",]

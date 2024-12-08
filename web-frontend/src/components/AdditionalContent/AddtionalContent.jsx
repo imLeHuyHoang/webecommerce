@@ -1,8 +1,10 @@
 // src/components/AdditionalContent/AdditionalContent.js
 
 import React from "react";
-import { Carousel, Alert, Button } from "react-bootstrap";
+import { Carousel } from "react-bootstrap";
 import "./AdditionalContent.css";
+import imgSale1 from "../../assets/giangsinhsale.1.jpg";
+import imgSale2 from "../../assets/iphone-16-pro.webp";
 
 const AdditionalContent = () => {
   return (
@@ -12,23 +14,23 @@ const AdditionalContent = () => {
         <Carousel.Item>
           <img
             className="d-block w-100 additional-carousel-image"
-            src="https://via.placeholder.com/600x300?text=Promotion+1"
+            src={imgSale1}
             alt="Promotion 1"
           />
           <Carousel.Caption>
-            <h5>Khuyến mãi 1</h5>
-            <p>Miêu tả khuyến mãi 1.</p>
+            <h5>Giảm giá 20% cho mùa giáng sinh</h5>
+            <p>Nhập code: SALE20</p>
           </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item>
           <img
             className="d-block w-100 additional-carousel-image"
-            src="https://via.placeholder.com/600x300?text=Promotion+2"
+            src={imgSale2}
             alt="Promotion 2"
           />
           <Carousel.Caption>
-            <h5>Khuyến mãi 2</h5>
-            <p>Miêu tả khuyến mãi 2.</p>
+            <h5>Giảm giá 10% cho iphone 16</h5>
+            <p>Nhập code: Iphone16</p>
           </Carousel.Caption>
         </Carousel.Item>
         {/* Add more Carousel.Items as needed */}

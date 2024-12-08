@@ -5,7 +5,7 @@ services:
       context: ./web-backend
       dockerfile: Dockerfile
     container_name: backend-dev
-    command: nodemon index.js
+    command: node index.js
     volumes:
       - ./web-backend:/app
       - node_modules_backend:/app/node_modules
@@ -19,7 +19,7 @@ services:
       context: ./web-frontend
       dockerfile: Dockerfile
     container_name: frontend-dev
-    command: npm run dev -- --host
+    command: npm run start -- --host
     volumes:
       - ./web-frontend:/app
       - node_modules_frontend:/app/node_modules

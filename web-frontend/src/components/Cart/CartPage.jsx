@@ -2,13 +2,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/api-client";
-import {
-  FaTrashAlt,
-  FaPlus,
-  FaMinus,
-  FaArrowLeft,
-  FaCartArrowDown,
-} from "react-icons/fa";
+import { FaTrashAlt, FaArrowLeft, FaCartArrowDown } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { ToastContext } from "../ToastNotification/ToastContext";

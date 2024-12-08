@@ -3,6 +3,14 @@
 .product-list .product-card {
   transition: transform 0.2s;
 }
+.product-list {
+  background-color: rgb(255, 255, 255);
+  padding-top: 50px;
+  margin-top: 32px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  color: black;
+}
 
 .product-list .product-card:hover {
   transform: scale(1.05);

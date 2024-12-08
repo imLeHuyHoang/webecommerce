@@ -66,7 +66,7 @@ function ProductList({ filters }) {
   console.log(currentProducts);
 
   return (
-    <section className="product-list my-5">
+    <section className="product-list ">
       <Container>
         {currentProducts.length > 0 ? (
           <>

@@ -21,6 +21,7 @@ import CommentComponent from "../../RatingandComment/CommentComponent";
 import CompareModal from "./CompareModel"; // Ensure the path is correct
 import AdditionalContent from "../../AdditionalContent/AddtionalContent"; // Adjust the path
 import "./SingleProductPage.css";
+import imgSale from "../../../assets/giangsinh1.jpg";
 
 const SingleProductPage = () => {
   const { id } = useParams(); // Get product ID from URL
@@ -130,7 +131,7 @@ const SingleProductPage = () => {
 
   return (
     <div className="single-product-page">
-      <Container className="mt-5 container-single-product">
+      <Container className=" container-single-product">
         {/* Breadcrumb Navigation */}
         <Row className="mb-4">
           <Col>
@@ -222,6 +223,7 @@ const SingleProductPage = () => {
 
               {/* Additional Content */}
               <AdditionalContent />
+              <img src={imgSale} className="img-sale" alt="sale-image" />
             </div>
           </Col>
 
@@ -249,7 +251,7 @@ const SingleProductPage = () => {
               {/* Quantity Controls and Compare Button */}
               <div className="quantity-controls">
                 <button
-                  className="button button-minus"
+                  className="btn-decrease"
                   onClick={handleDecrease}
                   disabled={quantity <= 1}
                 >
@@ -259,7 +261,7 @@ const SingleProductPage = () => {
                 <p className="text-quantity">{quantity}</p>
 
                 <button
-                  className="button button-plus"
+                  className=" btn-increase"
                   onClick={handleIncrease}
                   disabled={quantity >= product.stock}
                 >

@@ -67,6 +67,10 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
       <Card.Body className="d-flex flex-column">
         <Card.Title className="product-title">{title}</Card.Title>
         <Card.Text className="product-price">{formatPrice(price)}</Card.Text>
+        <Card.Text className="product-stock">
+          {stock > 0 ? `Còn ${stock} sản phẩm` : "Hết hàng"}
+        </Card.Text>
+
         <div className="product-rating mb-2">
           {Array.from({ length: 5 }, (_, i) => (
             <i
