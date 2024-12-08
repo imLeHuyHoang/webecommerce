@@ -21,4 +21,4 @@ EXPOSE 5000
 ENV NODE_ENV=production
 
 # Khởi động ứng dụng bằng PM2
-CMD ["pm2-runtime", "start", "index.js"]
+CMD ["pm2-runtime", "node", "index.js"]
