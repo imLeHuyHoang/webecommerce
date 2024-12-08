@@ -6,7 +6,6 @@ import { ToastContainer, toast } from "react-toastify";
 import UserInfoForm from "../Profile/UserInforForm";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./CheckoutPage.css";
 
 const CheckoutPage = () => {
   const [userInfo, setUserInfo] = useState(null);
