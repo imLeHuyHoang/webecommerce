@@ -1,14 +1,18 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
-
 COPY package*.json ./
 RUN npm install
-
 COPY . .
 
-# Expose cổng frontend dev (Vite dev server)
+# Build ra static file
+RUN npm run build
+
+# Cài đặt serve (hoặc bạn dùng Nginx)
+RUN npm install -g serve
+
+# Expose port 5173 hoặc 80 tùy ý
 EXPOSE 5173
 
-# Chạy vite dev server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Dùng serve để phục vụ static file ở thư mục dist
+CMD ["serve", "-s", "dist", "-l", "5173"]
