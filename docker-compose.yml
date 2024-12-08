@@ -3,12 +3,12 @@ services:
   backend:
     build:
       context: ./web-backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: backend-dev
     command: nodemon index.js
     volumes:
       - ./web-backend:/app
-      - /app/node_modules
+      - node_modules_backend:/app/node_modules
     ports:
       - "5000:5000"
     env_file:
@@ -17,15 +17,19 @@ services:
   frontend:
     build:
       context: ./web-frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: frontend-dev
-    command: npm run dev -- --host 0.0.0.0
+    command: npm run dev
     volumes:
       - ./web-frontend:/app
-      - /app/node_modules
+      - node_modules_frontend:/app/node_modules
     ports:
       - "5173:5173"
     depends_on:
       - backend
     env_file:
       - ./web-frontend/.env
+
+volumes:
+  node_modules_backend:
+  node_modules_frontend:
