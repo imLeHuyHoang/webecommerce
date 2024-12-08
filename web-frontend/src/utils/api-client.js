@@ -21,6 +21,10 @@ const processQueue = (error, token = null) => {
 
 apiClient.interceptors.request.use(
   (config) => {
+    // Nếu URL không bắt đầu bằng "/api" thì thêm vào
+    if (!config.url.startsWith("/api")) {
+      config.url = `/api${config.url}`;
+    }
     const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

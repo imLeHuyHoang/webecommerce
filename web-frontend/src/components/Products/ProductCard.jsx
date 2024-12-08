@@ -48,10 +48,7 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
         <div className="image-container">
           <Card.Img
             variant="top"
-            src={`${import.meta.env.VITE_API_BASE_URL.replace(
-              "/api",
-              ""
-            )}/products/${image}`}
+            src={`${import.meta.env.VITE_API_BASE_URL}/products/${image}`}
             alt={title}
             onError={(e) => {
               e.target.onerror = null;
@@ -59,6 +56,7 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
             }}
             className="product-image"
           />
+
           {stock === 0 && (
             <Badge bg="danger" className="stock-badge">
               Hết hàng
