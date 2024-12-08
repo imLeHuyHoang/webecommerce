@@ -19,7 +19,7 @@ services:
       context: ./web-frontend
       dockerfile: Dockerfile
     container_name: frontend-dev
-    command: npm run dev
+    command: npm run dev -- --host
     volumes:
       - ./web-frontend:/app
       - node_modules_frontend:/app/node_modules
