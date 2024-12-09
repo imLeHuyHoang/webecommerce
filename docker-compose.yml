@@ -5,9 +5,8 @@ services:
       context: ./web-backend
       dockerfile: Dockerfile
     container_name: backend
-    # Không cần volumes
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     env_file:
       - ./web-backend/.env
 
@@ -16,10 +15,9 @@ services:
       context: ./web-frontend
       dockerfile: Dockerfile
     container_name: frontend
-    # Không cần volumes
-    ports:
-      - "80:80" # Nếu bạn dùng nginx để serve static frontend
     depends_on:
       - backend
+    ports:
+      - "80:80"
     env_file:
       - ./web-frontend/.env
