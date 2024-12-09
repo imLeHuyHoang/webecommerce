@@ -48,10 +48,9 @@ phases:
       - docker push $FRONTEND_REPO_URI:$IMAGE_TAG
       # Tạo file imagedefinitions.json
       - echo "Ghi file imagedefinitions.json..."
-      - printf '[{"name":"web-backend","imageUri":"%s"},{"name":"web-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$IMAGE_TAG $FRONTEND_REPO_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"my-web-backend","imageUri":"%s"},{"name":"my-web-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$IMAGE_TAG $FRONTEND_REPO_URI:$IMAGE_TAG > imagedefinitions.json
       - echo "create imagedefinitions.json file"
       - cat imagedefinitions.json
-      - echo "Build and push completed on $(date)"
 
 artifacts:
   files:
