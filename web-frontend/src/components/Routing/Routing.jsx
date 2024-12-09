@@ -17,7 +17,7 @@ import ProductManagement from "../Admin/ProductManagement.jsx";
 import OrderManagement from "../Admin/OrderManagement.jsx";
 import AdminLogin from "../Admin/adminlogin/AdminLogin";
 import AdminRoute from "../Admin/AdminRoute.jsx";
-import CheckoutPage from "../Cart/checkoutPage.jsx";
+import Checkout from "./../Cart/Checkout.jsx";
 import PaymentResult from "../PaymentResult.jsx";
 import ForgotPassword from "../ForgotPassword/ForgotPassword.jsx";
 import ResetCode from "../ForgotPassword/ResetCode.jsx";
@@ -35,7 +35,7 @@ function Routing() {
       <Route path="/logout" element={<Logout />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/admin-login" element={<AdminLogin />} />
-      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/checkout" element={<Checkout />} />
       <Route path="/payment-result" element={<PaymentResult />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/verify-code" element={<ResetCode />} />
