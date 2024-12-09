@@ -20,7 +20,6 @@ RUN npm run build
 EXPOSE 5173
 
 # Thiết lập biến môi trường NODE_ENV thành production
-ENV NODE_ENV=production
 
 # Khởi động ứng dụng bằng PM2
-CMD ["pm2-runtime", "npm", "", "run", "start" , "--", "--host",]
+CMD ["pm2-runtime", "npm", "", "run", "start"]
