@@ -18,22 +18,19 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Reset error message
+    setError("");
     try {
       const response = await apiClient.post("/user/login", formData);
       const { accessToken, id, user } = response.data;
-
       if (!user) {
         setError("Không nhận được thông tin người dùng từ máy chủ.");
         return;
       }
-
       localStorage.setItem("userId", id);
       login(user, accessToken);
       navigate("/");
       window.location.reload();
     } catch (error) {
-      // **Enhanced Error Handling: Display specific error messages from the backend**
       if (
         error.response &&
         error.response.data &&
@@ -48,22 +45,19 @@ const Login = () => {
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     const { credential } = credentialResponse;
-    setError(""); // Reset error message
+    setError("");
     try {
       const response = await apiClient.post("/user/google-login", {
         credential,
       });
       const { accessToken, user } = response.data;
-
       if (!user) {
         setError("Không nhận được thông tin người dùng từ máy chủ.");
         return;
       }
-
       login(user, accessToken);
       navigate("/");
     } catch (error) {
-      // **Enhanced Error Handling for Google Login**
       if (
         error.response &&
         error.response.data &&
@@ -87,10 +81,8 @@ const Login = () => {
           className="bg-white p-5 rounded shadow-lg w-100 google-login-container"
           style={{ maxWidth: "400px" }}
         >
-          <h5 className="text-center text-login ">Đăng nhập</h5>
-
+          <h5 className="text-center text-login">Đăng nhập</h5>
           {error && <div className="alert alert-danger">{error}</div>}
-
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="email" className="form-label">
@@ -121,7 +113,7 @@ const Login = () => {
               />
             </div>
             <div className="d-flex justify-content-between mb-3">
-              <Link to="#" className="forget-pass">
+              <Link to="/forgot-password" className="forget-pass">
                 Quên mật khẩu?
               </Link>
             </div>
@@ -129,7 +121,6 @@ const Login = () => {
               Đăng nhập
             </button>
           </form>
-
           <div className="text-center my-3">
             <span className="text-muted">hoặc</span>
           </div>
@@ -147,7 +138,6 @@ const Login = () => {
               )}
             />
           </div>
-
           <div className="d-flex justify-content-between two-button">
             <Link to="/signup" className="text-decoration-none">
               Bạn chưa có tài khoản? Đăng ký

@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
+const nodemailer = require("nodemailer");
 
 // Tạo JWT token
 const generateTokens = (user) => {
@@ -462,5 +463,95 @@ exports.deleteUser = async (req, res) => {
     res.status(200).json({ message: "User deleted successfully." });
   } catch (error) {
     res.status(500).json({ message: "Server error." });
+  }
+};
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Email không tồn tại trong hệ thống." });
+    }
+
+    // Tạo code 6 chữ số
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordCode = code;
+    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // Mã hết hạn sau 10 phút
+    await user.save();
+
+    // Gửi email qua nodemailer
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Mã xác thực đặt lại mật khẩu",
+      text: `Mã xác thực của bạn là: ${code}. Mã này sẽ hết hạn sau 10 phút.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: "Mã xác thực đã được gửi tới email." });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+};
+
+exports.verifyResetCode = async (req, res) => {
+  const { email, code } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user || !user.resetPasswordCode) {
+      return res.status(400).json({ message: "Thông tin không hợp lệ." });
+    }
+
+    if (user.resetPasswordCode !== code) {
+      return res.status(400).json({ message: "Mã xác thực không đúng." });
+    }
+
+    if (Date.now() > user.resetPasswordExpires) {
+      return res.status(400).json({ message: "Mã xác thực đã hết hạn." });
+    }
+
+    // Nếu mã đúng và chưa hết hạn:
+    res.json({ message: "Mã xác thực hợp lệ." });
+  } catch (error) {
+    console.error("Verify code error:", error);
+    res.status(500).json({ message: "Lỗi server." });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { email, code, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user || user.resetPasswordCode !== code) {
+      return res.status(400).json({ message: "Thông tin không hợp lệ." });
+    }
+
+    if (Date.now() > user.resetPasswordExpires) {
+      return res.status(400).json({ message: "Mã xác thực đã hết hạn." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    user.password = hashedPassword;
+    user.resetPasswordCode = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Đặt lại mật khẩu thành công." });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Lỗi server." });
   }
 };

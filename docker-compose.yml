@@ -4,11 +4,8 @@ services:
     build:
       context: ./web-backend
       dockerfile: Dockerfile
-    container_name: backend-dev
-    command: node index.js
-    volumes:
-      - ./web-backend:/app
-      - node_modules_backend:/app/node_modules
+    container_name: backend
+    # Không cần volumes
     ports:
       - "5000:5000"
     env_file:
@@ -18,18 +15,11 @@ services:
     build:
       context: ./web-frontend
       dockerfile: Dockerfile
-    container_name: frontend-dev
-    command: npm run start -- --host
-    volumes:
-      - ./web-frontend:/app
-      - node_modules_frontend:/app/node_modules
+    container_name: frontend
+    # Không cần volumes
     ports:
-      - "5173:5173"
+      - "80:80" # Nếu bạn dùng nginx để serve static frontend
     depends_on:
       - backend
     env_file:
       - ./web-frontend/.env
-
-volumes:
-  node_modules_backend:
-  node_modules_frontend:

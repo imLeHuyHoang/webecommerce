@@ -22,7 +22,6 @@ import {
 import "./CartPage.css";
 
 const CartPage = () => {
-  // Khởi tạo cart với products là mảng rỗng để tránh lỗi
   const [cart, setCart] = useState({ products: [] });
   const [loading, setLoading] = useState(false);
   const { updateCart } = useCart();
@@ -48,7 +47,7 @@ const CartPage = () => {
       }
     };
     fetchCart();
-  }, [auth.user]); // Loại bỏ addToast khỏi dependency array
+  }, [auth.user]);
 
   const updateQuantity = async (productId, increment) => {
     try {
@@ -59,9 +58,7 @@ const CartPage = () => {
       }
       const response = await apiClient.get("/cart");
       setCart(response.data);
-      updateCart(); // Update cart count in context
-
-      // Thêm thông báo
+      updateCart();
       addToast("Cập nhật số lượng sản phẩm thành công", "success");
     } catch (error) {
       console.error("Error updating quantity:", error);
@@ -74,9 +71,7 @@ const CartPage = () => {
       await apiClient.delete(`/cart/product/${productId}`);
       const response = await apiClient.get("/cart");
       setCart(response.data);
-      updateCart(); // Update cart count in context
-
-      // Thêm thông báo
+      updateCart();
       addToast("Sản phẩm đã được xóa khỏi giỏ hàng", "success");
     } catch (error) {
       console.error("Error removing item:", error);
@@ -91,8 +86,6 @@ const CartPage = () => {
       });
       setCart(response.data);
       setDiscountError("");
-
-      // Thêm thông báo
       addToast("Áp dụng mã giảm giá thành công", "success");
     } catch (error) {
       console.error("Error applying discount code:", error);
@@ -100,8 +93,6 @@ const CartPage = () => {
         error.response?.data?.message ||
           "Mã giảm giá không hợp lệ hoặc đã hết hạn."
       );
-
-      // Thêm thông báo
       addToast(
         error.response?.data?.message ||
           "Mã giảm giá không hợp lệ hoặc đã hết hạn.",
@@ -115,8 +106,6 @@ const CartPage = () => {
       const response = await apiClient.post("/cart/remove-discount");
       setCart(response.data);
       setDiscountCode("");
-
-      // Thêm thông báo
       addToast("Đã xóa mã giảm giá", "success");
     } catch (error) {
       console.error("Error removing discount code:", error);
@@ -131,14 +120,11 @@ const CartPage = () => {
         discountCode,
       });
       setCart(response.data);
-      // Xóa mã giảm giá sản phẩm trong input
       setProductDiscountCodes((prevCodes) => {
         const newCodes = { ...prevCodes };
         delete newCodes[productId];
         return newCodes;
       });
-
-      // Thêm thông báo
       addToast("Áp dụng mã giảm giá cho sản phẩm thành công", "success");
     } catch (error) {
       console.error("Error applying product discount:", error);
@@ -156,8 +142,6 @@ const CartPage = () => {
         `/cart/product/${productId}/remove-discount`
       );
       setCart(response.data);
-
-      // Thêm thông báo
       addToast("Đã xóa mã giảm giá cho sản phẩm", "success");
     } catch (error) {
       console.error("Error removing product discount:", error);
@@ -187,27 +171,22 @@ const CartPage = () => {
     }
 
     try {
-      // Lấy danh sách sản phẩm và số lượng trong giỏ
       const cartProducts = cart.products.map((item) => ({
         productId: item.product._id,
         quantity: item.quantity,
       }));
 
-      // Kiểm tra tồn kho
       const response = await apiClient.post("/cart/check-stock", {
         products: cartProducts,
       });
 
       if (response.data.message === "Tất cả sản phẩm có sẵn trong kho.") {
-        // Nếu tất cả sản phẩm có sẵn trong kho, chuyển hướng đến trang checkout
         navigate("/checkout", { state: { cartItems: cart.products } });
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        const outOfStockItems = error.response.data.outOfStockItems;
         const nameOfOutOfStockItems = error.response.data.nameOfOutOfStockItems;
-        if (outOfStockItems.length > 0) {
-          // Hiển thị thông báo lỗi nếu có sản phẩm hết hàng
+        if (nameOfOutOfStockItems && nameOfOutOfStockItems.length > 0) {
           addToast(
             `Các sản phẩm ${nameOfOutOfStockItems.join(", ")} đã hết hàng.`,
             "danger"
@@ -223,7 +202,6 @@ const CartPage = () => {
     if (!cart || !cart.products) return 0;
     let totalDiscount = 0;
 
-    // Tính tổng giảm giá của từng sản phẩm
     totalDiscount += cart.products.reduce((total, item) => {
       if (item.discount) {
         const discountAmount = item.discount.isPercentage
@@ -234,7 +212,6 @@ const CartPage = () => {
       return total;
     }, 0);
 
-    // Tính giảm giá của giỏ hàng nếu có
     if (cart.discountCode) {
       const cartTotalBeforeDiscount = cart.products.reduce((total, item) => {
         return total + item.price * item.quantity;
@@ -250,40 +227,45 @@ const CartPage = () => {
   };
 
   return (
-    <div className="cartpage">
-      <Container className="my-5">
-        <Row>
-          {/* Danh sách sản phẩm trong giỏ hàng */}
-          <Col xl={8}>
+    <div className="cart-page">
+      <Container className="cart-container my-5">
+        <Row className="cart-row">
+          <Col xl={8} className="cart-col">
             {loading ? (
-              <div className="text-center" id="loading">
+              <div className="cart-loading text-center" id="loading">
                 <Spinner animation="border" variant="primary" />
               </div>
             ) : !cart || cart.products.length === 0 ? (
-              <div className="text-center" id="empty-cart">
-                <Alert variant="info">Giỏ hàng của bạn đang trống.</Alert>
-                <Button variant="primary" onClick={() => navigate("/product")}>
+              <div className="cart-empty text-center" id="empty-cart">
+                <Alert variant="info" className="cart-empty-alert">
+                  Giỏ hàng của bạn đang trống.
+                </Alert>
+                <Button
+                  variant="primary"
+                  className="cart-continue-button"
+                  onClick={() => navigate("/product")}
+                >
                   <FaArrowLeft /> Tiếp tục mua sắm
                 </Button>
               </div>
             ) : (
               <>
-                <h3 className="mb-4">Giỏ hàng của bạn</h3>
+                <h3 className="cart-heading">Giỏ hàng của bạn</h3>
                 {cart.products.map((item) => {
-                  const discountAmount = item.discount
-                    ? item.discount.isPercentage
-                      ? (item.price * item.discount.value * item.quantity) / 100
-                      : item.discount.value * item.quantity
-                    : 0;
                   return (
                     <Card
                       border="light"
-                      className="mb-4 shadow-sm"
+                      className="cart-product-card"
                       key={item._id}
                     >
-                      <Card.Body>
-                        <Row className="align-items-center">
-                          <Col md={3} sm={4} xs={5}>
+                      <Card.Body className="cart-product-card-body">
+                        <Row className="cart-product-row">
+                          <Col
+                            md={3}
+                            sm={4}
+                            xs={5}
+                            className="cart-product-col"
+                          >
                             <Image
                               src={
                                 item.product.images &&
@@ -297,28 +279,35 @@ const CartPage = () => {
                               alt={item.product.name}
                               fluid
                               rounded
-                              className="product-image"
+                              className="cart-product-image"
                             />
                           </Col>
-                          <Col md={3} sm={8} xs={7}>
-                            <h5 className="product-name">
+                          <Col
+                            md={3}
+                            sm={8}
+                            xs={7}
+                            className="cart-product-col"
+                          >
+                            <h5 className="cart-product-name">
                               {item.product.name}
                             </h5>
-                            <p className="text-muted mb-1">
+                            <p className="cart-product-price">
                               {formatPrice(item.price)}
                             </p>
                             {item.discount && (
-                              <Badge bg="success">
+                              <Badge
+                                bg="success"
+                                className="cart-product-discount-badge"
+                              >
                                 Giảm {item.discount.value}
                                 {item.discount.isPercentage ? "%" : "₫"}
                               </Badge>
                             )}
                           </Col>
-                          <Col md={3} className="d-none d-md-block">
-                            <InputGroup className="quantity">
-                              {/* Nút giảm */}
+                          <Col md={3} className="cart-product-col">
+                            <div className="cart-quantity-container">
                               <button
-                                className=" button-minus"
+                                className="cart-quantity-button"
                                 onClick={() =>
                                   updateQuantity(item.product._id, -1)
                                 }
@@ -326,13 +315,11 @@ const CartPage = () => {
                               >
                                 -
                               </button>
-
-                              {/* Ô input hiển thị số lượng */}
-                              <p className="text-quantity">{item.quantity}</p>
-
-                              {/* Nút tăng */}
+                              <p className="cart-quantity-display">
+                                {item.quantity}
+                              </p>
                               <button
-                                className=" button-plus"
+                                className="cart-quantity-button"
                                 onClick={() =>
                                   updateQuantity(item.product._id, 1)
                                 }
@@ -340,33 +327,38 @@ const CartPage = () => {
                               >
                                 +
                               </button>
-                            </InputGroup>
+                            </div>
                           </Col>
-
-                          <Col md={2} className="d-none d-md-block text-end">
-                            <h5>{formatPrice(item.totalPrice)}</h5>
+                          <Col md={2} className="cart-product-col">
+                            <h5 className="cart-product-totalprice">
+                              {formatPrice(item.totalPrice)}
+                            </h5>
                           </Col>
-                          <Col md={1} className="text-end">
+                          <Col md={1} className="cart-product-col">
                             <Button
                               variant="danger"
                               size="sm"
+                              className="cart-remove-button"
                               onClick={() => removeItem(item.product._id)}
                             >
                               <FaTrashAlt />
                             </Button>
                           </Col>
                         </Row>
-                        {/* Tùy chọn giảm giá sản phẩm */}
-                        <Row className="mt-3">
+                        <Row className="cart-product-discount-row">
                           <Col md={6} sm={12}>
                             {item.discount ? (
-                              <div className="d-flex align-items-center">
-                                <Badge bg="info" className="me-2">
+                              <div className="cart-product-discount-applied">
+                                <Badge
+                                  bg="info"
+                                  className="cart-product-discount-code-badge"
+                                >
                                   Mã giảm giá: {item.discount.code}
                                 </Badge>
                                 <Button
                                   variant="outline-danger"
                                   size="sm"
+                                  className="cart-product-discount-remove-button"
                                   onClick={() =>
                                     removeProductDiscount(item.product._id)
                                   }
@@ -375,10 +367,11 @@ const CartPage = () => {
                                 </Button>
                               </div>
                             ) : (
-                              <InputGroup className="mb-3">
+                              <InputGroup className="cart-product-discount-group">
                                 <Form.Control
                                   type="text"
                                   placeholder="Nhập mã giảm giá"
+                                  className="cart-product-discount-input"
                                   value={
                                     productDiscountCodes[item.product._id] || ""
                                   }
@@ -391,6 +384,7 @@ const CartPage = () => {
                                 />
                                 <Button
                                   variant="success"
+                                  className="cart-product-discount-apply-button"
                                   onClick={() =>
                                     applyProductDiscount(
                                       item.product._id,
@@ -412,60 +406,69 @@ const CartPage = () => {
             )}
           </Col>
 
-          {/* Tóm tắt đơn hàng */}
-          <Col xl={4}>
-            <Card border="light" className="shadow-sm">
-              <Card.Header className="bg-transparent border-bottom">
-                <h4>Tóm tắt đơn hàng</h4>
+          <Col xl={4} className="cart-col">
+            <Card border="light" className="cart-summary-card">
+              <Card.Header className="cart-summary-header">
+                <h4 className="cart-summary-heading">Tóm tắt đơn hàng</h4>
               </Card.Header>
-              <Card.Body>
+              <Card.Body className="cart-summary-body">
                 {cart && cart.products.length > 0 && (
                   <>
-                    <Row className="mb-2">
-                      <Col>Thành tiền:</Col>
-                      <Col className="text-end">
+                    <Row className="cart-summary-row">
+                      <Col className="cart-summary-label">Thành tiền:</Col>
+                      <Col className="cart-summary-value text-end">
                         {formatPrice(getTotalPrice())}
                       </Col>
                     </Row>
-                    <Row className="mb-2">
-                      <Col>Giảm giá:</Col>
-                      <Col className="text-end">
+                    <Row className="cart-summary-row">
+                      <Col className="cart-summary-label">Giảm giá:</Col>
+                      <Col className="cart-summary-value text-end">
                         {formatPrice(getTotalDiscount())}
                       </Col>
                     </Row>
                     <hr />
-                    <Row className="mb-3">
-                      <Col>
+                    <Row className="cart-summary-row cart-summary-total-row">
+                      <Col className="cart-summary-total-label">
                         <strong>Tổng tiền thanh toán:</strong>
                       </Col>
-                      <Col className="text-end">
+                      <Col className="cart-summary-total-value text-end">
                         <strong>
                           {formatPrice(getTotalPrice() - getTotalDiscount())}
                         </strong>
                       </Col>
                     </Row>
-                    {/* Mã giảm giá toàn bộ giỏ hàng */}
-                    <Form.Group className="mb-3">
-                      <Form.Label>Mã giảm giá toàn bộ giỏ hàng</Form.Label>
-                      <InputGroup>
+                    <Form.Group className="cart-discount-section">
+                      <Form.Label className="cart-discount-label">
+                        Mã giảm giá toàn bộ giỏ hàng
+                      </Form.Label>
+                      <InputGroup className="cart-discount-input-group">
                         <Form.Control
                           type="text"
                           placeholder="Nhập mã giảm giá"
+                          className="cart-discount-input"
                           value={discountCode}
                           onChange={(e) => setDiscountCode(e.target.value)}
                         />
-                        <Button variant="primary" onClick={applyCartDiscount}>
+                        <Button
+                          variant="primary"
+                          className="cart-discount-apply-button"
+                          onClick={applyCartDiscount}
+                        >
                           Áp dụng
                         </Button>
                       </InputGroup>
                       {cart.discountCode && (
-                        <div className="mt-2 d-flex align-items-center">
-                          <Badge bg="success" className="me-2">
+                        <div className="cart-discount-applied">
+                          <Badge
+                            bg="success"
+                            className="cart-discount-code-badge me-2"
+                          >
                             {cart.discountCode.code}
                           </Badge>
                           <Button
                             variant="outline-danger"
                             size="sm"
+                            className="cart-discount-remove-button"
                             onClick={removeCartDiscount}
                           >
                             Xóa
@@ -473,18 +476,19 @@ const CartPage = () => {
                         </div>
                       )}
                       {discountError && (
-                        <Alert variant="danger" className="mt-2">
+                        <Alert variant="danger" className="cart-discount-error">
                           {discountError}
                         </Alert>
                       )}
                     </Form.Group>
-                    <div className="d-grid gap-2">
+                    <div className="cart-checkout-section">
                       <Button
                         variant="success"
                         size="lg"
+                        className="cart-checkout-button"
                         onClick={handleProceedToCheckout}
                       >
-                        <FaCartArrowDown className="me-2" />
+                        <FaCartArrowDown className="cart-checkout-icon" />
                         Thanh toán
                       </Button>
                     </div>

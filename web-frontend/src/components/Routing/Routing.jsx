@@ -19,7 +19,9 @@ import AdminLogin from "../Admin/adminlogin/AdminLogin";
 import AdminRoute from "../Admin/AdminRoute.jsx";
 import CheckoutPage from "../Cart/checkoutPage.jsx";
 import PaymentResult from "../PaymentResult.jsx";
-
+import ForgotPassword from "../ForgotPassword/ForgotPassword.jsx";
+import ResetCode from "../ForgotPassword/ResetCode.jsx";
+import ResetPassword from "../ForgotPassword/ResetPassword.jsx";
 function Routing() {
   return (
     <Routes>
@@ -35,6 +37,9 @@ function Routing() {
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/payment-result" element={<PaymentResult />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/verify-code" element={<ResetCode />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Các route cho admin */}
       <Route path="/admin" element={<AdminRoute />}>

@@ -1,202 +1,124 @@
-/* General Sidebar Container */
-.product-sidebar {
-  background-color: #ffffff;
+.product-sidebar-container {
+  background: #fff;
   padding: 20px;
-  border-radius: 8px; /* Softly rounded corners */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  border-right: 1px solid #ddd;
+  transition: transform 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 250px;
+  z-index: 1050;
+  transform: translateX(-100%);
   overflow-y: auto;
-  max-height: 100vh;
 }
-
-/* Show Filters Animation */
-.product-sidebar.show {
+.product-sidebar-container.show {
   transform: translateX(0);
-  opacity: 1;
 }
 
-@media (max-width: 768px) {
-  .product-sidebar {
-    transform: translateX(-100%);
-    opacity: 0;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 80%;
-    height: 100%;
-    z-index: 1000;
-  }
+.product-sidebar-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 
-/* Sidebar Titles */
-.sidebar-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #343a40;
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 5px;
+.product-sidebar-error-alert {
+  margin-bottom: 20px;
 }
 
-/* Categories List */
-.product-sidebar .list-group-item {
-  border: none;
-  border-radius: 5px;
-  margin-bottom: 8px;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+.product-sidebar-category-list {
+  margin-bottom: 20px;
+}
+
+.product-sidebar-category-item {
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.product-sidebar .list-group-item:hover {
-  background-color: #f8f9fa;
-  transform: translateY(-2px); /* Slight lift on hover */
-}
-
-.product-sidebar .list-group-item.active {
-  background-color: #007bff;
-  border-color: #007bff;
-  color: #ffffff;
-}
-
-.category-image {
-  border-radius: 50%; /* Circular images */
+.product-sidebar-category-image {
+  border-radius: 50%;
   object-fit: cover;
 }
 
-/* Selected Category Display */
-.selected-category {
-  background-color: #e9ecef;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
+.product-sidebar-no-category {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #999;
 }
 
-.selected-category strong {
-  color: #007bff;
+.product-sidebar-selected-category {
+  font-size: 0.9rem;
+  color: #333;
 }
 
-/* Filters Section */
-.filters {
-  margin-top: 20px;
+.product-sidebar-filters {
+  margin-top: 30px;
 }
 
-.filters .form-group {
+.product-sidebar-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.product-sidebar-input {
+  font-size: 0.9rem;
+}
+
+.product-sidebar-button {
+  font-size: 0.9rem;
+}
+
+.product-sidebar-select {
+  font-size: 0.9rem;
+}
+
+.product-sidebar-form {
   margin-bottom: 15px;
 }
 
-.filters .form-label {
-  font-weight: 500;
-  color: #495057;
+.product-sidebar-form-group {
+  margin-bottom: 15px;
 }
 
-.filters .form-control,
-.filters .form-select {
-  border-radius: 5px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+/* Nút mở sidebar trên di động */
+.product-sidebar-filter-toggle-button {
+  font-size: 1rem;
+  margin-bottom: 10px;
 }
 
-.filters .form-control:focus,
-.filters .form-select:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-/* Buttons */
-.filters .btn {
-  border-radius: 5px;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.filters .btn:hover {
-  background-color: #0056b3;
-  transform: translateY(-1px);
-}
-
-/* Search and Brand Forms */
-.filters form {
-  margin-bottom: 20px;
-}
-.filter-toggle-button {
-  display: none; /* Ẩn mặc định trên màn hình lớn */
+/* Overlay cho sidebar trên di động */
+.product-sidebar-overlay {
   position: fixed;
-  top: 90px;
-  right: 5px;
-  background-color: #007bff;
-  color: #ffffff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 25px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1100; /* Đảm bảo nằm trên sidebar */
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+.product-sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
-.filter-toggle-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
-/* Selected Category Responsiveness */
-@media (max-width: 768px) {
-  /* Hiển thị nút Bộ lọc trên thiết bị di động */
-  .filter-toggle-button {
-    display: block;
-  }
-
-  /* Sidebar trên thiết bị di động */
-  .product-sidebar {
-    transform: translateX(-100%);
-    opacity: 0;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 80%;
-    height: 100%;
-    z-index: 1000;
-    background-color: #ffffff;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-
-  .product-sidebar.show {
+/* Ẩn sidebar trên màn hình lớn */
+@media (min-width: 768px) {
+  .product-sidebar-container {
+    position: static;
     transform: translateX(0);
-    opacity: 1;
-  }
-
-  /* Overlay khi sidebar mở */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
+    height: auto;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 900;
-    transition: opacity 0.3s ease;
+    border-right: none;
   }
-
-  .sidebar-overlay.active {
-    display: block;
-    opacity: 1;
+  .product-sidebar-overlay {
+    display: none;
   }
-}
-
-/* Scrollbar Styling (Optional) */
-.product-sidebar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.product-sidebar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.product-sidebar::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-.product-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  .product-sidebar-filter-toggle-button {
+    display: none;
+  }
 }

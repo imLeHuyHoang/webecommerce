@@ -1,5 +1,4 @@
-// src/components/UserInfoForm.jsx
-
+// src/components/Profile/UserInfoForm.jsx
 import React from "react";
 
 const UserInfoForm = ({ formData, setFormData }) => {
@@ -13,14 +12,13 @@ const UserInfoForm = ({ formData, setFormData }) => {
 
   return (
     <>
-      {/* Các trường thông tin người dùng */}
       <div className="form-group">
         <label>Họ tên</label>
         <input
           type="text"
           className="form-control"
           name="name"
-          value={formData.name}
+          value={formData.name || ""}
           onChange={handleChange}
           required
         />
@@ -31,7 +29,7 @@ const UserInfoForm = ({ formData, setFormData }) => {
           type="text"
           className="form-control"
           name="phone"
-          value={formData.phone}
+          value={formData.phone || ""}
           onChange={handleChange}
           required
         />
@@ -41,7 +39,7 @@ const UserInfoForm = ({ formData, setFormData }) => {
         <select
           className="form-control"
           name="gender"
-          value={formData.gender}
+          value={formData.gender || ""}
           onChange={handleChange}
           required
         >

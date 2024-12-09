@@ -1,3 +1,4 @@
+// src/models/User.js
 const mongoose = require("mongoose");
 
 const addressSchema = new mongoose.Schema({
@@ -12,11 +13,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  phone: [
-    {
-      type: String,
-    },
-  ],
+  phone: [{ type: String }],
   gender: {
     type: String,
     enum: ["male", "female", "other"],
@@ -29,6 +26,10 @@ const userSchema = new mongoose.Schema({
   refreshToken: { type: String, default: null },
   createAt: { type: Date, default: Date.now },
   updateAt: { type: Date, default: Date.now },
+
+  // Thêm hai trường phục vụ chức năng quên mật khẩu:
+  resetPasswordCode: { type: String },
+  resetPasswordExpires: { type: Date },
 });
 
 module.exports = mongoose.model("User", userSchema);

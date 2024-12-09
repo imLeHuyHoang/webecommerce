@@ -67,18 +67,15 @@ function ProductSidebar({
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     onFilterChange("search", searchTerm);
-    // Đóng sidebar trên thiết bị di động sau khi áp dụng bộ lọc
     setIsSidebarVisible(false);
   };
 
   const handleBrandSubmit = (e) => {
     e.preventDefault();
     onFilterChange("brand", brand);
-    // Đóng sidebar trên thiết bị di động sau khi áp dụng bộ lọc
     setIsSidebarVisible(false);
   };
 
-  // Hàm để đóng sidebar khi nhấn vào overlay
   const handleCloseSidebar = () => {
     setIsSidebarVisible(false);
   };
@@ -87,7 +84,7 @@ function ProductSidebar({
     <>
       {/* Nút Bộ lọc chỉ hiển thị trên thiết bị di động */}
       <Button
-        className="filter-toggle-button d-md-none"
+        className="product-sidebar-filter-toggle-button d-md-none"
         onClick={() => setIsSidebarVisible(true)}
       >
         Bộ lọc
@@ -95,20 +92,26 @@ function ProductSidebar({
 
       {/* Overlay khi sidebar mở trên thiết bị di động */}
       <div
-        className={`sidebar-overlay ${isSidebarVisible ? "active" : ""}`}
+        className={`product-sidebar-overlay ${
+          isSidebarVisible ? "active" : ""
+        }`}
         onClick={handleCloseSidebar}
       ></div>
 
       <div
-        className={`product-sidebar ${showFilters ? "show" : ""} ${
+        className={`product-sidebar-container ${showFilters ? "show" : ""} ${
           isSidebarVisible ? "show" : ""
         }`}
       >
         {/* Categories */}
-        <h4 className="sidebar-title">Danh mục</h4>
-        {error && <Alert variant="danger">{error}</Alert>}
+        <h4 className="product-sidebar-title">Danh mục</h4>
+        {error && (
+          <Alert variant="danger" className="product-sidebar-error-alert">
+            {error}
+          </Alert>
+        )}
         {loading ? (
-          <ListGroup>
+          <ListGroup className="product-sidebar-category-list">
             {Array(5)
               .fill(0)
               .map((_, index) => (
@@ -116,7 +119,7 @@ function ProductSidebar({
               ))}
           </ListGroup>
         ) : (
-          <ListGroup>
+          <ListGroup className="product-sidebar-category-list">
             {categories.length > 0 ? (
               categories.map((cat) => (
                 <ListGroup.Item
@@ -124,7 +127,7 @@ function ProductSidebar({
                   action
                   active={selectedCategory === cat.name}
                   onClick={() => handleCategoryClick(cat.name)}
-                  className="d-flex align-items-center"
+                  className="product-sidebar-category-item d-flex align-items-center"
                 >
                   <img
                     src={`${import.meta.env.VITE_API_BASE_URL.replace(
@@ -132,7 +135,7 @@ function ProductSidebar({
                       ""
                     )}/category/${cat.images[0]}`}
                     alt={cat.name}
-                    className="category-image me-2"
+                    className="product-sidebar-category-image me-2"
                     width="20"
                     height="20"
                   />
@@ -140,34 +143,46 @@ function ProductSidebar({
                 </ListGroup.Item>
               ))
             ) : (
-              <p>Không có danh mục nào.</p>
+              <p className="product-sidebar-no-category">
+                Không có danh mục nào.
+              </p>
             )}
           </ListGroup>
         )}
 
         {/* Selected Category */}
         {selectedCategory && (
-          <p className="selected-category mt-3">
+          <p className="product-sidebar-selected-category mt-3">
             Bạn đang ở danh mục: <strong>{selectedCategory}</strong>
           </p>
         )}
 
         {/* Filters */}
-        <div className="filters mt-4">
-          <h4 className="sidebar-title">Bộ lọc</h4>
+        <div className="product-sidebar-filters mt-4">
+          <h4 className="product-sidebar-title">Bộ lọc</h4>
 
           {/* Search Filter */}
-          <Form onSubmit={handleSearchSubmit} className="mb-3">
+          <Form
+            onSubmit={handleSearchSubmit}
+            className="mb-3 product-sidebar-form"
+          >
             <Form.Group controlId="search">
-              <Form.Label>Tìm kiếm</Form.Label>
+              <Form.Label className="product-sidebar-label">
+                Tìm kiếm
+              </Form.Label>
               <InputGroup>
                 <Form.Control
                   type="text"
                   placeholder="Nhập từ khóa..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  className="product-sidebar-input"
                 />
-                <Button variant="outline-secondary" type="submit">
+                <Button
+                  variant="outline-secondary"
+                  type="submit"
+                  className="product-sidebar-button"
+                >
                   Tìm
                 </Button>
               </InputGroup>
@@ -175,17 +190,27 @@ function ProductSidebar({
           </Form>
 
           {/* Brand Filter */}
-          <Form onSubmit={handleBrandSubmit} className="mb-3">
+          <Form
+            onSubmit={handleBrandSubmit}
+            className="mb-3 product-sidebar-form"
+          >
             <Form.Group controlId="brand">
-              <Form.Label>Thương hiệu</Form.Label>
+              <Form.Label className="product-sidebar-label">
+                Thương hiệu
+              </Form.Label>
               <InputGroup>
                 <Form.Control
                   type="text"
                   placeholder="Nhập thương hiệu..."
                   value={brand}
                   onChange={(e) => setBrand(e.target.value)}
+                  className="product-sidebar-input"
                 />
-                <Button variant="outline-secondary" type="submit">
+                <Button
+                  variant="outline-secondary"
+                  type="submit"
+                  className="product-sidebar-button"
+                >
                   Áp dụng
                 </Button>
               </InputGroup>
@@ -193,16 +218,21 @@ function ProductSidebar({
           </Form>
 
           {/* Price Range Filter */}
-          <Form.Group controlId="price" className="mb-3">
-            <Form.Label>Khoảng giá</Form.Label>
+          <Form.Group
+            controlId="price"
+            className="mb-3 product-sidebar-form-group"
+          >
+            <Form.Label className="product-sidebar-label">
+              Khoảng giá
+            </Form.Label>
             <Form.Select
               value={priceRange}
               onChange={(e) => {
                 setPriceRange(e.target.value);
                 onFilterChange("price", e.target.value);
-                // Đóng sidebar trên thiết bị di động khi thay đổi bộ lọc
                 setIsSidebarVisible(false);
               }}
+              className="product-sidebar-select"
             >
               <option value="">Tất cả</option>
               <option value="0-5000000">Dưới 5 triệu</option>
@@ -213,16 +243,19 @@ function ProductSidebar({
           </Form.Group>
 
           {/* Rating Filter */}
-          <Form.Group controlId="rating" className="mb-3">
-            <Form.Label>Đánh giá</Form.Label>
+          <Form.Group
+            controlId="rating"
+            className="mb-3 product-sidebar-form-group"
+          >
+            <Form.Label className="product-sidebar-label">Đánh giá</Form.Label>
             <Form.Select
               value={rating}
               onChange={(e) => {
                 setRating(e.target.value);
                 onFilterChange("rating", e.target.value);
-                // Đóng sidebar trên thiết bị di động khi thay đổi bộ lọc
                 setIsSidebarVisible(false);
               }}
+              className="product-sidebar-select"
             >
               <option value="">Tất cả</option>
               <option value="4">4 sao trở lên</option>

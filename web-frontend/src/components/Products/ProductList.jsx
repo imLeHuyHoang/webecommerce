@@ -50,7 +50,7 @@ function ProductList({ filters }) {
 
   if (loading) {
     return (
-      <div className="text-center my-5">
+      <div className="product-list-loading text-center my-5">
         <Spinner animation="border" variant="primary" />
       </div>
     );
@@ -58,21 +58,27 @@ function ProductList({ filters }) {
 
   if (error) {
     return (
-      <Container className="my-5">
-        <Alert variant="danger">{error}</Alert>
+      <Container className="product-list-error-container my-5">
+        <Alert variant="danger" className="product-list-error-alert">
+          {error}
+        </Alert>
       </Container>
     );
   }
-  console.log(currentProducts);
 
   return (
-    <section className="product-list ">
-      <Container>
+    <section className="product-list-section">
+      <Container className="product-list-container">
         {currentProducts.length > 0 ? (
           <>
-            <Row>
+            <Row className="product-list-row">
               {currentProducts.map((product) => (
-                <Col key={product._id} md={4} lg={3} className="mb-4">
+                <Col
+                  key={product._id}
+                  md={4}
+                  lg={3}
+                  className="product-list-col mb-4"
+                >
                   <ProductCard
                     id={product._id}
                     title={product.name}
@@ -87,7 +93,7 @@ function ProductList({ filters }) {
             </Row>
 
             {totalPages > 1 && (
-              <div className="d-flex justify-content-center">
+              <div className="product-list-pagination d-flex justify-content-center">
                 <Pagination>
                   <Pagination.First
                     onClick={() => handlePageChange(1)}
@@ -119,7 +125,9 @@ function ProductList({ filters }) {
             )}
           </>
         ) : (
-          <p className="text-center">Không có sản phẩm nào.</p>
+          <p className="product-list-empty text-center">
+            Không có sản phẩm nào.
+          </p>
         )}
       </Container>
     </section>

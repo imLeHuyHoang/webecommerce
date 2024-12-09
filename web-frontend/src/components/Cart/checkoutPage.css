@@ -1,0 +1,167 @@
+.checkout-page-section {
+  background: #f8f9fa;
+  padding: 30px 0;
+}
+
+.checkout-page-container {
+  background: #fff;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.checkout-page-row {
+  margin: 0;
+}
+
+.checkout-page-col-left,
+.checkout-page-col-right {
+  margin-bottom: 20px;
+}
+
+/* Heading */
+.checkout-page-heading {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* User Info Card */
+.checkout-page-user-card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.checkout-page-user-card-body {
+  padding: 20px;
+}
+
+.checkout-page-userinfo-form-section p {
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.checkout-page-userinfo-name,
+.checkout-page-userinfo-phone,
+.checkout-page-userinfo-address {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.checkout-page-userinfo-edit-btn {
+  font-size: 0.9rem;
+  padding: 0;
+}
+
+/* Address Editing */
+.checkout-page-address-edit-btn,
+.checkout-page-add-address-btn,
+.checkout-page-new-address-btn,
+.checkout-page-save-address-btn,
+.checkout-page-cancel-address-btn {
+  font-size: 0.9rem;
+}
+
+.checkout-page-address-select-label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.checkout-page-address-select {
+  font-size: 0.9rem;
+}
+
+.checkout-page-new-address-form {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.checkout-page-no-address-alert {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Payment Method Card */
+.checkout-page-payment-card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.checkout-page-payment-card-body {
+  padding: 20px;
+}
+
+.checkout-page-payment-method-group label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.checkout-page-payment-select {
+  font-size: 0.9rem;
+}
+
+/* Order Information */
+.checkout-page-order-card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.checkout-page-order-card-body {
+  padding: 20px;
+}
+
+.checkout-page-order-header strong {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.checkout-page-order-item {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.checkout-page-empty-cart {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* Order Total Card */
+.checkout-page-total-card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.checkout-page-total-card-body {
+  padding: 20px;
+}
+
+.checkout-page-total-text {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Place Order Button */
+.checkout-page-placeorder-btn {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Loading State */
+.checkout-page-loading-container {
+  text-align: center;
+}
+
+.checkout-page-loading-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.checkout-page-loading-text {
+  font-size: 1rem;
+  color: #666;
+}

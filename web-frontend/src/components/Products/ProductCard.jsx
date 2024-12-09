@@ -29,12 +29,8 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
     }
   };
 
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-  };
+  const formatPrice = (price) =>
+    price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
   const renderTooltip = (props) => (
     <Tooltip id={`tooltip-${id}`} {...props}>
@@ -43,9 +39,12 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
   );
 
   return (
-    <Card className="product-card h-100 shadow-sm">
-      <NavLink to={`/product/${id}`} className="text-decoration-none">
-        <div className="image-container">
+    <Card className="product-card-container h-100 shadow-sm">
+      <NavLink
+        to={`/product/${id}`}
+        className="text-decoration-none product-card-link"
+      >
+        <div className="product-card-image-container">
           <Card.Img
             variant="top"
             src={`${import.meta.env.VITE_API_BASE_URL}/products/${image}`}
@@ -54,34 +53,35 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
               e.target.onerror = null;
               e.target.src = "/images/default-image.png";
             }}
-            className="product-image"
+            className="product-card-image"
           />
-
           {stock === 0 && (
-            <Badge bg="danger" className="stock-badge">
+            <Badge bg="danger" className="product-card-stock-badge">
               Hết hàng
             </Badge>
           )}
         </div>
       </NavLink>
-      <Card.Body className="d-flex flex-column">
-        <Card.Title className="product-title">{title}</Card.Title>
-        <Card.Text className="product-price">{formatPrice(price)}</Card.Text>
-        <Card.Text className="product-stock">
+      <Card.Body className="d-flex flex-column product-card-body">
+        <Card.Title className="product-card-title">{title}</Card.Title>
+        <Card.Text className="product-card-price">
+          {formatPrice(price)}
+        </Card.Text>
+        <Card.Text className="product-card-stock">
           {stock > 0 ? `Còn ${stock} sản phẩm` : "Hết hàng"}
         </Card.Text>
 
-        <div className="product-rating mb-2">
+        <div className="product-card-rating mb-2">
           {Array.from({ length: 5 }, (_, i) => (
             <i
               key={i}
-              className={`fas fa-star${
-                i < Math.round(rating) ? "" : "-half-alt"
-              } text-warning`}
+              className={`fas ${
+                i < Math.round(rating) ? "fa-star" : "fa-star-half-alt"
+              } text-warning product-card-star-icon`}
             ></i>
           ))}
-          <span className="ms-2">
-            ({rating.toFixed(1)}-{reviewCount} đánh giá)
+          <span className="ms-2 product-card-review-count">
+            ({rating.toFixed(1)} - {reviewCount} đánh giá)
           </span>
         </div>
         <OverlayTrigger placement="top" overlay={renderTooltip}>
@@ -89,7 +89,7 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
             variant={stock > 0 ? "primary" : "secondary"}
             onClick={addToCart}
             disabled={stock === 0}
-            className="mt-auto add-to-cart-btn"
+            className="mt-auto product-card-add-to-cart-btn"
           >
             {stock > 0 ? "Thêm vào giỏ hàng" : "Hết hàng"}
           </Button>

@@ -15,6 +15,9 @@ const {
   getAllUsers,
   createUserByAdmin,
   updateUserByAdmin,
+  forgotPassword,
+  verifyResetCode,
+  resetPassword,
 } = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/auth");
@@ -25,6 +28,11 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/google-login", googleLogin);
 router.post("/loginadmin", loginUserAdmin);
+
+// Forgot password flow
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-code", verifyResetCode);
+router.post("/reset-password", resetPassword);
 
 // Protected routes
 router.get("/profile", verifyToken, getProfile);
