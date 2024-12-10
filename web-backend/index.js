@@ -12,8 +12,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    // cho phép cors từ tất cả các domain
-    origin: ["http://localhost:5173"],
+    origin: ["http://54.169.183.168:5173"],
 
     credentials: true, // Cho phép gửi cookies
   })
