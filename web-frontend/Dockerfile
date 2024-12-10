@@ -16,4 +16,8 @@ COPY . .
 # Build ứng dụng React (tạo thư mục dist/ với các file tĩnh)
 RUN npm run build
 
-CMD [ "pm2","start", "serve", "--name", "react-app", "--", "-s", "dist", "-l", "5173"]
+# Expose cổng để phục vụ ứng dụng React
+EXPOSE 5173
+
+# Sử dụng PM2 để phục vụ ứng dụng React
+CMD ["pm2", "start", "serve", "--name", "react-app", "--", "-s", "dist", "-l", "5173"]
