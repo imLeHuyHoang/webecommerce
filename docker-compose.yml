@@ -1,29 +1,35 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  backend:
-    build: ./backend
-    image: my-backend-image
-    container_name: backend
-    expose:
-      - "5000"
-    depends_on:
-      - frontend
+  web-backend:
+    build:
+      context: ./web-backend
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - web-network
 
-  frontend:
-    build: ./frontend
-    image: my-frontend-image
-    container_name: frontend
-    expose:
-      - "5173"
+  web-frontend:
+    build:
+      context: ./web-frontend
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - web-network
 
   nginx:
-    image: nginx:alpine
-    container_name: nginx
-    depends_on:
-      - frontend
-      - backend
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
     ports:
       - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: always
+    depends_on:
+      - web-frontend
+      - web-backend
+    networks:
+      - web-network
+
+networks:
+  web-network:
+    driver: bridge
