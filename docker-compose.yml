@@ -1,35 +1,22 @@
-version: "3.8"
-
 services:
-  web-backend:
-    build:
-      context: ./web-backend
-      dockerfile: Dockerfile
-    restart: always
-    networks:
-      - web-network
-
-  web-frontend:
+  frontend:
     build:
       context: ./web-frontend
       dockerfile: Dockerfile
-    restart: always
+    ports:
+      - "5173:5173"
     networks:
-      - web-network
+      - app-network
 
-  nginx:
+  backend:
     build:
-      context: ./nginx
+      context: ./web-backend
       dockerfile: Dockerfile
     ports:
-      - "80:80"
-    restart: always
-    depends_on:
-      - web-frontend
-      - web-backend
+      - "5000:5000"
     networks:
-      - web-network
+      - app-network
 
 networks:
-  web-network:
+  app-network:
     driver: bridge
