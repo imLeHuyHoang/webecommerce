@@ -9,10 +9,11 @@ const cronJobs = require("./services/cronJobs");
 
 const app = express();
 const PORT = process.env.PORT;
+const corsOrigin = process.env.corsOrigin;
 
 app.use(
   cors({
-    origin: ["http://54.169.183.168:5173", "http://localhost:5173"],
+    origin: corsOrigin,
     credentials: true,
   })
 );
