@@ -64,6 +64,10 @@ function Footer() {
               <li>
                 <i className="fas fa-print mr-3"></i> +123 456 789
               </li>
+              <li>
+                <i className="fas fa-clock mr-3"></i> Mon - Fri 8:00 AM to 5:00
+                PM
+              </li>
             </ul>
           </div>
 
