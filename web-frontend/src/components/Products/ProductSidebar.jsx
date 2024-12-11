@@ -21,7 +21,7 @@ function ProductSidebar({
   const [priceRange, setPriceRange] = useState("");
   const [rating, setRating] = useState("");
 
-  // State for selected category
+  // State for selected category (store category _id)
   const [selectedCategory, setSelectedCategory] = useState(
     filters.category || ""
   );
@@ -51,16 +51,16 @@ function ProductSidebar({
     setSelectedCategory(filters.category || "");
   }, [filters]);
 
-  const handleCategoryClick = (categoryName) => {
-    if (selectedCategory === categoryName) {
+  const handleCategoryClick = (categoryId) => {
+    if (selectedCategory === categoryId) {
       // Deselect if the same category is clicked
       setSelectedCategory("");
       onCategoryChange("");
       onFilterChange("category", "");
     } else {
-      setSelectedCategory(categoryName);
-      onCategoryChange(categoryName);
-      onFilterChange("category", categoryName);
+      setSelectedCategory(categoryId);
+      onCategoryChange(categoryId);
+      onFilterChange("category", categoryId);
     }
   };
 
@@ -79,6 +79,14 @@ function ProductSidebar({
   const handleCloseSidebar = () => {
     setIsSidebarVisible(false);
   };
+
+  // Tìm tên danh mục từ selectedCategory (nếu có)
+  const selectedCategoryObj = categories.find(
+    (cat) => cat._id === selectedCategory
+  );
+  const selectedCategoryName = selectedCategoryObj
+    ? selectedCategoryObj.name
+    : "";
 
   return (
     <>
@@ -125,8 +133,8 @@ function ProductSidebar({
                 <ListGroup.Item
                   key={cat._id}
                   action
-                  active={selectedCategory === cat.name}
-                  onClick={() => handleCategoryClick(cat.name)}
+                  active={selectedCategory === cat._id}
+                  onClick={() => handleCategoryClick(cat._id)}
                   className="product-sidebar-category-item d-flex align-items-center"
                 >
                   <img
@@ -151,9 +159,9 @@ function ProductSidebar({
         )}
 
         {/* Selected Category */}
-        {selectedCategory && (
+        {selectedCategoryName && (
           <p className="product-sidebar-selected-category mt-3">
-            Bạn đang ở danh mục: <strong>{selectedCategory}</strong>
+            Bạn đang ở danh mục: <strong>{selectedCategoryName}</strong>
           </p>
         )}
 

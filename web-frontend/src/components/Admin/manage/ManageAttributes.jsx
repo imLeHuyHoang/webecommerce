@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import { z } from "zod";
 import ToastNotification from "../../ToastNotification/ToastNotification";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const attributeSchema = z.object({
   key: z.string().min(1, "Attribute key is required"),
@@ -30,7 +28,7 @@ const ManageAttributes = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/category`);
+      const response = await apiClient.get("/category");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -48,8 +46,8 @@ const ManageAttributes = () => {
 
   const fetchAttributes = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/attributes/category/${selectedCategoryId}`
+      const response = await apiClient.get(
+        `/attributes/category/${selectedCategoryId}`
       );
       setAttributes(response.data || []);
     } catch (error) {
@@ -73,7 +71,7 @@ const ManageAttributes = () => {
     if (!window.confirm("Are you sure you want to delete this attribute?"))
       return;
     try {
-      await axios.delete(`${API_BASE_URL}/attributes/${attributeId}`);
+      await apiClient.delete(`/attributes/${attributeId}`);
       setToast({
         show: true,
         message: "Attribute deleted successfully",
@@ -93,7 +91,6 @@ const ManageAttributes = () => {
   const handleSaveAttribute = async (e) => {
     e.preventDefault();
     try {
-      // Validate data
       const attributeData = {
         categoryId: selectedCategoryId,
         key: e.target.key.value,
@@ -103,8 +100,8 @@ const ManageAttributes = () => {
 
       if (selectedAttribute) {
         // Update attribute
-        await axios.put(
-          `${API_BASE_URL}/attributes/${selectedAttribute._id}`,
+        await apiClient.put(
+          `/attributes/${selectedAttribute._id}`,
           attributeData
         );
         setToast({
@@ -114,7 +111,7 @@ const ManageAttributes = () => {
         });
       } else {
         // Add new attribute
-        await axios.post(`${API_BASE_URL}/attributes`, attributeData);
+        await apiClient.post("/attributes", attributeData);
         setToast({
           show: true,
           message: "Attribute added successfully",
@@ -132,7 +129,6 @@ const ManageAttributes = () => {
         });
         setErrors(errorObject);
       } else if (error.response && error.response.data) {
-        // Xử lý lỗi từ backend
         setErrors({ form: error.response.data.message });
       } else {
         console.error("Error saving attribute:", error);
@@ -280,7 +276,6 @@ const ManageAttributes = () => {
         </div>
       )}
 
-      {/* Toast Notification */}
       <ToastNotification
         show={toast.show}
         message={toast.message}

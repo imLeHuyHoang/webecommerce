@@ -1,5 +1,3 @@
-// src/components/RatingandComment/CommentComponent.jsx
-
 import React, { useState, useEffect } from "react";
 import { Spinner, Form, Button, Collapse } from "react-bootstrap";
 import apiClient from "../../utils/api-client";

@@ -46,12 +46,9 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [toastVariant, setToastVariant] = useState("success"); // New state for variant
+  const [toastVariant, setToastVariant] = useState("success");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
-  // API base URL
-  const API_URL = import.meta.env.VITE_API_BASE_URL + "/user";
 
   // Access token from local storage or context
   const accessToken = localStorage.getItem("accessToken");
@@ -64,7 +61,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`${API_URL}/users`, {
+      const response = await apiClient.get("/user/users", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -105,7 +102,7 @@ const UserManagement = () => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      await apiClient.delete(`${API_URL}/${userId}`, {
+      await apiClient.delete(`/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -132,15 +129,11 @@ const UserManagement = () => {
       const updatedUser = { isActive: !user.isActive };
 
       // Update user in backend
-      const response = await apiClient.put(
-        `${API_URL}/${userId}`,
-        updatedUser,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await apiClient.put(`/user/${userId}`, updatedUser, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       // Update users state
       setUsers(users.map((u) => (u._id === userId ? response.data : u)));
@@ -160,12 +153,12 @@ const UserManagement = () => {
       // Prepare the user data for validation and submission
       const userToSubmit = { ...selectedUser };
 
-      // If password is empty, delete it from the object
+      // If password is empty, delete it from the object (for editing)
       if (!userToSubmit.password) {
         delete userToSubmit.password;
       }
 
-      // Choose the appropriate schema
+      // Validation
       if (userToSubmit._id) {
         existingUserSchema.parse(userToSubmit);
       } else {
@@ -175,7 +168,7 @@ const UserManagement = () => {
       if (userToSubmit._id) {
         // Update existing user
         const response = await apiClient.put(
-          `${API_URL}/${userToSubmit._id}`,
+          `/user/${userToSubmit._id}`,
           userToSubmit,
           {
             headers: {
@@ -191,16 +184,12 @@ const UserManagement = () => {
         setToastMessage("User updated successfully");
         setToastVariant("success");
       } else {
-        // Add new user
-        const response = await apiClient.post(
-          `${API_URL}/admin`,
-          userToSubmit,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+        // Add new user (admin endpoint)
+        const response = await apiClient.post("/user/admin", userToSubmit, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         setUsers((prevUsers) => [...prevUsers, response.data]);
         setToastMessage("User added successfully");
         setToastVariant("success");
@@ -273,7 +262,6 @@ const UserManagement = () => {
           <Table striped bordered hover responsive>
             <thead>
               <tr>
-                {/* Removed ID column for brevity */}
                 <th>Name</th>
                 <th>Email</th>
                 <th>Roles</th>
@@ -284,7 +272,6 @@ const UserManagement = () => {
             <tbody>
               {users.map((user) => (
                 <tr key={user._id}>
-                  {/* Removed ID cell for brevity */}
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.roles.join(", ")}</td>
@@ -415,7 +402,7 @@ const UserManagement = () => {
         message={toastMessage}
         show={showToast}
         onClose={() => setShowToast(false)}
-        variant={toastVariant} // Pass the variant here
+        variant={toastVariant}
       />
     </Container>
   );

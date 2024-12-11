@@ -124,7 +124,15 @@ exports.createOrder = async (req, res) => {
 };
 exports.getOrderStatusCounts = async (req, res) => {
   try {
+    // Lấy userId từ request (thường là từ middleware auth)
+    const userId = req.user._id;
+    // Hoặc nếu userId truyền qua query hoặc params thì lấy tương ứng
+    // const userId = req.params.userId; // tùy vào cách bạn thiết kế router
+
     const counts = await Order.aggregate([
+      {
+        $match: { user: userId }, // Lọc đơn hàng theo user đang đăng nhập
+      },
       {
         $group: {
           _id: "$shippingStatus",
@@ -133,7 +141,6 @@ exports.getOrderStatusCounts = async (req, res) => {
       },
     ]);
 
-    // Chuyển đổi kết quả thành một đối tượng dễ sử dụng
     const statusCounts = {
       processing: 0,
       shipping: 0,
@@ -151,6 +158,7 @@ exports.getOrderStatusCounts = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi lấy thông tin đơn hàng." });
   }
 };
+
 exports.getUserOrders = async (req, res) => {
   try {
     const { status, startDate, endDate, page = 1, limit = 10 } = req.query;

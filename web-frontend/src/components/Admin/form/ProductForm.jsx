@@ -3,8 +3,6 @@ import { Form, Button, Row, Col, InputGroup } from "react-bootstrap";
 import apiClient from "../../../utils/api-client";
 import { z } from "zod";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const productSchema = z.object({
   code: z.string().min(1, "Code is required"),
   name: z.string().min(1, "Name is required"),
@@ -40,7 +38,7 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await apiClient.get(`${API_BASE_URL}/category`);
+        const response = await apiClient.get("/category");
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -55,7 +53,7 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
       const fetchAttributes = async () => {
         try {
           const response = await apiClient.get(
-            `${API_BASE_URL}/attributes/category/${formData.category}`
+            `/attributes/category/${formData.category}`
           );
           setAttributeOptions(response.data || []);
           setFormData((prevData) => ({
@@ -134,7 +132,6 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
         });
       }
 
-      // Thêm console.log để kiểm tra dữ liệu trong FormData
       console.log("FormData entries:");
       for (let pair of data.entries()) {
         console.log(pair[0] + ": ", pair[1]);
@@ -142,12 +139,12 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
 
       if (product) {
         // Cập nhật sản phẩm
-        await apiClient.put(`${API_BASE_URL}/product/${product._id}`, data, {
+        await apiClient.put(`/product/${product._id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
         // Tạo sản phẩm mới
-        await apiClient.post(`${API_BASE_URL}/product`, data, {
+        await apiClient.post("/product", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -160,7 +157,6 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
         });
         setErrors(errorObject);
       } else if (error.response && error.response.data) {
-        // Xử lý lỗi từ backend
         setErrors({ form: error.response.data.message });
       } else {
         console.error("Error saving product:", error);
@@ -322,7 +318,10 @@ const ProductForm = ({ product, onSuccess, onCancel }) => {
             {product.images.map((img, index) => (
               <img
                 key={index}
-                src={`${API_BASE_URL.replace("/api", "")}/products/${img}`}
+                src={`${import.meta.env.VITE_API_BASE_URL.replace(
+                  "/api",
+                  ""
+                )}/products/${img}`}
                 alt={product.name}
                 style={{ width: "50px", marginRight: "5px" }}
               />

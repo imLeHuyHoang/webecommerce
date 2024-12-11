@@ -4,8 +4,6 @@ import ProductForm from "../form/ProductForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import "./ManageProducts.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/product";
-
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -16,7 +14,7 @@ const ManageProducts = () => {
     message: "",
     variant: "",
   });
-  const [showFilters, setShowFilters] = useState(false); // State to manage filter form visibility
+  const [showFilters, setShowFilters] = useState(false);
 
   const [filters, setFilters] = useState({
     code: "",
@@ -39,7 +37,8 @@ const ManageProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await apiClient.get(API_BASE_URL);
+      // Gọi API với đường dẫn tương đối
+      const response = await apiClient.get("/product");
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -65,7 +64,7 @@ const ManageProducts = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?"))
       return;
     try {
-      await apiClient.delete(`${API_BASE_URL}/${productId}`);
+      await apiClient.delete(`/product/${productId}`);
       setToast({
         show: true,
         message: "Xóa sản phẩm thành công",
@@ -308,13 +307,13 @@ const ManageProducts = () => {
                     </td>
                     <td className="action-buttons">
                       <button
-                        className="btn  btn-edit"
+                        className="btn btn-edit"
                         onClick={() => handleEditProduct(product)}
                       >
                         Sửa
                       </button>
                       <button
-                        className="btn  btn-delete"
+                        className="btn btn-delete"
                         onClick={() => handleDeleteProduct(product._id)}
                       >
                         Xóa

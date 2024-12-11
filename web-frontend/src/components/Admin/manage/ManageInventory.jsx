@@ -1,38 +1,33 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../utils/api-client";
-import "./ManageInventory.css"; // Import CSS
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import "./ManageInventory.css";
 
 const ManageInventory = () => {
-  // State variables
-  const [inventories, setInventories] = useState([]); // List of inventories
-  const [products, setProducts] = useState([]); // List of products
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(""); // Error message
-  const [showModal, setShowModal] = useState(false); // Modal visibility state
-  const [selectedInventory, setSelectedInventory] = useState(null); // Selected inventory for editing
+  const [inventories, setInventories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedInventory, setSelectedInventory] = useState(null);
   const [form, setForm] = useState({
     product: "",
     productCode: "",
     location: "",
     quantity: "",
-  }); // Form data
-  const [productInfo, setProductInfo] = useState(null); // Selected product info
-  const [searchTerm, setSearchTerm] = useState(""); // Search term for filtering inventories
-  const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products for product search
+  });
+  const [productInfo, setProductInfo] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
-  // Fetch inventories and products when component mounts
   useEffect(() => {
     fetchInventories();
     fetchProducts();
   }, []);
 
-  // Fetch inventories from server
   const fetchInventories = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`${API_BASE_URL}/inventory`);
+      const response = await apiClient.get("/inventory");
       setInventories(response.data);
       setLoading(false);
     } catch (error) {
@@ -41,17 +36,15 @@ const ManageInventory = () => {
     }
   };
 
-  // Fetch products from server
   const fetchProducts = async () => {
     try {
-      const response = await apiClient.get(`${API_BASE_URL}/product`);
+      const response = await apiClient.get("/product");
       setProducts(response.data);
     } catch (error) {
       setError(error.message);
     }
   };
 
-  // Handle add inventory button click
   const handleAddInventory = () => {
     setSelectedInventory(null);
     setForm({
@@ -64,7 +57,6 @@ const ManageInventory = () => {
     setShowModal(true);
   };
 
-  // Handle edit inventory button click
   const handleEditInventory = (inventory) => {
     setSelectedInventory(inventory);
     setForm({
@@ -77,42 +69,34 @@ const ManageInventory = () => {
     setShowModal(true);
   };
 
-  // Handle delete inventory button click
   const handleDeleteInventory = async (inventoryId) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa tồn kho này không?")) return;
     try {
-      await apiClient.delete(`${API_BASE_URL}/inventory/${inventoryId}`);
+      await apiClient.delete(`/inventory/${inventoryId}`);
       fetchInventories();
     } catch (error) {
       setError(error.message);
     }
   };
 
-  // Handle save inventory form submission
   const handleSaveInventory = async (e) => {
     e.preventDefault();
-    console.log("Dữ liệu gửi:", form); // Log form data for debugging
-
     try {
       if (selectedInventory) {
         // Update existing inventory
-        await apiClient.put(
-          `${API_BASE_URL}/inventory/${selectedInventory._id}`,
-          form
-        );
+        await apiClient.put(`/inventory/${selectedInventory._id}`, form);
       } else {
         // Add new inventory
-        await apiClient.post(`${API_BASE_URL}/inventory`, form);
+        await apiClient.post("/inventory", form);
       }
       setShowModal(false);
       fetchInventories();
     } catch (error) {
-      console.error("Lỗi API:", error.response.data); // Log API error for debugging
+      console.error("Lỗi API:", error.response?.data);
       setError(error.message);
     }
   };
 
-  // Handle form input change
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -120,10 +104,9 @@ const ManageInventory = () => {
     });
   };
 
-  // Handle product search input change
   const handleProductSearch = (e) => {
     const code = e.target.value;
-    setForm({ ...form, productCode: code }); // Display product code in input
+    setForm({ ...form, productCode: code });
 
     if (code.length > 0) {
       const filtered = products.filter((product) =>
@@ -135,19 +118,16 @@ const ManageInventory = () => {
     }
   };
 
-  // Handle product selection from search results
   const handleProductSelect = (product) => {
-    setForm({ ...form, product: product._id, productCode: product.code }); // Save product ID and display code in input
-    setProductInfo(product); // Display product info
+    setForm({ ...form, product: product._id, productCode: product.code });
+    setProductInfo(product);
     setFilteredProducts([]);
   };
 
-  // Handle search term input change
   const handleSearchTermChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Filter inventories based on search term
   const filteredInventories = inventories.filter((inventory) => {
     return (
       inventory.product?.code
@@ -162,7 +142,6 @@ const ManageInventory = () => {
     );
   });
 
-  // Log products data for debugging
   console.log(products);
 
   return (

@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import CategoryForm from "../form/CategoryForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import "./ManageCategories.css"; // Import file CSS
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/category";
 
 const ManageCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -19,7 +17,8 @@ const ManageCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(API_BASE_URL);
+      // Gọi đúng endpoint, giả sử GET /category trả về danh sách categories
+      const response = await apiClient.get("/category");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -45,7 +44,8 @@ const ManageCategories = () => {
     if (!window.confirm("Are you sure you want to delete this category?"))
       return;
     try {
-      await axios.delete(`${API_BASE_URL}/${categoryId}`);
+      // Sử dụng template string đúng cách
+      await apiClient.delete(`/category/${categoryId}`);
       setToast({
         show: true,
         message: "Category deleted successfully",
@@ -101,10 +101,14 @@ const ManageCategories = () => {
                         {cat.images.map((img, index) => (
                           <img
                             key={index}
-                            src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                              "/api",
-                              ""
-                            )}/category/${img}`}
+                            src={
+                              // Giả sử ảnh có thể truy cập từ http://localhost:5000/category/<imgName>
+                              // Đã có sẵn logic remove "/api" phía dưới
+                              `${import.meta.env.VITE_API_BASE_URL.replace(
+                                "/api",
+                                ""
+                              )}/category/${img}`
+                            }
                             alt={cat.name}
                             className="category-image"
                           />

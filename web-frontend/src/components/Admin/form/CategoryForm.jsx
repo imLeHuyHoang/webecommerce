@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../../utils/api-client";
 import { z } from "zod";
-
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/category`;
 
 const categorySchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -55,24 +53,25 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
       const data = new FormData();
       data.append("name", validatedData.name);
       data.append("descriptions", validatedData.descriptions || "");
-      validatedData.images.forEach((image) => {
-        data.append("images", image);
-      });
+      if (validatedData.images) {
+        validatedData.images.forEach((image) => {
+          data.append("images", image);
+        });
+      }
 
       if (category) {
         // Update category
-        await axios.put(`${API_BASE_URL}/${category._id}`, data, {
+        await apiClient.put(`/category/${category._id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
         // Create category
-        await axios.post(API_BASE_URL, data, {
+        await apiClient.post("/category", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
       onSuccess();
     } catch (error) {
-      // ... error handling
       if (error instanceof z.ZodError) {
         const errorObject = {};
         error.errors.forEach((e) => {
@@ -119,16 +118,12 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
           accept="image/*"
         />
         {imageError && <Alert variant="danger">{imageError}</Alert>}
-        {/* Display existing images when editing */}
         {category && category.images && (
           <div className="mt-2">
             {category.images.map((img, index) => (
               <img
                 key={index}
-                src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                  "/api",
-                  ""
-                )}/category/${img}`}
+                src={`/category/${img}`}
                 alt={category.name}
                 style={{ width: "50px", marginRight: "5px" }}
               />
