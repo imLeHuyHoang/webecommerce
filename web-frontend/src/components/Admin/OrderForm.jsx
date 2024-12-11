@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../../utils/api-client";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const OrderForm = ({ order, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
     user: "",
@@ -58,13 +56,10 @@ const OrderForm = ({ order, onSuccess, onCancel }) => {
     try {
       if (order) {
         // Update order
-        await apiClient.patch(
-          `${API_BASE_URL}/order/admin/${order._id}`,
-          formData
-        );
+        await apiClient.patch(`/order/admin/${order._id}`, formData);
       } else {
         // Create new order
-        await apiClient.post(`${API_BASE_URL}/order/create`, formData);
+        await apiClient.post("/order/create", formData);
       }
       onSuccess();
     } catch (error) {
@@ -117,8 +112,7 @@ const OrderForm = ({ order, onSuccess, onCancel }) => {
           required
         />
       </div>
-      {/* Other fields like products, payment, etc. */}
-      {/* Note: Implement inputs for products array, payment details, etc., as needed */}
+      {/* Total */}
       <div className="mb-3">
         <label className="form-label">Total</label>
         <input

@@ -6,32 +6,21 @@ const Inventory = require("../models/Inventory");
 const Category = require("../models/Category");
 const mongoose = require("mongoose");
 
-// Lấy tất cả sản phẩm
 /**
  * @route   GET /api/products
- * @desc    Lấy tất cả sản phẩm
+ * @desc    Lấy tất cả sản phẩm (có thể lọc theo category, brand, search)
  * @access  Public
  */
 exports.getAllProducts = async (req, res) => {
   try {
-    console.log("getAllProducts called with query:", req.query); // Thêm log để kiểm tra
     const { category, brand, search } = req.query;
-
-    // Xây dựng điều kiện lọc
     let filter = {};
-    if (category) {
-      filter.category = category;
-    }
-    if (brand) {
-      filter.brand = brand;
-    }
-    if (search) {
-      filter.name = { $regex: search, $options: "i" }; // Tìm kiếm tên sản phẩm
-    }
+    if (category) filter.category = category;
+    if (brand) filter.brand = brand;
+    if (search) filter.name = { $regex: search, $options: "i" };
 
     const products = await Product.find(filter).populate("category", "name");
 
-    // Thêm thông tin tồn kho cho từng sản phẩm
     const productsWithInventory = await Promise.all(
       products.map(async (product) => {
         const inventory = await Inventory.findOne({ product: product._id });
@@ -49,7 +38,6 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-// Lấy sản phẩm theo ID
 /**
  * @route   GET /api/products/:id
  * @desc    Lấy sản phẩm theo ID
@@ -65,9 +53,7 @@ exports.getProductById = async (req, res) => {
       console.log("Product not found for ID:", req.params.id);
       return res.status(404).json({ message: "Product not found" });
     }
-
     const inventory = await Inventory.findOne({ product: product._id });
-
     const productWithInventory = {
       ...product.toObject(),
       stock: inventory ? inventory.quantity : 0,
@@ -79,7 +65,6 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-// Tạo sản phẩm mới
 /**
  * @route   POST /api/products
  * @desc    Tạo sản phẩm mới
@@ -87,30 +72,26 @@ exports.getProductById = async (req, res) => {
  */
 exports.createProduct = async (req, res) => {
   try {
+    console.log("req.body:", req.body);
     const { code, name, description, brand, price, category, attributes } =
       req.body;
 
-    // Kiểm tra các trường bắt buộc
     if (!code || !name || !brand || !price || !category) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Kiểm tra xem mã sản phẩm đã tồn tại chưa
     const productExist = await Product.findOne({ code });
     if (productExist) {
       return res.status(400).json({ message: "Product code already exists" });
     }
 
-    // Kiểm tra xem tên sản phẩm đã tồn tại chưa
     const nameExist = await Product.findOne({ name });
     if (nameExist) {
       return res.status(400).json({ message: "Product name already exists" });
     }
 
-    // Parse attributes nếu có
     const parsedAttributes = attributes ? JSON.parse(attributes) : [];
 
-    // Tạo đối tượng sản phẩm mới
     const product = new Product({
       code,
       name,
@@ -119,19 +100,16 @@ exports.createProduct = async (req, res) => {
       price,
       category,
       attributes: parsedAttributes,
-      images: [], // Khởi tạo mảng ảnh rỗng
+      images: [],
     });
 
-    // Lưu sản phẩm vào cơ sở dữ liệu
     const newProduct = await product.save();
 
-    // Tạo thư mục riêng cho sản phẩm sau khi sản phẩm đã được tạo thành công
     const productFolder = path.join(__dirname, "../upload/products", name);
     if (!fs.existsSync(productFolder)) {
       fs.mkdirSync(productFolder, { recursive: true });
     }
 
-    // Lấy danh sách ảnh từ thư mục tạm thời và di chuyển vào thư mục sản phẩm
     const images = req.files
       ? req.files.map((file) => {
           const tempPath = path.join(
@@ -152,7 +130,6 @@ exports.createProduct = async (req, res) => {
         })
       : [];
 
-    // Cập nhật sản phẩm với danh sách ảnh
     newProduct.images = images;
     await newProduct.save();
 
@@ -163,7 +140,6 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-// Cập nhật sản phẩm
 /**
  * @route   PUT /api/products/:id
  * @desc    Cập nhật sản phẩm
@@ -174,21 +150,16 @@ exports.updateProduct = async (req, res) => {
     const productId = req.params.id;
     const { code, name, description, brand, price, category, attributes } =
       req.body;
-
     const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
     const oldFolder = path.join(__dirname, "../upload/products", product.name);
     const newFolder = path.join(__dirname, "../upload/products", name);
 
-    // Nếu tên sản phẩm thay đổi, đổi tên thư mục
-    if (product.name !== name && fs.existsSync(oldFolder)) {
+    if (name && product.name !== name && fs.existsSync(oldFolder)) {
       fs.renameSync(oldFolder, newFolder);
     }
 
-    // Lấy danh sách ảnh từ request hoặc giữ nguyên ảnh cũ
     const images =
       req.files && req.files.length > 0
         ? req.files.map((file) => {
@@ -222,7 +193,6 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-// Xóa sản phẩm
 /**
  * @route   DELETE /api/products/:id
  * @desc    Xóa sản phẩm
@@ -231,17 +201,12 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
-
-    if (!productId) {
+    if (!productId)
       return res.status(400).json({ message: "Product ID is required" });
-    }
 
     const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // Xóa thư mục chứa ảnh sản phẩm
     const productFolder = path.join(
       __dirname,
       "../upload/products",
@@ -251,7 +216,6 @@ exports.deleteProduct = async (req, res) => {
       fs.rmSync(productFolder, { recursive: true, force: true });
     }
 
-    // Xóa sản phẩm khỏi cơ sở dữ liệu
     await Product.findByIdAndDelete(productId);
     res
       .status(200)
@@ -261,17 +225,21 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+/**
+ * @route   POST /api/products/compare
+ * @desc    So sánh hai sản phẩm
+ * @access  Public
+ */
 exports.compareProducts = async (req, res) => {
   try {
-    const { productIds } = req.body; // Nhận danh sách ID từ body
-
+    const { productIds } = req.body;
     if (!productIds || !Array.isArray(productIds) || productIds.length !== 2) {
       return res
         .status(400)
         .json({ message: "Vui lòng cung cấp đúng hai ID sản phẩm" });
     }
 
-    // Kiểm tra tính hợp lệ của từng ID
     productIds.forEach((id) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new Error(`Invalid product ID: ${id}`);
@@ -282,14 +250,12 @@ exports.compareProducts = async (req, res) => {
       "category",
       "name"
     );
-
     if (products.length !== 2) {
       return res
         .status(404)
         .json({ message: "Một hoặc cả hai sản phẩm không tồn tại" });
     }
 
-    // Lấy thông tin kho hàng cho từng sản phẩm
     const productsWithInventory = await Promise.all(
       products.map(async (product) => {
         const inventory = await Inventory.findOne({ product: product._id });

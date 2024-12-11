@@ -124,14 +124,11 @@ exports.createOrder = async (req, res) => {
 };
 exports.getOrderStatusCounts = async (req, res) => {
   try {
-    // Lấy userId từ request (thường là từ middleware auth)
     const userId = req.user._id;
-    // Hoặc nếu userId truyền qua query hoặc params thì lấy tương ứng
-    // const userId = req.params.userId; // tùy vào cách bạn thiết kế router
 
     const counts = await Order.aggregate([
       {
-        $match: { user: userId }, // Lọc đơn hàng theo user đang đăng nhập
+        $match: { user: userId },
       },
       {
         $group: {

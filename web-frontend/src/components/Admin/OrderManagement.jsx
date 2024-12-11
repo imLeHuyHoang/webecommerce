@@ -5,8 +5,6 @@ import OrderForm from "./OrderForm";
 import ToastNotification from "../ToastNotification/ToastNotification";
 import "./OrderManagement.css"; // Optional: If you plan to add custom CSS
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/order";
-
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -14,7 +12,7 @@ const ManageOrders = () => {
   const [toast, setToast] = useState({
     show: false,
     message: "",
-    variant: "info", // Default variant
+    variant: "info",
   });
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState(null); // To track which order is being updated
@@ -27,7 +25,7 @@ const ManageOrders = () => {
   const fetchOrders = async () => {
     setLoadingOrders(true);
     try {
-      const response = await apiClient.get(`${API_BASE_URL}/admin/all`);
+      const response = await apiClient.get("/order/admin/all");
       setOrders(response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -54,7 +52,7 @@ const ManageOrders = () => {
   const handleDeleteOrder = async (orderId) => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
     try {
-      await apiClient.delete(`${API_BASE_URL}/admin/${orderId}`);
+      await apiClient.delete(`/order/admin/${orderId}`);
       setToast({
         show: true,
         message: "Order deleted successfully",
@@ -87,12 +85,9 @@ const ManageOrders = () => {
 
     setUpdatingOrderId(orderId);
     try {
-      const response = await apiClient.patch(
-        `${API_BASE_URL}/admin/${orderId}`,
-        {
-          shippingStatus: "shipping",
-        }
-      );
+      const response = await apiClient.patch(`/order/admin/${orderId}`, {
+        shippingStatus: "shipping",
+      });
 
       // Check if response is successful
       if (response.status === 200) {
@@ -121,13 +116,13 @@ const ManageOrders = () => {
   const getPaymentStatusClasses = (status) => {
     switch (status.toLowerCase()) {
       case "paid":
-        return "bg-success text-white p-2 rounded"; // Green background, white text
+        return "bg-success text-white p-2 rounded";
       case "unpaid":
-        return "bg-warning text-dark p-2 rounded"; // Yellow background, dark text
+        return "bg-warning text-dark p-2 rounded";
       case "cancelled":
-        return "bg-danger text-white p-2 rounded"; // Red background, white text
+        return "bg-danger text-white p-2 rounded";
       default:
-        return "bg-secondary text-white p-2 rounded"; // Default gray background
+        return "bg-secondary text-white p-2 rounded";
     }
   };
 
@@ -135,15 +130,15 @@ const ManageOrders = () => {
   const getShippingStatusClasses = (status) => {
     switch (status.toLowerCase()) {
       case "processing":
-        return "bg-warning text-dark p-2 rounded"; // Yellow background, dark text
+        return "bg-warning text-dark p-2 rounded";
       case "shipping":
-        return "bg-info text-white p-2 rounded"; // Blue background, white text
+        return "bg-info text-white p-2 rounded";
       case "shipped":
-        return "bg-success text-white p-2 rounded"; // Green background, white text
+        return "bg-success text-white p-2 rounded";
       case "cancelled":
-        return "bg-danger text-white p-2 rounded"; // Red background, white text
+        return "bg-danger text-white p-2 rounded";
       default:
-        return "bg-secondary text-white p-2 rounded"; // Default gray background
+        return "bg-secondary text-white p-2 rounded";
     }
   };
 
@@ -186,7 +181,6 @@ const ManageOrders = () => {
                       <td>{order._id}</td>
                       <td>{order.user?.name || "N/A"}</td>
                       <td>${order.total.toFixed(2)}</td>
-                      {/* Apply dynamic classes to Payment Status */}
                       <td>
                         <span
                           className={getPaymentStatusClasses(
@@ -196,7 +190,6 @@ const ManageOrders = () => {
                           {order.paymentStatus}
                         </span>
                       </td>
-                      {/* Apply dynamic classes to Shipping Status */}
                       <td>
                         <span
                           className={getShippingStatusClasses(
@@ -208,7 +201,6 @@ const ManageOrders = () => {
                       </td>
                       <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                       <td className="Actions">
-                        {/* Confirm Order Button */}
                         {order.shippingStatus.toLowerCase() ===
                           "processing" && (
                           <button
@@ -228,7 +220,6 @@ const ManageOrders = () => {
                           </button>
                         )}
 
-                        {/* Edit Button */}
                         <button
                           className="btn btn-warning btn-sm me-2 btn-edit"
                           onClick={() => handleEditOrder(order)}
@@ -236,7 +227,6 @@ const ManageOrders = () => {
                           Edit
                         </button>
 
-                        {/* Delete Button */}
                         <button
                           className="btn btn-danger btn-sm btn-delete"
                           onClick={() => handleDeleteOrder(order._id)}
@@ -290,7 +280,7 @@ const ManageOrders = () => {
       <ToastNotification
         show={toast.show}
         message={toast.message}
-        variant={toast.variant || "info"} // Ensure variant is always set
+        variant={toast.variant || "info"}
         onClose={() => setToast({ ...toast, show: false })}
       />
     </>
