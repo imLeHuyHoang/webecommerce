@@ -9,6 +9,15 @@ permissions:
     group: ec2-user
     mode: 755
 hooks:
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      runas: ec2-user
   AfterInstall:
-    - location: scripts/build_and_deploy.sh
+    - location: scripts/after_install.sh
+      runas: ec2-user
+  ApplicationStart:
+    - location: scripts/start_application.sh
+      runas: ec2-user
+  ValidateService:
+    - location: scripts/validate_service.sh
       runas: ec2-user
