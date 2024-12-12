@@ -47,7 +47,10 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
         <div className="product-card-image-container">
           <Card.Img
             variant="top"
-            src={`${import.meta.env.VITE_API_BASE_URL}/products/${image}`}
+            src={`${import.meta.env.VITE_API_BASE_URL.replace(
+              "/api",
+              ""
+            )}/products/${image}`}
             alt={title}
             onError={(e) => {
               e.target.onerror = null;

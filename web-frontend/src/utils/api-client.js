@@ -21,9 +21,7 @@ const processQueue = (error, token = null) => {
 
 apiClient.interceptors.request.use(
   (config) => {
-    if (!config.url.startsWith("/api")) {
-      config.url = `/api${config.url}`;
-    }
+    // Không thêm /api nữa vì đã có trong baseURL
     const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
