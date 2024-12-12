@@ -56,6 +56,10 @@ app.use("/products", express.static(__dirname + "/upload/products"));
 
 cronJobs;
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
