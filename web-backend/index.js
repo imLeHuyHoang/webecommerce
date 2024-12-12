@@ -13,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT;
 const corsOrigin = process.env.corsOrigin;
 app.get("/api/health", (req, res) => {
+  console.log("Health check");
   res.status(200).json({ status: "OK" });
 });
 app.use(
@@ -60,6 +61,10 @@ app.use("/products", express.static(__dirname + "/upload/products"));
 
 cronJobs;
 
+app.get("/api/unhealth", (req, res) => {
+  console.log("Health check");
+  res.status(200).json({ status: "OK" });
+});
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

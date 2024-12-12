@@ -1,22 +1,11 @@
 services:
-  frontend:
-    build:
-      context: ./web-frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
-    networks:
-      - app-network
-
   backend:
-    build:
-      context: ./web-backend
-      dockerfile: Dockerfile
+    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-backend:latest
     ports:
       - "5000:5000"
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+    restart: always
+  frontend:
+    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-frontend:latest
+    ports:
+      - "5173:5173"
+    restart: always
