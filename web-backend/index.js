@@ -7,10 +7,10 @@ require("dotenv").config();
 require("./db/connectDB"); // Connect to MongoDB
 const cronJobs = require("./services/cronJobs");
 
+//check trước
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
-
 const app = express();
 const PORT = process.env.PORT;
 const corsOrigin = process.env.corsOrigin;
