@@ -5,9 +5,14 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan"); // Logging
 require("./db/connectDB"); // Connect to MongoDB
 const cronJobs = require("./services/cronJobs");
-
+require("dotenv").config();
 // Initialize Express app
 const app = express();
+// Health check routes
+app.get("/api/health", (req, res) => {
+  console.log("Health check");
+  res.status(200).json({ status: "OK" });
+});
 
 // Read environment variables
 const PORT = process.env.PORT || 5000;
@@ -17,12 +22,6 @@ if (!corsOrigin) {
   console.error("Error: corsOrigin environment variable is not set.");
   process.exit(1);
 }
-
-// Health check routes
-app.get("/api/health", (req, res) => {
-  console.log("Health check");
-  res.status(200).json({ status: "OK" });
-});
 
 // Middleware setup
 app.use(
