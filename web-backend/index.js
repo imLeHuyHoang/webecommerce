@@ -3,19 +3,28 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan"); // Logging
-require("dotenv").config();
 require("./db/connectDB"); // Connect to MongoDB
 const cronJobs = require("./services/cronJobs");
 
-//check trước
-
+// Initialize Express app
 const app = express();
-const PORT = process.env.PORT;
+
+// Read environment variables
+const PORT = process.env.PORT || 5000;
 const corsOrigin = process.env.corsOrigin;
+
+if (!corsOrigin) {
+  console.error("Error: corsOrigin environment variable is not set.");
+  process.exit(1);
+}
+
+// Health check routes
 app.get("/api/health", (req, res) => {
   console.log("Health check");
   res.status(200).json({ status: "OK" });
 });
+
+// Middleware setup
 app.use(
   cors({
     origin: corsOrigin,
@@ -25,6 +34,8 @@ app.use(
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(morgan("dev"));
+app.use(cookieParser());
 
 // Import routes
 const userRoutes = require("./routes/userRoutes");
@@ -39,10 +50,7 @@ const discountRoutes = require("./routes/discountRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 
-// Middleware setup
-app.use(morgan("dev"));
-app.use(cookieParser());
-
+// Route setup
 app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
@@ -59,12 +67,15 @@ app.use("/api/products", commentRoutes);
 app.use("/category", express.static(__dirname + "/upload/category"));
 app.use("/products", express.static(__dirname + "/upload/products"));
 
+// Initialize cron jobs
 cronJobs;
 
+// Additional health check
 app.get("/api/unhealth", (req, res) => {
-  console.log("Health check");
+  console.log("Unhealth check");
   res.status(200).json({ status: "OK" });
 });
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
