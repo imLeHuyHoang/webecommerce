@@ -1,16 +1,6 @@
 version: "3.8"
 
 services:
-  frontend:
-    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-frontend:latest
-    ports:
-      - "5173:5173"
-    networks:
-      - app-network
-    env_file:
-      - ./web-frontend/.env
-    restart: always
-
   backend:
     image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-backend:latest
     ports:
@@ -19,7 +9,15 @@ services:
       - app-network
     env_file:
       - ./web-backend/.env
-    restart: always
+
+  frontend:
+    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-frontend:latest
+    ports:
+      - "5173:5173"
+    networks:
+      - app-network
+    env_file:
+      - ./web-frontend/.env
 
 networks:
   app-network:
