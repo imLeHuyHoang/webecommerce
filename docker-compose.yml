@@ -1,14 +1,6 @@
+version: "3.8"
+
 services:
-  backend:
-    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-backend:latest
-    ports:
-      - "5000:5000"
-    networks:
-      - app-network
-    env_file:
-      - ./web-backend/.env
-    volumes:
-      - ./web-backend.env:/app/.env
   frontend:
     image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-frontend:latest
     ports:
@@ -17,8 +9,18 @@ services:
       - app-network
     env_file:
       - ./web-frontend/.env
-    volumes:
-      - ./web-frontend.env:/app/.env
+    restart: always
+
+  backend:
+    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-backend:latest
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    env_file:
+      - ./web-backend/.env
+    restart: always
+
 networks:
   app-network:
     driver: bridge

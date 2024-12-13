@@ -21,32 +21,36 @@ phases:
 
   build:
     commands:
-      # Build và tag Backend
       - echo "Build Docker image backend với tag latest..."
       - docker build -t $BACKEND_REPO_URI:latest ./web-backend
       - echo "Tag Docker image backend với tag commit hash..."
       - docker tag $BACKEND_REPO_URI:latest $BACKEND_REPO_URI:$IMAGE_TAG
       - echo "Docker images backend đã được build và tag thành công."
 
-      # Build và tag Frontend
       - echo "Build Docker image frontend với tag latest..."
       - docker build -t $FRONTEND_REPO_URI:latest ./web-frontend
       - echo "Tag Docker image frontend với tag commit hash..."
       - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$IMAGE_TAG
       - echo "Docker images frontend đã được build và tag thành công."
 
+      # Kiểm Tra Nội Dung Docker Images
+      - echo "Kiểm tra nội dung Docker image backend..."
+      - docker run --rm $BACKEND_REPO_URI:latest ls -la /app
+      - echo "Kiểm tra nội dung Docker image frontend..."
+      - docker run --rm $FRONTEND_REPO_URI:latest ls -la /app
+
   post_build:
     commands:
       - echo "Build completed on $(date)"
-      # Push Backend Images
+
       - echo "Pushing the backend Docker image to ECR..."
       - docker push $BACKEND_REPO_URI:latest
       - docker push $BACKEND_REPO_URI:$IMAGE_TAG
-      # Push Frontend Images
+
       - echo "Pushing the frontend Docker image to ECR..."
       - docker push $FRONTEND_REPO_URI:latest
       - docker push $FRONTEND_REPO_URI:$IMAGE_TAG
-      # Tạo file imagedefinitions.json (Nếu triển khai đến ECS)
+
       - echo "Ghi file imagedefinitions.json..."
       - printf '[{"name":"my-app-backend","imageUri":"%s"},{"name":"my-app-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$IMAGE_TAG $FRONTEND_REPO_URI:$IMAGE_TAG > imagedefinitions.json
       - echo "create imagedefinitions.json file"
