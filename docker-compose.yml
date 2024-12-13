@@ -1,4 +1,3 @@
-version: "3"
 services:
   backend:
     image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-backend:latest
