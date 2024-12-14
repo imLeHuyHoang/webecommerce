@@ -1,13 +1,13 @@
-// Snowfall.jsx
+// src/components/Snowfall/Snowfall.jsx
 import React, { useEffect, useState, useRef } from "react";
 import "./Snowfall.css";
 
 const Snowfall = ({
-  snowflakeCount = 20, // Số lượng bông tuyết ban đầu
-  snowflakeSize = { min: 2, max: 6 }, // Kích thước bông tuyết (tối thiểu và tối đa)
-  fallSpeed = { min: 5, max: 10 }, // Tốc độ rơi của bông tuyết (tối thiểu và tối đa)
-  drift = { min: -100, max: 100 }, // Độ lệch ngang của bông tuyết (tối thiểu và tối đa)
-  maxSnowflakes = 100, // Số lượng bông tuyết tối đa trên màn hình
+  snowflakeCount = 100, // Default value
+  snowflakeSize = { min: 5, max: 15 },
+  fallSpeed = { min: 5, max: 10 },
+  drift = { min: -2, max: 2 },
+  maxSnowflakes = 200,
 }) => {
   const [snowflakes, setSnowflakes] = useState([]);
   const snowflakeId = useRef(0);
@@ -21,7 +21,7 @@ const Snowfall = ({
         const size =
           Math.random() * (snowflakeSize.max - snowflakeSize.min) +
           snowflakeSize.min;
-        const left = Math.random() * 100; // Vị trí ngang dưới dạng phần trăm
+        const left = Math.random() * 100;
         const duration =
           Math.random() * (fallSpeed.max - fallSpeed.min) + fallSpeed.min;
         const horizontalDrift =
@@ -40,17 +40,16 @@ const Snowfall = ({
       }
     };
 
-    // Tạo các bông tuyết ban đầu với độ trễ ngẫu nhiên
+    // Create initial snowflakes with random delay
     for (let i = 0; i < snowflakeCount; i++) {
       setTimeout(createSnowflake, Math.random() * 10000);
     }
 
-    // Liên tục tạo bông tuyết theo khoảng thời gian
+    // Continuously create snowflakes
     const interval = setInterval(() => {
       createSnowflake();
-    }, 2000); // Điều chỉnh khoảng thời gian tạo bông tuyết mới
+    }, 2000);
 
-    // Dọn dẹp khi component bị unmount
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -59,7 +58,6 @@ const Snowfall = ({
     };
   }, [snowflakeCount, snowflakeSize, fallSpeed, drift, maxSnowflakes]);
 
-  // Hàm xử lý khi animation kết thúc
   const handleAnimationEnd = (id) => {
     setSnowflakes((prev) => prev.filter((snowflake) => snowflake.id !== id));
     snowflakeCountRef.current -= 1;

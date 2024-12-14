@@ -1,5 +1,5 @@
-// AuthContext.js (Frontend)
-import {
+// src/context/AuthContext.js
+import React, {
   createContext,
   useContext,
   useState,
@@ -18,6 +18,13 @@ export const AuthProvider = ({ children }) => {
     isLoading: true,
   });
   const navigate = useNavigate();
+
+  // Define clearAuthData before using it in useEffect
+  const clearAuthData = useCallback(() => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    setAuth({ user: null, accessToken: null, isLoading: false });
+  }, []);
 
   // Initialize auth state
   useEffect(() => {
@@ -42,13 +49,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     initializeAuth();
-  }, []);
-
-  const clearAuthData = useCallback(() => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    setAuth({ user: null, accessToken: null, isLoading: false });
-  }, []);
+  }, [clearAuthData]); // Now clearAuthData is defined
 
   // Token refresh mechanism
   useEffect(() => {
