@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import apiClient from "../../utils/api-client";
 import { useCart } from "../../context/CartContext";
 import { ToastContext } from "../ToastNotification/ToastContext";
+import { getProductImageUrl } from "../../utils/image-helper"; // Import helper
 import "./ProductCard.css";
 
 function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
@@ -38,6 +39,9 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
     </Tooltip>
   );
 
+  // Sử dụng hàm helper để xây dựng URL hình ảnh
+  const imageUrl = getProductImageUrl(image);
+
   return (
     <Card className="product-card-container h-100 shadow-sm">
       <NavLink
@@ -47,10 +51,7 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
         <div className="product-card-image-container">
           <Card.Img
             variant="top"
-            src={`${import.meta.env.VITE_API_BASE_URL.replace(
-              "/api",
-              ""
-            )}/products/${image}`}
+            src={imageUrl}
             alt={title}
             onError={(e) => {
               e.target.onerror = null;

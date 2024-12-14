@@ -1,5 +1,4 @@
 // src/pages/SingleProductPage/SingleProductPage.js
-
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -20,6 +19,7 @@ import RatingComponent from "../../RatingandComment/RatingComponent";
 import CommentComponent from "../../RatingandComment/CommentComponent";
 import CompareModal from "./CompareModel"; // Ensure the path is correct
 import AdditionalContent from "../../AdditionalContent/AddtionalContent"; // Adjust the path
+import { getProductImageUrl } from "../../../utils/image-helper"; // Import helper
 import "./SingleProductPage.css";
 import imgSale from "../../../assets/giangsinh1.jpg";
 
@@ -129,6 +129,10 @@ const SingleProductPage = () => {
     currentSlide * imagesPerSlide + imagesPerSlide
   );
 
+  // Sử dụng hàm helper để xây dựng URL hình ảnh
+  const mainImageUrl = getProductImageUrl(mainImage);
+  const smallImageUrls = displayedImages.map((img) => getProductImageUrl(img));
+
   return (
     <div className="single-product-page">
       <Container className=" container-single-product">
@@ -164,10 +168,7 @@ const SingleProductPage = () => {
               {/* Main Image */}
               <div className="main-image mb-3">
                 <Image
-                  src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                    "/api",
-                    ""
-                  )}/products/${mainImage}`}
+                  src={mainImageUrl}
                   alt="Hình ảnh sản phẩm chính"
                   fluid
                   rounded
@@ -189,19 +190,16 @@ const SingleProductPage = () => {
 
                 {/* Small Images */}
                 <div className="small-images-container d-flex mx-2">
-                  {displayedImages.map((img, idx) => (
+                  {smallImageUrls.map((imgUrl, idx) => (
                     <Image
                       key={idx}
-                      src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                        "/api",
-                        ""
-                      )}/products/${img}`}
+                      src={imgUrl}
                       alt={`Hình ảnh sản phẩm ${idx + 1}`}
                       fluid
                       rounded
-                      onClick={() => handleImageClick(img)}
+                      onClick={() => handleImageClick(displayedImages[idx])}
                       className={`small-image shadow me-2 ${
-                        mainImage === img ? "selected" : ""
+                        mainImage === displayedImages[idx] ? "selected" : ""
                       }`}
                     />
                   ))}

@@ -1,7 +1,9 @@
+// src/pages/ManageCategories/ManageCategories.jsx
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../utils/api-client";
 import CategoryForm from "../form/CategoryForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
+import { getCategoryImageUrl } from "../../../utils/image-helper"; // Import helper
 import "./ManageCategories.css"; // Import file CSS
 
 const ManageCategories = () => {
@@ -24,7 +26,7 @@ const ManageCategories = () => {
       console.error("Error fetching categories:", error);
       setToast({
         show: true,
-        message: "Failed to load categories",
+        message: "Không thể tải danh mục",
         variant: "danger",
       });
     }
@@ -41,14 +43,14 @@ const ManageCategories = () => {
   };
 
   const handleDeleteCategory = async (categoryId) => {
-    if (!window.confirm("Are you sure you want to delete this category?"))
+    if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này không?"))
       return;
     try {
       // Sử dụng template string đúng cách
       await apiClient.delete(`/category/${categoryId}`);
       setToast({
         show: true,
-        message: "Category deleted successfully",
+        message: "Xóa danh mục thành công",
         variant: "success",
       });
       fetchCategories();
@@ -56,7 +58,7 @@ const ManageCategories = () => {
       console.error("Error deleting category:", error);
       setToast({
         show: true,
-        message: "Failed to delete category",
+        message: "Không thể xóa danh mục",
         variant: "danger",
       });
     }
@@ -72,11 +74,11 @@ const ManageCategories = () => {
       <div className="container mt-4 mb-2">
         <div className="row">
           <div className="col-12 col-md-6">
-            <h2>Category Management</h2>
+            <h2>Quản lý danh mục</h2>
           </div>
           <div className="col-12 col-md-6 text-md-end mt-3 mt-md-0">
             <button className="btn btn-primary" onClick={handleAddCategory}>
-              Add New Category
+              Thêm danh mục mới
             </button>
           </div>
         </div>
@@ -86,10 +88,10 @@ const ManageCategories = () => {
               <table className="table table-striped table-bordered table-hover">
                 <thead className="thead-dark">
                   <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Descriptions</th>
-                    <th scope="col">Images</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">Tên</th>
+                    <th scope="col">Mô tả</th>
+                    <th scope="col">Hình ảnh</th>
+                    <th scope="col">Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -101,14 +103,7 @@ const ManageCategories = () => {
                         {cat.images.map((img, index) => (
                           <img
                             key={index}
-                            src={
-                              // Giả sử ảnh có thể truy cập từ http://localhost:5000/category/<imgName>
-                              // Đã có sẵn logic remove "/api" phía dưới
-                              `${import.meta.env.VITE_API_BASE_URL.replace(
-                                "/api",
-                                ""
-                              )}/category/${img}`
-                            }
+                            src={getCategoryImageUrl(img)} // Sử dụng helper
                             alt={cat.name}
                             className="category-image"
                           />
@@ -116,22 +111,25 @@ const ManageCategories = () => {
                       </td>
                       <td>
                         <button
-                          className="btn btn-warning btn-sm"
+                          className="btn btn-warning btn-sm me-2"
                           onClick={() => handleEditCategory(cat)}
                         >
-                          Edit
-                        </button>{" "}
+                          Sửa
+                        </button>
                         <button
                           className="btn btn-danger btn-sm"
                           onClick={() => handleDeleteCategory(cat._id)}
                         >
-                          Delete
+                          Xóa
                         </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {categories.length === 0 && (
+                <p className="text-center">Không có danh mục nào được thêm.</p>
+              )}
             </div>
           </div>
         </div>
@@ -144,7 +142,7 @@ const ManageCategories = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {selectedCategory ? "Edit Category" : "Add New Category"}
+                  {selectedCategory ? "Sửa danh mục" : "Thêm danh mục mới"}
                 </h5>
                 <button
                   type="button"

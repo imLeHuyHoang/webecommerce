@@ -1,7 +1,9 @@
+// src/pages/ManageProducts/ManageProducts.jsx
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../utils/api-client";
 import ProductForm from "../form/ProductForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
+import { getProductImageUrl } from "../../../utils/image-helper"; // Import helper
 import "./ManageProducts.css";
 
 const ManageProducts = () => {
@@ -282,7 +284,12 @@ const ManageProducts = () => {
                     <td>{product.code}</td>
                     <td>{product.name}</td>
                     <td>{product.brand || "N/A"}</td>
-                    <td>{product.price}</td>
+                    <td>
+                      {product.price.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </td>
                     <td>{product.category?.name || "N/A"}</td>
                     <td>
                       {product.attributes.map((attr, index) => (
@@ -295,10 +302,7 @@ const ManageProducts = () => {
                       {product.images.map((img, index) => (
                         <img
                           key={index}
-                          src={`${import.meta.env.VITE_API_BASE_URL.replace(
-                            "/api",
-                            ""
-                          )}/products/${img}`}
+                          src={getProductImageUrl(img)} // Sử dụng helper
                           alt={product.name}
                           className="img-thumbnail"
                           style={{ width: "50px", marginRight: "5px" }}
