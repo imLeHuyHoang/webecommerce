@@ -24,12 +24,6 @@ phases:
       - echo "Tag Docker image frontend với tag commit hash..."
       - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$IMAGE_TAG
 
-      # Kiểm Tra Nội Dung Docker Images
-      - echo "Kiểm tra nội dung Docker image backend..."
-      - docker run --rm $BACKEND_REPO_URI:latest ls -la /app
-      - echo "Kiểm tra nội dung Docker image frontend..."
-      - docker run --rm $FRONTEND_REPO_URI:latest ls -la /app
-
   post_build:
     commands:
       - echo "Build completed on $(date)"
