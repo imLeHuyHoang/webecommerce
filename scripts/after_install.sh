@@ -43,6 +43,7 @@ echo "Retrieving backend .env from Parameter Store..."
 aws ssm get-parameter \
   --name "/myapp/web-backend/.env" \
   --with-decryption \
+  --region ap-southeast-1 \
   --query "Parameter.Value" \
   --output text > $BACKEND_DIR/.env
 
@@ -56,6 +57,7 @@ echo "Retrieving frontend .env from Parameter Store..."
 aws ssm get-parameter \
   --name "/myapp/web-frontend/.env" \
   --with-decryption \
+  --region ap-southeast-1 \
   --query "Parameter.Value" \
   --output text > $FRONTEND_DIR/.env
 
@@ -74,7 +76,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Dừng các container đang chạy (nếu có)
+# Dừng các container đang chạy (nếu có) và khởi động lại
 echo "Stopping existing containers..."
 docker-compose down || true
 
