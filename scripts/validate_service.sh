@@ -1,18 +1,17 @@
 #!/bin/bash
 # validate_service.sh
+
+set -e  # Dừng script nếu có lỗi xảy ra
+
 echo "Validating service..."
 
+APP_DIR="/home/ec2-user/myapp"
+
+echo "Navigating to application directory: $APP_DIR"
+cd $APP_DIR
+
 # Kiểm tra trạng thái container
+echo "Checking Docker containers status..."
 docker ps
-
-# Kiểm tra logs của backend
-echo "Checking backend service logs..."
-docker-compose logs backend
-
-
-# Kiểm tra logs của frontend
-echo "Checking frontend service logs..."
-docker-compose logs frontend
-
 
 echo "Service validation completed successfully."

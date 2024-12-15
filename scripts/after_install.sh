@@ -8,6 +8,7 @@ echo "Running AfterInstall hooks..."
 # Kiểm tra Docker daemon
 echo "Starting Docker daemon..."
 sudo systemctl start docker
+sudo systemctl enable docker
 sudo systemctl status docker
 
 # Đăng nhập vào Amazon ECR
@@ -67,6 +68,15 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Environment files created successfully."
+
+# **Thêm bước dọn dẹp Docker để giải phóng không gian đĩa**
+echo "Cleaning up Docker resources to free up disk space..."
+docker system prune -a --volumes -f
+if [ $? -ne 0 ]; then
+    echo "Failed to prune Docker system."
+    exit 1
+fi
+echo "Docker resources cleaned up successfully."
 
 # Kéo Docker images từ ECR
 echo "Pulling Docker images..."
