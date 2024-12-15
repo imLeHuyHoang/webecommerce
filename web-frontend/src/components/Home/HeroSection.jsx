@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Col, Button } from "react-bootstrap";
 import "./HeroSection.css"; // Import CSS truyền thống
 
 const HeroSection = ({ title, subtitle, link, image }) => {
