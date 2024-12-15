@@ -1,22 +1,23 @@
+# Sử dụng Node.js phiên bản 22 trên Alpine Linux
 FROM node:22-alpine
 
-# Set the working directory
+# Đặt thư mục làm việc
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Sao chép package.json và package-lock.json (nếu có)
 COPY package*.json ./
 
-# Install dependencies
+# Cài đặt các dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Sao chép toàn bộ mã nguồn ứng dụng
 COPY . .
 
-# Build the application
+# Build ứng dụng
 RUN npm run build
 
-# Expose the desired port
+# Mở cổng mà ứng dụng sẽ chạy (cổng 5173)
 EXPOSE 5173
 
-# Start the application
-CMD ["npm", "run", "preview"]
+# Khởi động ứng dụng sử dụng script "start"
+CMD ["npm", "start"]
