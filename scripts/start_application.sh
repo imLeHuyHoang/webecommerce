@@ -13,8 +13,10 @@ echo "Navigating to application directory: $APP_DIR"
 cd $APP_DIR
 
 # Khởi động lại các container với cấu hình mới
-echo "Starting Docker containers..."
+echo "Stopping existing Docker containers..."
 docker-compose down
-docker-compose up --build
+
+echo "Starting Docker containers in detached mode..."
+docker-compose up --build -d
 
 echo "Application started successfully."
