@@ -14,7 +14,7 @@ echo "Stopping existing Docker containers..."
 docker-compose down
 
 echo "Starting Docker containers in detached mode..."
-docker-compose up -d
+docker-compose up -d 
 
 # **Thêm bước kiểm tra trạng thái các container sau khi khởi động**
 echo "Checking Docker containers status..."
