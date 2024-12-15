@@ -14,6 +14,6 @@ cd $APP_DIR
 
 # Khởi động lại các container với cấu hình mới
 echo "Starting Docker containers..."
-docker-compose up -d
+docker-compose up --build
 
 echo "Application started successfully."
