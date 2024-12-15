@@ -36,10 +36,10 @@ phases:
       - docker push $FRONTEND_REPO_URI:latest
       - docker push $FRONTEND_REPO_URI:$IMAGE_TAG
 
-      - echo "Ghi file imagedefinitions.json..."
-      - printf '[{"name":"my-app-backend","imageUri":"%s"},{"name":"my-app-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$IMAGE_TAG $FRONTEND_REPO_URI:$IMAGE_TAG > imagedefinitions.json
-      - echo "create imagedefinitions.json file"
-      - cat imagedefinitions.json
+      # - echo "Ghi file imagedefinitions.json..."
+      # - printf '[{"name":"my-app-backend","imageUri":"%s"},{"name":"my-app-frontend","imageUri":"%s"}]' $BACKEND_REPO_URI:$IMAGE_TAG $FRONTEND_REPO_URI:$IMAGE_TAG > imagedefinitions.json
+      # - echo "create imagedefinitions.json file"
+      # - cat imagedefinitions.json
 
 artifacts:
   files:
@@ -47,5 +47,3 @@ artifacts:
     - scripts/**
     - docker-compose.yml
     - imagedefinitions.json
-    - web-backend/**
-    - web-frontend/**
