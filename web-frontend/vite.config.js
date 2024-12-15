@@ -11,7 +11,7 @@ export default defineConfig({
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
   },
-  server: {
+  preview: {
     host: "0.0.0.0",
     port: 5173, // Giữ nguyên cổng 5173
   },

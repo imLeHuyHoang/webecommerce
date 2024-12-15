@@ -1,24 +1,27 @@
-# Sử dụng Node.js phiên bản 22 trên Alpine Linux
-FROM node:22-alpine
+# Giai đoạn build
+FROM node:22-alpine AS build_image
 
-# Đặt thư mục làm việc
 WORKDIR /app
 
-# Sao chép package.json và package-lock.json (nếu có)
 COPY package*.json ./
-
-# Cài đặt các dependencies
 RUN npm install
 
-# Sao chép toàn bộ mã nguồn ứng dụng
 COPY . .
-
-# Build ứng dụng
 RUN npm run build
 
+# Giai đoạn sản xuất
+FROM node:22-alpine AS production_image
 
-# Mở cổng mà ứng dụng sẽ chạy (cổng 5173)
+WORKDIR /app
+
+# Sao chép thư mục dist từ build_image
+COPY --from=build_image /app/dist/ /app/dist/
+
+# Cài đặt serve để phục vụ các tệp tĩnh
+RUN npm install -g serve
+
+# Mở cổng 5173
 EXPOSE 5173
 
-# Khởi động ứng dụng sử dụng script "start"
-CMD ["npm", "run", "dev"]
+# Khởi động ứng dụng bằng lệnh "serve"
+CMD ["serve", "-s", "dist", "-l", "5173"]
