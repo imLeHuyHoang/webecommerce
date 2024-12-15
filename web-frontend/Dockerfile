@@ -16,11 +16,9 @@ COPY . .
 # Build ứng dụng
 RUN npm run build
 
-# Cài đặt serve để phục vụ các tệp tĩnh
-RUN npm install -g serve
 
 # Mở cổng mà ứng dụng sẽ chạy (cổng 5173)
 EXPOSE 5173
 
 # Khởi động ứng dụng sử dụng script "start"
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
