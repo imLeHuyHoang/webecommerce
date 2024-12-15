@@ -21,7 +21,7 @@ function App() {
             <ToastProvider>
               <ScrollToTop />
               <Snowfall
-                snowflakeCount={100} // Ensure you pass necessary props
+                snowflakeCount={100}
                 snowflakeSize={{ min: 5, max: 15 }}
                 fallSpeed={{ min: 5, max: 10 }}
                 drift={{ min: -2, max: 2 }}
