@@ -15,12 +15,12 @@ phases:
   build:
     commands:
       - echo "Build Docker image backend với tag latest..."
-      - docker build --platform linux/amd64 -t $BACKEND_REPO_URI:latest ./web-backend
+      - docker build -t $BACKEND_REPO_URI:latest ./web-backend
       - echo "Tag Docker image backend với tag commit hash..."
       - docker tag $BACKEND_REPO_URI:latest $BACKEND_REPO_URI:$IMAGE_TAG
 
       - echo "Build Docker image frontend với tag latest..."
-      - docker build --platform linux/amd64 -t $FRONTEND_REPO_URI:latest ./web-frontend
+      - docker build -t $FRONTEND_REPO_URI:latest ./web-frontend
       - echo "Tag Docker image frontend với tag commit hash..."
       - docker tag $FRONTEND_REPO_URI:latest $FRONTEND_REPO_URI:$IMAGE_TAG
 
