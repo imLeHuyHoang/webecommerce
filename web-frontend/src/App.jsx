@@ -1,6 +1,6 @@
-// App.js
+// src/App.js
 import React from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import "./assets/styles/App.css"; // Custom CSS
 import Routing from "./components/Routing/Routing";
 import Navbar from "./components/Navbar/Navbar";
@@ -14,7 +14,7 @@ import Snowfall from "./components/Snowfall/Snowfall";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <AuthProvider>
         <AuthAdminProvider>
           <CartProvider>
@@ -38,7 +38,7 @@ function App() {
           </CartProvider>
         </AuthAdminProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </Router>
   );
 }
 
