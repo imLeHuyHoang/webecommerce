@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { useNavigate } from "react-router-dom";
 import apiClient from "../utils/api-client";
 
 const AuthContext = createContext();
@@ -17,16 +16,14 @@ export const AuthProvider = ({ children }) => {
     accessToken: null,
     isLoading: true,
   });
-  const navigate = useNavigate();
 
-  // Define clearAuthData before using it in useEffect
   const clearAuthData = useCallback(() => {
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
     setAuth({ user: null, accessToken: null, isLoading: false });
   }, []);
 
-  // Initialize auth state
+  // Khởi tạo trạng thái auth
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -49,9 +46,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     initializeAuth();
-  }, [clearAuthData]); // Now clearAuthData is defined
+  }, [clearAuthData]);
 
-  // Token refresh mechanism
+  // Cơ chế refresh token
   useEffect(() => {
     let refreshInterval;
 
@@ -68,14 +65,13 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error("Token refresh error:", error);
         clearAuthData();
-        navigate("/login");
+        // Không navigate, chỉ xóa dữ liệu auth
       }
     };
 
     if (auth.accessToken) {
-      refreshInterval = setInterval(refreshToken, 10 * 60 * 1000); // 10 minutes
-
-      // Initial refresh
+      refreshInterval = setInterval(refreshToken, 10 * 60 * 1000); // 10 phút
+      // Refresh ngay lần đầu
       refreshToken();
     }
 
@@ -84,7 +80,7 @@ export const AuthProvider = ({ children }) => {
         clearInterval(refreshInterval);
       }
     };
-  }, [auth.accessToken, clearAuthData, navigate]);
+  }, [auth.accessToken, clearAuthData]);
 
   const login = useCallback((user, accessToken) => {
     if (user && accessToken) {
@@ -105,9 +101,9 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout error:", error);
     } finally {
       clearAuthData();
-      navigate("/login");
+      // Không navigate, việc chuyển hướng sẽ do component khác xử lý
     }
-  }, [clearAuthData, navigate]);
+  }, [clearAuthData]);
 
   return (
     <AuthContext.Provider

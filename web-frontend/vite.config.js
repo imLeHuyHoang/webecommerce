@@ -5,12 +5,7 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      react: path.resolve(__dirname, "node_modules/react"),
-      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
-    },
-  },
+  resolve: {},
   server: {
     host: "0.0.0.0",
     port: 5173,
