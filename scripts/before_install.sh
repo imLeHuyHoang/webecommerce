@@ -1,9 +1,20 @@
 #!/bin/bash
 # before_install.sh
 
-set -e  # Dừng script nếu có lỗi xảy ra
+set -e  # Dừng script nếu có lỗi
 
 echo "Running BeforeInstall hooks..."
+
+# Cài đặt Git nếu chưa có
+if ! command -v git &> /dev/null
+then
+    echo "Git not found. Installing Git..."
+    sudo yum update -y
+    sudo yum install git -y
+    echo "Git installed successfully."
+else
+    echo "Git is already installed."
+fi
 
 # Kiểm tra và cài đặt Docker nếu chưa có
 if ! command -v docker &> /dev/null
@@ -23,14 +34,16 @@ fi
 if ! command -v docker-compose &> /dev/null
 then
     echo "Docker Compose not found. Installing Docker Compose..."
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    DOCKER_COMPOSE_VERSION="1.29.2"
+    sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" \
+     -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     echo "Docker Compose installed successfully."
 else
     echo "Docker Compose is already installed."
 fi
 
-# Kiểm tra phiên bản Docker và Docker Compose
+# Kiểm tra phiên bản
 docker --version
 docker-compose --version
 

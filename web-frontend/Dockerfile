@@ -1,22 +1,23 @@
+# web-frontend/Dockerfile
+
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Sao chép file package.json và package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Cài đặt dependencies
+# Cài đặt dependencies (npm ci nếu có package-lock.json)
 RUN npm ci
-
-# Cài đặt công cụ `serve` để chạy production
-RUN npm install -g serve
 
 # Sao chép toàn bộ mã nguồn
 COPY . .
 
-# Build ra folder dist
+# Build ra dist
 RUN npm run build
 
-# Chạy serve để phục vụ thư mục dist
+# Cài đặt serve
+RUN npm install -g serve
+
 EXPOSE 5173
 CMD ["serve", "-s", "dist", "-l", "5173"]

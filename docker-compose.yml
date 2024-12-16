@@ -1,14 +1,18 @@
-version: "3"
+version: "3.9"
 services:
   backend:
-    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-backend:latest
+    build:
+      context: ./web-backend
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     env_file:
       - ./web-backend/.env
 
   frontend:
-    image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-frontend:latest
+    build:
+      context: ./web-frontend
+      dockerfile: Dockerfile
     ports:
       - "5173:5173"
     env_file:
