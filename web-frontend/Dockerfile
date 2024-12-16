@@ -8,12 +8,15 @@ COPY package*.json ./
 # Cài đặt dependencies
 RUN npm ci
 
+# Cài đặt công cụ `serve` để chạy production
+RUN npm install -g serve
+
 # Sao chép toàn bộ mã nguồn
 COPY . .
 
 # Build ra folder dist
 RUN npm run build
 
-# Chạy serve production bằng vite preview
+# Chạy serve để phục vụ thư mục dist
 EXPOSE 5173
-CMD ["npm", "run", "start"]
+CMD ["serve", "-s", "dist", "-l", "5173"]
