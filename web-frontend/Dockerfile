@@ -2,10 +2,18 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Sao chép file package.json và package-lock.json
 COPY package*.json ./
-RUN npm install
 
+# Cài đặt dependencies
+RUN npm ci
+
+# Sao chép toàn bộ mã nguồn
 COPY . .
 
-# Lúc chạy container, serve build production
-CMD ["npm","run","start"]
+# Build ra folder dist
+RUN npm run build
+
+# Chạy serve production bằng vite preview
+EXPOSE 5173
+CMD ["npm", "run", "start"]
