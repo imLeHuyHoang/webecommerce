@@ -5,6 +5,8 @@ set -e
 
 echo "Running BeforeInstall hooks..."
 
+
+
 # Kiểm tra và cài đặt Git nếu chưa có
 if ! command -v git &> /dev/null
 then
@@ -56,5 +58,12 @@ fi
 
 # Thay đổi quyền sở hữu thư mục ứng dụng
 sudo chown -R ec2-user:ec2-user $APP_DIR
+
+cd /home/ec2-user
+wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
+chmod +x ./install
+sudo ./install auto
+sudo systemctl start codedeploy-agent
+sudo systemctl enable codedeploy-agent
 
 echo "BeforeInstall hooks completed successfully."

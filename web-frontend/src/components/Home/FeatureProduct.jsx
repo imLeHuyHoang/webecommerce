@@ -57,8 +57,8 @@ function FeatureProduct() {
               <ProductCard
                 id={product._id}
                 stock={product.stock}
-                rating={product.reviews?.rate || 0}
-                ratingCount={product.reviews?.counts || 0}
+                rating={product.averageRating || 0}
+                ratingCount={product.reviewCount || 0}
                 title={product.name}
                 price={product.price}
                 image={product.images?.[0]}

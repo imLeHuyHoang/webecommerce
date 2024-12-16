@@ -95,7 +95,6 @@ const RatingComponent = ({ productId }) => {
       setMessage("Có lỗi xảy ra khi gửi đánh giá."); // Error message
     }
   };
-  console.log(allReviews);
 
   if (loading)
     return (
