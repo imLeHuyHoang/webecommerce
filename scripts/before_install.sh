@@ -46,5 +46,6 @@ fi
 # Kiểm tra phiên bản
 docker --version
 docker-compose --version
+rm -rf /home/ec2-user/myapp/*
 
 echo "BeforeInstall hooks completed successfully."
