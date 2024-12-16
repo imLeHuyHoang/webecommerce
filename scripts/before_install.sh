@@ -46,6 +46,8 @@ fi
 # Kiểm tra phiên bản
 docker --version
 docker-compose --version
+sudo chown -R ec2-user:ec2-user /home/ec2-user/myapp/
+sudo chmod -R u+rw /home/ec2-user/myapp/
 rm -rf /home/ec2-user/myapp/*
 
 echo "BeforeInstall hooks completed successfully."
