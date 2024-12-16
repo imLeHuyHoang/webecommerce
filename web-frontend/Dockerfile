@@ -1,5 +1,5 @@
 # Giai đoạn build
-FROM node:20-alpine AS build_image
+FROM node:20-alpine
 
 WORKDIR /app
 

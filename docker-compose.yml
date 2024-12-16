@@ -3,8 +3,6 @@ services:
     image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-backend:latest
     ports:
       - "5000:5000"
-    networks:
-      - app-network
     env_file:
       - ./web-backend/.env
 
@@ -12,11 +10,5 @@ services:
     image: 654654447255.dkr.ecr.ap-southeast-1.amazonaws.com/my-app-frontend:latest
     ports:
       - "5173:5173"
-    networks:
-      - app-network
     env_file:
       - ./web-frontend/.env
-
-networks:
-  app-network:
-    driver: bridge
