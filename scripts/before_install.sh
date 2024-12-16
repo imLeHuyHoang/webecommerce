@@ -1,11 +1,11 @@
 #!/bin/bash
 # before_install.sh
 
-set -e  # Dừng script nếu có lỗi
+set -e
 
 echo "Running BeforeInstall hooks..."
 
-# Cài đặt Git nếu chưa có
+# Kiểm tra và cài đặt Git nếu chưa có
 if ! command -v git &> /dev/null
 then
     echo "Git not found. Installing Git..."
@@ -46,8 +46,15 @@ fi
 # Kiểm tra phiên bản
 docker --version
 docker-compose --version
-sudo chown -R ec2-user:ec2-user /home/ec2-user/myapp/
-sudo chmod -R u+rw /home/ec2-user/myapp/
-rm -rf /home/ec2-user/myapp/*
+
+# Tạo thư mục ứng dụng nếu chưa tồn tại
+APP_DIR="/home/ec2-user/myapp"
+if [ ! -d "$APP_DIR" ]; then
+    echo "Creating application directory: $APP_DIR"
+    mkdir -p $APP_DIR
+fi
+
+# Thay đổi quyền sở hữu thư mục ứng dụng
+sudo chown -R ec2-user:ec2-user $APP_DIR
 
 echo "BeforeInstall hooks completed successfully."
