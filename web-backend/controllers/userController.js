@@ -23,7 +23,6 @@ const generateTokens = (user) => {
 
   return { accessToken, refreshToken };
 };
-
 // Cấu hình cookie
 const getCookieConfig = (isProduction) => ({
   httpOnly: true,
@@ -57,7 +56,7 @@ exports.registerUser = async (req, res) => {
       password: hashedPassword,
       phone,
       gender,
-      tokenVersion: 0,
+      tokenVersion: 0, // Đảm bảo tokenVersion được thiết lập
     });
 
     await newUser.save();
@@ -88,7 +87,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ message: "Tài khoản không tồn tại." });
     }
 
-    // **New Check: Verify if the user's account is active**
+    // Kiểm tra tài khoản có bị khóa không
     if (!user.isActive) {
       return res.status(403).json({
         message:
@@ -207,7 +206,15 @@ exports.refreshToken = async (req, res) => {
       getCookieConfig(process.env.NODE_ENV === "production")
     );
 
-    res.json({ accessToken: tokens.accessToken });
+    // Trả về access token và thông tin người dùng
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      roles: user.roles,
+    };
+
+    res.json({ accessToken: tokens.accessToken, user: userResponse });
   } catch (error) {
     console.error("Refresh token error:", error);
     res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn." });

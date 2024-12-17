@@ -161,6 +161,8 @@ const CheckoutPage = () => {
           },
           autoClose: 3000,
         });
+        // Làm trống giỏ hàng trên frontend
+        setCart(null);
       }
     } catch (error) {
       console.error("Error during checkout:", error);

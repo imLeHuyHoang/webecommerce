@@ -30,8 +30,10 @@
 .hero-title {
   font-size: 3rem;
   font-weight: bold;
+  color: white;
 }
 
 .hero-subtitle {
   font-size: 1.5rem;
+  color: white;
 }

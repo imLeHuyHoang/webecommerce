@@ -3,7 +3,7 @@ import axios from "axios";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true, // Ensure cookies are sent with requests
+  withCredentials: true, // Đảm bảo cookies được gửi với các yêu cầu
 });
 
 let isRefreshing = false;

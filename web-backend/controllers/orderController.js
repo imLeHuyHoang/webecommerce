@@ -4,17 +4,24 @@ const Discount = require("../models/Discount");
 const paymentService = require("../services/paymentService");
 const Inventory = require("../models/Inventory");
 const mongoose = require("mongoose");
+const Cart = require("../models/Cart");
 
 exports.createOrder = async (req, res) => {
+  const session = await mongoose.startSession();
   try {
+    session.startTransaction();
+
     const { shippingAddress, products, paymentMethod, cartDiscountCode, note } =
       req.body;
 
     if (!shippingAddress || !products || products.length === 0) {
-      return res.status(400).json({ message: "Invalid order information." });
+      await session.abortTransaction();
+      return res
+        .status(400)
+        .json({ message: "Thông tin đơn hàng không hợp lệ." });
     }
 
-    // Ensure shippingAddress.phone is a string
+    // Đảm bảo phone là string
     if (Array.isArray(shippingAddress.phone)) {
       shippingAddress.phone = shippingAddress.phone[0];
     }
@@ -22,20 +29,20 @@ exports.createOrder = async (req, res) => {
     let totalAmount = 0;
     let cartDiscount = null;
 
-    // Process product details with discounts
+    // Xử lý chi tiết sản phẩm với discount
     const productDetails = await Promise.all(
       products.map(async (item) => {
-        const product = await Product.findById(item.product);
+        const product = await Product.findById(item.product).session(session);
         if (!product) {
-          throw new Error(`Product with ID: ${item.product} not found`);
+          throw new Error(`Không tìm thấy sản phẩm với ID: ${item.product}`);
         }
 
         let price = product.price;
         let discount = null;
 
-        // Process product discount if available
+        // Xử lý discount sản phẩm nếu có
         if (item.discount) {
-          discount = await Discount.findById(item.discount);
+          discount = await Discount.findById(item.discount).session(session);
           if (discount) {
             const discountValue = discount.isPercentage
               ? (price * discount.value) / 100
@@ -56,9 +63,9 @@ exports.createOrder = async (req, res) => {
       })
     );
 
-    // Process cart-level discount if available
+    // Xử lý discount cho toàn bộ giỏ hàng nếu có
     if (cartDiscountCode) {
-      cartDiscount = await Discount.findById(cartDiscountCode);
+      cartDiscount = await Discount.findById(cartDiscountCode).session(session);
       if (cartDiscount) {
         const cartDiscountValue = cartDiscount.isPercentage
           ? (totalAmount * cartDiscount.value) / 100
@@ -67,15 +74,15 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // Create the order
+    // Tạo đơn hàng
     const order = new Order({
       user: req.user._id,
       shippingAddress,
       products: productDetails,
       total: totalAmount,
       payment: { method: paymentMethod, isVerified: false },
-      paymentStatus: "pending",
-      paymentExpiry: new Date(Date.now() + 30 * 60 * 1000),
+      paymentStatus: paymentMethod === "zalopay" ? "pending" : "unpaid",
+      paymentExpiry: new Date(Date.now() + 30 * 60 * 1000), // 30 phút
       shippingStatus: "processing",
       discountCode: cartDiscount ? cartDiscount._id : null,
       note: note || "",
@@ -87,39 +94,76 @@ exports.createOrder = async (req, res) => {
       },
     });
 
+    // Lưu đơn hàng trước khi xử lý thanh toán
+    await order.save({ session });
+
     if (paymentMethod === "zalopay") {
+      // Gọi dịch vụ thanh toán ZaloPay sau khi đơn hàng đã được lưu
       const paymentResult = await paymentService.processZaloPayPayment(
         order,
         productDetails
       );
       if (paymentResult.success) {
-        await order.save();
+        await session.commitTransaction();
+        session.endSession();
         return res.status(201).json({ orderUrl: paymentResult.orderUrl });
       } else {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(400).json({ message: paymentResult.message });
       }
     }
 
     if (paymentMethod === "cod") {
-      // Chuyển trạng thái thanh toán sang unpaid
-      order.paymentStatus = "unpaid";
+      // Xử lý giảm tồn kho và xóa giỏ hàng
+      // 1. Kiểm tra và giảm tồn kho
+      for (const item of productDetails) {
+        const inventory = await Inventory.findOne({
+          product: item.product,
+        }).session(session);
+        if (!inventory) {
+          throw new Error(
+            `Không tìm thấy tồn kho cho sản phẩm: ${item.product}`
+          );
+        }
 
-      await order.save();
-      return res
-        .status(201)
-        .json({ message: "Order created successfully.", order });
+        if (inventory.quantity < item.quantity) {
+          throw new Error(
+            `Sản phẩm ${item.name} không đủ số lượng. Tồn kho hiện tại: ${inventory.quantity}`
+          );
+        }
+
+        // Giảm số lượng tồn kho
+        inventory.quantity -= item.quantity;
+        inventory.lastUpdated = new Date();
+        await inventory.save({ session });
+      }
+
+      // 2. Xóa giỏ hàng của người dùng
+      await Cart.findOneAndDelete({ user: req.user._id }).session(session);
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return res.status(201).json({ message: "Đặt hàng thành công.", order });
     }
 
-    await order.save();
-
-    res.status(201).json({ message: "Order created successfully.", order });
+    // Nếu phương thức thanh toán không hợp lệ
+    await session.abortTransaction();
+    session.endSession();
+    return res
+      .status(400)
+      .json({ message: "Phương thức thanh toán không hợp lệ." });
   } catch (error) {
     console.error("Error creating order:", error);
-    if (!res.headersSent) {
-      res
-        .status(500)
-        .json({ message: "Server error. Please try again later." });
-    }
+    await session.abortTransaction();
+    session.endSession();
+    res
+      .status(500)
+      .json({
+        message: "Có lỗi xảy ra khi tạo đơn hàng.",
+        error: error.message,
+      });
   }
 };
 exports.getOrderStatusCounts = async (req, res) => {
@@ -223,10 +267,9 @@ exports.cancelOrder = async (req, res) => {
 
     console.log(`Cancelling Order ID: ${orderId} for User ID: ${userId}`);
 
-    const order = await Order.findOne({
-      _id: orderId,
-      user: userId,
-    }).session(session);
+    const order = await Order.findOne({ _id: orderId, user: userId }).session(
+      session
+    );
 
     if (!order) {
       console.log("Order not found during cancellation.");
@@ -242,7 +285,7 @@ exports.cancelOrder = async (req, res) => {
       return res.status(400).json({ message: "Cannot cancel this order" });
     }
 
-    // Process ZaloPay Refund if payment is done via ZaloPay
+    // Process ZaloPay Refund if payment is done via ZaloPay and status is 'paid'
     if (order.paymentStatus === "paid" && order.payment.method === "zalopay") {
       console.log("Processing ZaloPay refund...");
       const refundResult = await paymentService.refundZaloPayOrder(order);
@@ -287,7 +330,26 @@ exports.cancelOrder = async (req, res) => {
       order.orderTimestamps.cancellation = new Date();
 
       // Step 2: Update Inventory (since no ZaloPay refund is involved)
-      await updateInventoryAfterRefund(order);
+      const productDetails = order.products;
+
+      for (const item of productDetails) {
+        const inventory = await Inventory.findOne({
+          product: item.product,
+        }).session(session);
+
+        if (inventory) {
+          // Increase the inventory by the quantity of the cancelled order
+          inventory.quantity += item.quantity; // Refund means we restock the products
+
+          // Update the last updated timestamp
+          inventory.lastUpdated = new Date();
+
+          await inventory.save({ session });
+        } else {
+          console.error(`Inventory not found for product ${item.product}`);
+          throw new Error(`Inventory not found for product ${item.product}`);
+        }
+      }
 
       await order.save({ session });
 
@@ -297,7 +359,9 @@ exports.cancelOrder = async (req, res) => {
   } catch (error) {
     console.error("Error cancelling order:", error);
     await session.abortTransaction();
-    res.status(500).json({ message: "Error cancelling order" });
+    res
+      .status(500)
+      .json({ message: "Error cancelling order", error: error.message });
   } finally {
     session.endSession();
   }

@@ -1,6 +1,6 @@
 // scripts/initTokenVersion.js
-import mongoose from "mongoose";
-import User from "../models/User"; // Điều chỉnh đường dẫn nếu cần
+const mongoose = require("mongoose");
+const User = require("../models/User"); // Điều chỉnh đường dẫn nếu cần
 
 mongoose.connect(process.env.DATABASE, {
   useNewUrlParser: true,
