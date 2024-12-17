@@ -11,7 +11,6 @@ import LoginPage from "../LoginPage/LoginPage.jsx";
 import SignUpPage from "../SignupPage/SignupPage.jsx";
 import Logout from "../LogOut/LogOut.jsx";
 import Profile from "../Profile/Profile.jsx";
-import Dashboard from "../Admin/Dashboard.jsx";
 import UserManagement from "../Admin/UserManagement.jsx";
 import ProductManagement from "../Admin/ProductManagement.jsx";
 import OrderManagement from "../Admin/OrderManagement.jsx";
@@ -43,7 +42,7 @@ function Routing() {
 
       {/* Các route cho admin */}
       <Route path="/admin" element={<AdminRoute />}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<ProductManagement />} />
         <Route path="usermanagement" element={<UserManagement />} />
         <Route path="productmanagement" element={<ProductManagement />} />
         <Route path="ordermanagement" element={<OrderManagement />} />

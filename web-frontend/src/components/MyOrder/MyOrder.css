@@ -1,0 +1,292 @@
+/* Container for the My Orders page */
+.my-order-page-container {
+  background-color: #f5f5f5;
+  padding: 20px 0;
+}
+
+/* Inner container for padding and alignment */
+.my-order-page-container-inner {
+  background-color: #ffffff;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Page Title */
+.my-order-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #333333;
+}
+
+/* Search and Filter Section */
+.my-order-page-search-filter {
+  gap: 15px;
+}
+
+.my-order-page-search-group {
+  display: flex;
+  flex: 1;
+}
+
+.my-order-page-search-input {
+  flex: 1;
+}
+
+.my-order-page-clear-btn {
+  min-width: 80px;
+}
+
+/* Filter Select */
+.my-order-page-filter-group {
+  min-width: 200px;
+}
+
+.my-order-page-filter-select {
+  width: 100%;
+}
+
+/* Loading Spinner */
+.my-order-page-loading {
+  padding: 50px 0;
+}
+
+/* Orders List */
+.my-order-page-orders .my-order-page-order-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.my-order-page-orders .my-order-page-order-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Order Card */
+.my-order-page-card {
+  border: none;
+}
+
+.my-order-page-card .card-body {
+  padding: 20px;
+}
+
+.my-order-page-order-id {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+.my-order-page-order-date {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.my-order-page-order-status,
+.my-order-page-order-total,
+.my-order-page-order-refund {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.my-order-page-view-details-btn,
+.my-order-page-cancel-order-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.my-order-page-view-details-btn {
+  background-color: #007bff;
+  border: none;
+}
+
+.my-order-page-cancel-order-btn {
+  background-color: #dc3545;
+  border: none;
+}
+
+/* No Orders Message */
+.my-order-page-no-orders,
+.my-order-page-no-login {
+  font-size: 1.1rem;
+  color: #6c757d;
+  padding: 50px 0;
+}
+
+/* Modals */
+
+/* General Modal Styles */
+.my-order-page-modal,
+.my-order-page-cancel-modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Titles */
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Modal Body */
+.my-order-page-modal .modal-body,
+.my-order-page-cancel-modal .modal-body {
+  color: #555555;
+}
+
+.my-order-page-modal-section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #333333;
+}
+
+/* Table Styles */
+.my-order-page-modal-table th,
+.my-order-page-modal-table td {
+  vertical-align: middle;
+}
+
+.my-order-page-modal-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.my-order-page-modal-table td {
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Refund Status Button */
+.my-order-page-check-refund-btn {
+  margin-top: 10px;
+}
+
+/* Cancel Order Input */
+.my-order-page-cancel-input {
+  margin-top: 15px;
+}
+
+/* Cancel Modal Buttons */
+.my-order-page-cancel-modal-close-btn,
+.my-order-page-cancel-confirm-btn {
+  width: 100%;
+}
+
+.my-order-page-cancel-confirm-btn {
+  background-color: #dc3545;
+  border: none;
+  margin-top: 10px;
+}
+
+/* Close Buttons */
+.my-order-page-modal-close-btn,
+.my-order-page-cancel-modal-close-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Responsive Design */
+
+/* Small Devices (Phones) */
+@media (max-width: 576px) {
+  .my-order-page-container-inner {
+    padding: 20px;
+  }
+
+  .my-order-page-title {
+    font-size: 1.5rem;
+  }
+
+  .my-order-page-search-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .my-order-page-search-group {
+    flex-direction: column;
+  }
+
+  .my-order-page-clear-btn {
+    margin-top: 10px;
+  }
+
+  .my-order-page-filter-group {
+    min-width: 100%;
+  }
+
+  .my-order-page-order-id {
+    font-size: 1rem;
+  }
+
+  .my-order-page-order-date {
+    font-size: 0.85rem;
+  }
+
+  .my-order-page-order-status,
+  .my-order-page-order-total,
+  .my-order-page-order-refund {
+    font-size: 0.95rem;
+  }
+
+  .my-order-page-view-details-btn,
+  .my-order-page-cancel-order-btn {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+}
+
+/* Medium Devices (Tablets) */
+@media (min-width: 577px) and (max-width: 992px) {
+  .my-order-page-title {
+    font-size: 1.75rem;
+  }
+
+  .my-order-page-order-id {
+    font-size: 1.1rem;
+  }
+
+  .my-order-page-order-date {
+    font-size: 0.9rem;
+  }
+
+  .my-order-page-order-status,
+  .my-order-page-order-total,
+  .my-order-page-order-refund {
+    font-size: 0.975rem;
+  }
+
+  .my-order-page-view-details-btn,
+  .my-order-page-cancel-order-btn {
+    font-size: 0.95rem;
+    padding: 9px;
+  }
+}
+
+/* Large Devices (Desktops) */
+@media (min-width: 993px) {
+  .my-order-page-title {
+    font-size: 2rem;
+  }
+
+  .my-order-page-order-id {
+    font-size: 1.2rem;
+  }
+
+  .my-order-page-order-date {
+    font-size: 0.95rem;
+  }
+
+  .my-order-page-order-status,
+  .my-order-page-order-total,
+  .my-order-page-order-refund {
+    font-size: 1rem;
+  }
+
+  .my-order-page-view-details-btn,
+  .my-order-page-cancel-order-btn {
+    font-size: 1rem;
+    padding: 10px;
+  }
+}

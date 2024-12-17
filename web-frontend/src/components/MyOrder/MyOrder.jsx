@@ -136,7 +136,9 @@ function MyOrders() {
 
   if (!auth.user) {
     return (
-      <p className="text-center">Bạn cần đăng nhập để xem đơn hàng của mình.</p>
+      <p className="my-order-page-no-login text-center">
+        Bạn cần đăng nhập để xem đơn hàng của mình.
+      </p>
     );
   }
 
@@ -162,59 +164,69 @@ function MyOrders() {
   };
 
   return (
-    <div>
+    <div className="my-order-page-container">
       {/* Main Content */}
-      <div className="container my-4">
-        <h1 className="text-center">Đơn hàng của tôi</h1>
+      <div className="container my-order-page-container-inner my-4">
+        <h1 className="my-order-page-title text-center">Đơn hàng của tôi</h1>
 
         {/* Search and Filter */}
-        <div className=" d-flex justify-content-between align-items-center my-3">
-          <div className="search-and-filter w-50">
+        <div className="my-order-page-search-filter d-flex flex-column flex-md-row justify-content-between align-items-center my-3">
+          <div className="my-order-page-search-group d-flex mb-2 mb-md-0">
             <input
-              className=" input-text small-input"
+              className="my-order-page-search-input form-control me-2"
               placeholder="Tìm kiếm theo mã đơn hàng"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="btn-delete" onClick={() => setSearchTerm("")}>
+            <button
+              className="my-order-page-clear-btn btn btn-outline-secondary"
+              onClick={() => setSearchTerm("")}
+            >
               Xóa
             </button>
           </div>
 
-          <select
-            className="custom-select"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="">Tất cả trạng thái</option>
-            <option value="processing">Đang xử lý</option>
-            <option value="shipping">Đang giao hàng</option>
-            <option value="shipped">Đã giao</option>
-            <option value="delivered">Đã nhận</option>
-            <option value="cancelled">Đã hủy</option>
-          </select>
+          <div className="my-order-page-filter-group">
+            <select
+              className="my-order-page-filter-select form-select"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="processing">Đang xử lý</option>
+              <option value="shipping">Đang giao hàng</option>
+              <option value="shipped">Đã giao</option>
+              <option value="delivered">Đã nhận</option>
+              <option value="cancelled">Đã hủy</option>
+            </select>
+          </div>
         </div>
 
         {/* Orders List */}
         {loading ? (
-          <div className="text-center my-4">
+          <div className="my-order-page-loading text-center my-4">
             <div className="spinner-border" role="status">
               <span className="visually-hidden">Đang tải đơn hàng...</span>
             </div>
           </div>
         ) : (
-          <div className="row">
+          <div className="my-order-page-orders row">
             {filteredOrders.length > 0 ? (
               filteredOrders.map((order) => (
-                <div key={order._id} className="col-md-4 mb-4">
-                  <div className="card order-card h-100">
-                    <div className="card-body">
-                      <h5 className="card-title">Mã đơn hàng: {order._id}</h5>
-                      <h6 className="card-subtitle mb-2 text-muted">
+                <div
+                  key={order._id}
+                  className="my-order-page-order-card col-md-6 col-lg-4 mb-4"
+                >
+                  <div className="card my-order-page-card h-100 shadow-sm">
+                    <div className="card-body d-flex flex-column">
+                      <h5 className="card-title my-order-page-order-id">
+                        Mã đơn hàng: {order._id}
+                      </h5>
+                      <h6 className="card-subtitle mb-2 text-muted my-order-page-order-date">
                         Ngày đặt:{" "}
                         {new Date(order.createdAt).toLocaleDateString()}
                       </h6>
-                      <p className="card-text">
+                      <p className="card-text my-order-page-order-status">
                         <strong>Trạng thái: </strong>
                         <span
                           className={`badge bg-${getStatusBadgeVariant(
@@ -224,12 +236,12 @@ function MyOrders() {
                           {order.shippingStatus}
                         </span>
                       </p>
-                      <p className="card-text">
+                      <p className="card-text my-order-page-order-total">
                         <strong>Tổng tiền: </strong>
                         {order.total.toLocaleString()} đ
                       </p>
                       {order.refund && order.refund.status && (
-                        <p className="card-text">
+                        <p className="card-text my-order-page-order-refund">
                           <strong>Tình trạng hoàn tiền: </strong>
                           <span
                             className={`badge bg-${getStatusBadgeVariant(
@@ -240,26 +252,30 @@ function MyOrders() {
                           </span>
                         </p>
                       )}
-                      <button
-                        className="btn btn-primary me-2"
-                        onClick={() => viewOrderDetails(order._id)}
-                      >
-                        Xem chi tiết
-                      </button>
-                      {order.shippingStatus === "processing" && (
+                      <div className="mt-auto">
                         <button
-                          className="btn btn-danger"
-                          onClick={() => openCancelModal(order)}
+                          className="my-order-page-view-details-btn btn btn-primary me-2"
+                          onClick={() => viewOrderDetails(order._id)}
                         >
-                          Hủy đơn hàng
+                          Xem chi tiết
                         </button>
-                      )}
+                        {order.shippingStatus === "processing" && (
+                          <button
+                            className="my-order-page-cancel-order-btn btn btn-danger"
+                            onClick={() => openCancelModal(order)}
+                          >
+                            Hủy đơn hàng
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-center">Không có đơn hàng nào.</p>
+              <p className="my-order-page-no-orders text-center">
+                Không có đơn hàng nào.
+              </p>
             )}
           </div>
         )}
@@ -267,10 +283,9 @@ function MyOrders() {
         {/* Refund Status Checker Removed */}
       </div>
 
-      {/* Order Details Modal */}
       {selectedOrder && (
         <div
-          className={`modal ${showModal ? "show" : ""}`}
+          className={`my-order-page-modal modal ${showModal ? "show" : ""}`}
           style={{ display: showModal ? "block" : "none" }}
         >
           <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -284,126 +299,152 @@ function MyOrders() {
                 ></button>
               </div>
               <div className="modal-body">
-                <p>
-                  <strong>Mã đơn hàng:</strong> {selectedOrder._id}
-                </p>
-                <p>
-                  <strong>Ngày đặt:</strong>{" "}
-                  {new Date(selectedOrder.createdAt).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Trạng thái:</strong>{" "}
-                  <span
-                    className={`badge bg-${getStatusBadgeVariant(
-                      selectedOrder.shippingStatus
-                    )}`}
-                  >
-                    {selectedOrder.shippingStatus}
-                  </span>
-                </p>
-                <p>
-                  <strong>Tổng tiền:</strong>{" "}
-                  {selectedOrder.total.toLocaleString()} đ
-                </p>
-                {selectedOrder.refund && selectedOrder.refund.status && (
-                  <>
-                    <h5>Thông tin hoàn tiền:</h5>
-                    <p>
-                      <strong>Tình trạng hoàn tiền:</strong>{" "}
-                      <span
-                        className={`badge bg-${getStatusBadgeVariant(
-                          selectedOrder.refund.status
-                        )}`}
-                      >
-                        {selectedOrder.refund.status}
-                      </span>
-                    </p>
-                    {selectedOrder.refund.mRefundId && (
+                <div className="container-fluid">
+                  {/* Hàng 1: 2 cột */}
+                  <div className="row">
+                    {/* Cột trái: Thông tin đơn hàng và hoàn tiền */}
+                    <div className="col-md-6">
                       <p>
-                        <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
-                        {selectedOrder.refund.mRefundId}
+                        <strong>Mã đơn hàng:</strong> {selectedOrder._id}
                       </p>
-                    )}
-                    <button
-                      className="btn btn-info"
-                      onClick={checkRefundStatus}
-                    >
-                      Kiểm tra tình trạng refund
-                    </button>
-                    {refundCheckResult && (
-                      <div className="mt-3">
-                        {refundCheckResult.error ? (
-                          <div className="alert alert-danger">
-                            {refundCheckResult.error}
-                          </div>
-                        ) : (
-                          <div className="alert alert-info">
-                            <p>
-                              <strong>Mã đơn hàng:</strong>{" "}
-                              {refundCheckResult.orderId}
-                            </p>
-                            <p>
-                              <strong>Tình trạng hoàn tiền:</strong>{" "}
-                              {refundCheckResult.refundStatus}
-                            </p>
-                            <p>
-                              <strong>Thông báo:</strong>{" "}
-                              {refundCheckResult.message}
-                            </p>
+                      <p>
+                        <strong>Ngày đặt:</strong>{" "}
+                        {new Date(selectedOrder.createdAt).toLocaleDateString()}
+                      </p>
+                      <p>
+                        <strong>Trạng thái:</strong>{" "}
+                        <span
+                          className={`badge bg-${getStatusBadgeVariant(
+                            selectedOrder.shippingStatus
+                          )}`}
+                        >
+                          {selectedOrder.shippingStatus}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Tổng tiền:</strong>{" "}
+                        {selectedOrder.total.toLocaleString()} đ
+                      </p>
+                      {selectedOrder.refund && selectedOrder.refund.status && (
+                        <>
+                          <h5 className="my-order-page-modal-section-title">
+                            Thông tin hoàn tiền:
+                          </h5>
+                          <p>
+                            <strong>Tình trạng hoàn tiền:</strong>{" "}
+                            <span
+                              className={`badge bg-${getStatusBadgeVariant(
+                                selectedOrder.refund.status
+                              )}`}
+                            >
+                              {selectedOrder.refund.status}
+                            </span>
+                          </p>
+                          {selectedOrder.refund.mRefundId && (
                             <p>
                               <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
-                              {refundCheckResult.mRefundId}
+                              {selectedOrder.refund.mRefundId}
                             </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
+                          )}
+                          <button
+                            className="my-order-page-check-refund-btn btn btn-info"
+                            onClick={checkRefundStatus}
+                          >
+                            Kiểm tra tình trạng refund
+                          </button>
+                          {refundCheckResult && (
+                            <div className="mt-3">
+                              {refundCheckResult.error ? (
+                                <div className="alert alert-danger">
+                                  {refundCheckResult.error}
+                                </div>
+                              ) : (
+                                <div className="alert alert-info">
+                                  <p>
+                                    <strong>Mã đơn hàng:</strong>{" "}
+                                    {refundCheckResult.orderId}
+                                  </p>
+                                  <p>
+                                    <strong>Tình trạng hoàn tiền:</strong>{" "}
+                                    {refundCheckResult.refundStatus}
+                                  </p>
+                                  <p>
+                                    <strong>Thông báo:</strong>{" "}
+                                    {refundCheckResult.message}
+                                  </p>
+                                  <p>
+                                    <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
+                                    {refundCheckResult.mRefundId}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
 
-                <h5>Sản phẩm:</h5>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Sản phẩm</th>
-                      <th>Số lượng</th>
-                      <th>Giá</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.products.map((item) => (
-                      <tr key={item.product._id}>
-                        <td>{item.product.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.price.toLocaleString()} đ</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <h5>Địa chỉ giao hàng:</h5>
-                <p>
-                  <strong>Tên:</strong> {selectedOrder.shippingAddress.name}
-                </p>
-                <p>
-                  <strong>Điện thoại:</strong>{" "}
-                  {selectedOrder.shippingAddress.phone}
-                </p>
-                <p>
-                  <strong>Địa chỉ:</strong>{" "}
-                  {selectedOrder.shippingAddress.address}
-                </p>
+                    {/* Cột phải: Địa chỉ giao hàng */}
+                    <div className="col-md-6">
+                      <h5 className="my-order-page-modal-section-title">
+                        Địa chỉ giao hàng:
+                      </h5>
+                      <p>
+                        <strong>Tên:</strong>{" "}
+                        {selectedOrder.shippingAddress.name}
+                      </p>
+                      <p>
+                        <strong>Điện thoại:</strong>{" "}
+                        {selectedOrder.shippingAddress.phone}
+                      </p>
+                      <p>
+                        <strong>Địa chỉ:</strong>{" "}
+                        {selectedOrder.shippingAddress.address}
+                      </p>
+                      {selectedOrder.shippingStatus === "processing" && (
+                        <button
+                          className="my-order-page-modal-cancel-btn btn btn-danger"
+                          onClick={() => openCancelModal(selectedOrder)}
+                        >
+                          Hủy đơn hàng
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Hàng 2: Bảng danh sách sản phẩm */}
+                  <div className="row mt-4">
+                    <div className="col-12">
+                      <h5 className="my-order-page-modal-section-title">
+                        Sản phẩm:
+                      </h5>
+                      <div className="table-responsive">
+                        <table className="table my-order-page-modal-table">
+                          <thead>
+                            <tr>
+                              <th>Sản phẩm</th>
+                              <th>Số lượng</th>
+                              <th>Giá</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedOrder.products.map((item) => (
+                              <tr key={item.product._id}>
+                                <td>{item.product.name}</td>
+                                <td>{item.quantity}</td>
+                                <td>{item.price.toLocaleString()} đ</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className="modal-footer">
-                {selectedOrder.shippingStatus === "processing" && (
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => openCancelModal(selectedOrder)}
-                  >
-                    Hủy đơn hàng
-                  </button>
-                )}
                 <button
-                  className="btn btn-secondary"
+                  className="my-order-page-modal-close-btn btn btn-secondary"
                   onClick={() => setShowModal(false)}
                 >
                   Đóng
@@ -416,7 +457,9 @@ function MyOrders() {
 
       {/* Cancel Order Confirmation Modal */}
       <div
-        className={`modal ${showCancelModal ? "show" : ""}`}
+        className={`my-order-page-cancel-modal modal ${
+          showCancelModal ? "show" : ""
+        }`}
         style={{ display: showCancelModal ? "block" : "none" }}
       >
         <div className="modal-dialog modal-dialog-centered">
@@ -437,7 +480,7 @@ function MyOrders() {
               </p>
               <input
                 type="text"
-                className="form-control"
+                className="my-order-page-cancel-input form-control"
                 placeholder="Nhập mã đơn hàng để xác nhận"
                 value={confirmOrderId}
                 onChange={(e) => setConfirmOrderId(e.target.value)}
@@ -448,12 +491,15 @@ function MyOrders() {
             </div>
             <div className="modal-footer">
               <button
-                className="btn btn-secondary"
+                className="my-order-page-cancel-modal-close-btn btn btn-secondary"
                 onClick={() => setShowCancelModal(false)}
               >
                 Hủy bỏ
               </button>
-              <button className="btn btn-danger" onClick={confirmCancelOrder}>
+              <button
+                className="my-order-page-cancel-confirm-btn btn btn-danger"
+                onClick={confirmCancelOrder}
+              >
                 Xác nhận hủy
               </button>
             </div>

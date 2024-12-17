@@ -1,60 +1,35 @@
-/* Snowfall.css */
+/* src/components/Snowfall/Snowfall.css */
+
 .snow-container {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none; /* Cho phép tương tác với các thành phần phía dưới */
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allows clicks through the snowfall */
   overflow: hidden;
-  z-index: 9999;
+  z-index: 9999; /* Ensure it's on top */
 }
 
 .snowflake {
   position: absolute;
-  top: -10px; /* Bắt đầu từ ngoài màn hình */
-  background: white;
-  clip-path: polygon(
-    50% 0%,
-    61% 35%,
-    98% 35%,
-    68% 57%,
-    79% 91%,
-    50% 70%,
-    21% 91%,
-    32% 57%,
-    2% 35%,
-    39% 35%
-  ); /* Hình cánh sao */
+  top: -10px; /* Start slightly above the viewport */
+  background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  border-radius: 50%;
   opacity: 0.8;
-  animation: fallAndDrift linear forwards;
-  box-shadow: 0 0 10px white; /* Tăng độ sáng */
-  filter: brightness(1.3); /* Làm cho bông tuyết sáng hơn */
+  animation: fall linear forwards;
+  border: 1px solid rgba(255, 255, 255, 0.5); /* Light border for highlight */
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Glow effect */
 }
 
-@keyframes fallAndDrift {
+/* Combined fall animation handling both Y and X movement */
+@keyframes fall {
   0% {
-    transform: translateX(0px) translateY(0px) rotate(0deg) scale(1);
+    transform: translateY(0) translateX(0);
     opacity: 1;
   }
-  25% {
-    transform: translateX(calc(var(--drift) / 2)) translateY(25vh) rotate(90deg)
-      scale(1.2);
-    opacity: 0.9;
-  }
-  50% {
-    transform: translateX(var(--drift)) translateY(50vh) rotate(180deg)
-      scale(1.3);
-    opacity: 0.8;
-  }
-  75% {
-    transform: translateX(calc(var(--drift) * 1.5)) translateY(75vh)
-      rotate(270deg) scale(1.2);
-    opacity: 0.9;
-  }
   100% {
-    transform: translateX(var(--drift)) translateY(100vh) rotate(360deg)
-      scale(1);
+    transform: translateY(100vh) translateX(var(--drift, 0px));
     opacity: 0.8;
   }
 }

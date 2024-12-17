@@ -1,9 +1,7 @@
-// src/components/ToastNotification/ToastNotification.jsx
-
 import React, { useEffect, useState } from "react";
-import { Toast, ToastContainer } from "react-bootstrap";
+import { Toast } from "react-bootstrap";
 import PropTypes from "prop-types";
-import "./ToastNotification.css"; // For any additional custom styles
+import "./ToastNotification.css"; // Để thêm các kiểu tùy chỉnh
 
 const ToastNotification = ({ message, show, onClose, variant, actions }) => {
   const [showToast, setShowToast] = useState(show);
@@ -12,10 +10,10 @@ const ToastNotification = ({ message, show, onClose, variant, actions }) => {
     setShowToast(show);
   }, [show]);
 
-  const validVariants = ["success", "danger", "warning", "info"];
-  const sanitizedVariant = validVariants.includes(variant) ? variant : "info"; // Default to 'info'
+  const validVariants = ["success", "danger", "warning", "info"]; //variants: định nghĩa là các loại thông báo hợp lệ
+  const sanitizedVariant = validVariants.includes(variant) ? variant : "info"; // Mặc định là 'info' nếu variant không hợp lệ
 
-  // Determine icon and color based on variant
+  // Xác định biểu tượng và màu sắc dựa trên variant
   const getVariantDetails = (type) => {
     switch (type) {
       case "success":
@@ -32,94 +30,82 @@ const ToastNotification = ({ message, show, onClose, variant, actions }) => {
 
   const { icon, color } = getVariantDetails(sanitizedVariant);
 
-  // Determine title based on variant
+  // Xác định tiêu đề dựa trên variant
   const getTitle = (type) => {
     switch (type) {
       case "success":
-        return "Thành Công"; // "Success" in Vietnamese
+        return "Thành Công";
       case "danger":
-        return "Lỗi"; // "Error" in Vietnamese
+        return "Lỗi";
       case "warning":
-        return "Cảnh báo"; // "Warning" in Vietnamese
+        return "Cảnh báo";
       case "info":
-        return "Thông tin"; // "Information" in Vietnamese
+        return "Thông tin";
       default:
-        return "Thông báo"; // "Notice" in Vietnamese
+        return "Thông báo";
     }
   };
 
   const title = getTitle(sanitizedVariant);
 
-  // Handle close with transition
+  // Xử lý đóng thông báo với hiệu ứng chuyển tiếp
   const handleClose = () => {
     setShowToast(false);
-    // Call the onClose prop after the transition duration (300ms)
+    // Gọi hàm onClose sau khi hiệu ứng chuyển tiếp kết thúc (300ms)
     setTimeout(() => {
       onClose();
     }, 300);
   };
 
   return (
-    <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
-      <Toast
-        onClose={handleClose}
-        show={showToast}
-        delay={3000}
-        autohide
-        bg="dark"
-        className="d-flex align-items-start"
-      >
-        {/* Icon */}
-        <div className={`${color} me-2 mt-1`}>
-          <i className={`${icon} fa-lg`}></i>
+    <Toast
+      onClose={handleClose}
+      show={showToast}
+      delay={3000}
+      autohide
+      bg={sanitizedVariant}
+      className={`toast-custom bg-${sanitizedVariant}`}
+    >
+      {/* Tiêu đề của Toast */}
+      <Toast.Header className="border-0" closeButton={false}>
+        <div className={`${color}`}>
+          <i className={`${icon} fa-lg me-2`}></i>
         </div>
+        <strong className="me-auto">{title}</strong>
+        <small className="">Vừa xong</small>
+      </Toast.Header>
 
-        {/* Content */}
-        <div className="flex-grow-1">
-          <Toast.Header className="border-0">
-            <strong className="me-auto">{title}</strong>
-            <small className="text-muted">Vừa xong</small> {/* "Just now" */}
-          </Toast.Header>
-          <Toast.Body className="text-white">
-            {message.length > 100 ? `${message.substring(0, 100)}...` : message}
-            {/* Action Buttons */}
-            {actions && actions.length > 0 && (
-              <div className="mt-2 d-flex space-x-2">
-                {actions.map((action, index) => (
-                  <button
-                    key={index}
-                    className="btn btn-link text-primary p-0 me-3"
-                    onClick={action.onClick}
-                  >
-                    {action.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </Toast.Body>
-        </div>
-
-        {/* Close Button */}
-        <button
-          type="button"
-          className="btn-close btn-close-white me-2 m-auto"
-          aria-label="Close"
-          onClick={handleClose}
-        ></button>
-      </Toast>
-    </ToastContainer>
+      {/* Nội dung của Toast */}
+      <Toast.Body>
+        {message.length > 100 ? `${message.substring(0, 100)}...` : message}
+        {/* Các nút hành động */}
+        {actions && actions.length > 0 && (
+          <div className="mt-2 d-flex">
+            {actions.map((action, index) => (
+              <button
+                key={index}
+                className="btn btn-link text-primary p-0 me-3"
+                onClick={action.onClick}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </Toast.Body>
+    </Toast>
   );
 };
 
 ToastNotification.propTypes = {
-  message: PropTypes.string.isRequired,
-  show: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  variant: PropTypes.oneOf(["success", "danger", "warning", "info"]),
+  message: PropTypes.string.isRequired, // Nội dung thông báo
+  show: PropTypes.bool.isRequired, // Trạng thái hiển thị thông báo
+  onClose: PropTypes.func.isRequired, // Hàm xử lý khi đóng thông báo
+  variant: PropTypes.oneOf(["success", "danger", "warning", "info"]), // Loại thông báo
   actions: PropTypes.arrayOf(
     PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      onClick: PropTypes.func.isRequired,
+      label: PropTypes.string.isRequired, // Nhãn của nút hành động
+      onClick: PropTypes.func.isRequired, // Hàm xử lý khi nhấn nút hành động
     })
   ),
 };

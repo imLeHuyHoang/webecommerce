@@ -1,0 +1,145 @@
+/* src/pages/ManageCategories/ManageCategories.css */
+
+/* General Styles */
+.manage-category-container {
+  background-color: #f8f9fa; /* Light background color */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.manage-category-container h2 {
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.btn-primary {
+  background-color: #007bff; /* Bootstrap primary color */
+  border-color: #007bff;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  border-color: #0056b3;
+}
+
+.table-responsive {
+  margin-top: 20px;
+}
+
+.table {
+  background-color: #ffffff; /* White background for table */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead {
+  background-color: #343a40; /* Dark gray background for table header */
+  color: #ffffff; /* White text for table header */
+}
+
+.table th,
+.table td {
+  vertical-align: middle; /* Center align text vertically */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f2f2f2; /* Light gray background for odd rows */
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e9ecef; /* Light gray background on hover */
+}
+
+.manage-category-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.btn-warning {
+  background-color: #ffc107; /* Bootstrap warning color */
+  border-color: #ffc107;
+  color: #343a40; /* Dark gray text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800; /* Darker warning color on hover */
+  border-color: #d39e00;
+}
+
+.btn-danger {
+  background-color: #dc3545; /* Bootstrap danger color */
+  border-color: #dc3545;
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-danger:hover {
+  background-color: #c82333; /* Darker danger color on hover */
+  border-color: #bd2130;
+}
+
+.text-center {
+  color: #6c757d; /* Medium gray text */
+}
+
+/* Modal Styles */
+.modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background-color: #343a40; /* Dark gray background for modal header */
+  color: #ffffff; /* White text for modal header */
+  border-bottom: none;
+}
+
+.modal-title {
+  font-weight: bold;
+}
+
+.btn-close {
+  color: #ffffff; /* White color for close button */
+  opacity: 1;
+}
+
+.btn-close:hover {
+  color: #e9ecef; /* Light gray color on hover */
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+/* Toast Notification Styles */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+.toast {
+  background-color: #343a40; /* Dark gray background for toast */
+  color: #ffffff; /* White text for toast */
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.hide {
+  opacity: 0;
+  transform: translateY(-20px);
+}

@@ -1,4 +1,3 @@
-// src/components/Profile.jsx
 import React, { useEffect, useState, useRef } from "react";
 import apiClient from "../../utils/api-client";
 import UserInfoForm from "./UserInforForm";
@@ -134,7 +133,7 @@ const Profile = () => {
 
   if (loading)
     return (
-      <p className="profile-page-loading-text">
+      <p className="profile-page-loading-text text-center mt-5">
         Đang tải thông tin người dùng...
       </p>
     );
@@ -142,250 +141,307 @@ const Profile = () => {
   return (
     <div className="profile-page-section bg-light py-5">
       <div className="profile-page-container bg-white p-5 rounded shadow-sm">
-        <div className="profile-page-welcome mb-4">
+        {/* Welcome Section */}
+        <div className="profile-page-welcome mb-4 text-center">
           <h1 className="profile-page-title h2 font-weight-bold">
-            Xin chào, {user.name}!
+            Xin chào, {user?.name}!
           </h1>
           <p className="profile-page-subtitle text-muted">
             Rất vui khi bạn đã quay lại.
           </p>
         </div>
 
-        <div className="profile-page-order-status mb-4">
-          <h2 className="profile-page-heading h4 font-weight-bold mb-3">
-            Tình trạng đơn hàng
-          </h2>
+        {/* Bố Cục Mới */}
+        <div className="profile-page-new-layout">
+          {/* Dòng 1: Tình trạng đơn hàng */}
+          <div className="profile-page-order-status mb-4">
+            <h2 className="profile-page-heading h4 font-weight-bold mb-3">
+              Tình trạng đơn hàng
+            </h2>
+            <div className="row">
+              <div className="col-md-3 mb-3">
+                <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
+                  <h3 className="profile-page-status-title h5 font-weight-bold">
+                    Đơn hàng chờ xác nhận
+                  </h3>
+                  <p className="profile-page-status-count display-4 font-weight-bold">
+                    {orderStatusCounts.processing}
+                  </p>
+                </div>
+              </div>
+              <div className="col-md-3 mb-3">
+                <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
+                  <h3 className="profile-page-status-title h5 font-weight-bold">
+                    Đơn hàng đang giao
+                  </h3>
+                  <p className="profile-page-status-count display-4 font-weight-bold">
+                    {orderStatusCounts.shipping}
+                  </p>
+                </div>
+              </div>
+              <div className="col-md-3 mb-3">
+                <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
+                  <h3 className="profile-page-status-title h5 font-weight-bold">
+                    Đơn hàng đã giao
+                  </h3>
+                  <p className="profile-page-status-count display-4 font-weight-bold">
+                    {orderStatusCounts.shipped}
+                  </p>
+                </div>
+              </div>
+              <div className="col-md-3 mb-3">
+                <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
+                  <h3 className="profile-page-status-title h5 font-weight-bold">
+                    Đơn hàng đã hủy
+                  </h3>
+                  <p className="profile-page-status-count display-4 font-weight-bold">
+                    {orderStatusCounts.cancelled}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Dòng 2: Thông tin người dùng và Địa chỉ */}
           <div className="row">
-            <div className="col-md-3 mb-3">
-              <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
-                <h3 className="profile-page-status-title h5 font-weight-bold">
-                  Đơn hàng chờ xác nhận
-                </h3>
-                <p className="profile-page-status-count display-4 font-weight-bold">
-                  {orderStatusCounts.processing}
-                </p>
+            {/* Cột trái: Thông tin người dùng */}
+            <div className="col-md-6 mb-4">
+              <div className="profile-page-user-info">
+                <h2 className="profile-page-heading h4 font-weight-bold mb-3">
+                  Thông tin người dùng
+                  <i
+                    className="fas fa-edit ml-2 profile-page-edit-icon"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setIsEditing(!isEditing)}
+                  ></i>
+                </h2>
+                {!isEditing ? (
+                  <>
+                    <div className="profile-page-personal-info mb-4">
+                      <h3 className="profile-page-subheading h5 font-weight-bold mb-2">
+                        Thông tin cá nhân
+                      </h3>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <label className="profile-page-label text-muted">
+                            Họ tên
+                          </label>
+                          <p className="profile-page-info bg-light p-2 rounded">
+                            {user?.name}
+                          </p>
+                        </div>
+                        <div className="col-md-6">
+                          <label className="profile-page-label text-muted">
+                            Số điện thoại
+                          </label>
+                          <p className="profile-page-info bg-light p-2 rounded">
+                            {user?.phone}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        className="profile-page-edit-btn btn btn-dark mt-3"
+                        onClick={() => setIsEditing(true)}
+                      >
+                        Chỉnh sửa thông tin
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <form onSubmit={handleSubmit}>
+                    <div className="profile-page-edit-personal mb-4">
+                      <h3 className="profile-page-subheading h5 font-weight-bold mb-2">
+                        Chỉnh sửa thông tin cá nhân
+                      </h3>
+                      <UserInfoForm
+                        formData={formData}
+                        setFormData={setFormData}
+                      />
+                    </div>
+
+                    <div className="profile-page-buttons text-right mt-4">
+                      <button
+                        type="button"
+                        className="profile-page-cancel-btn btn btn-secondary mr-2"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        type="submit"
+                        className="profile-page-save-btn btn btn-primary"
+                      >
+                        {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
-            <div className="col-md-3 mb-3">
-              <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
-                <h3 className="profile-page-status-title h5 font-weight-bold">
-                  Đơn hàng đang giao
-                </h3>
-                <p className="profile-page-status-count display-4 font-weight-bold">
-                  {orderStatusCounts.shipping}
-                </p>
-              </div>
-            </div>
-            <div className="col-md-3 mb-3">
-              <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
-                <h3 className="profile-page-status-title h5 font-weight-bold">
-                  Đơn hàng đã giao
-                </h3>
-                <p className="profile-page-status-count display-4 font-weight-bold">
-                  {orderStatusCounts.shipped}
-                </p>
-              </div>
-            </div>
-            <div className="col-md-3 mb-3">
-              <div className="profile-page-status-card bg-light p-3 rounded shadow-sm text-center">
-                <h3 className="profile-page-status-title h5 font-weight-bold">
-                  Đơn hàng đã hủy
-                </h3>
-                <p className="profile-page-status-count display-4 font-weight-bold">
-                  {orderStatusCounts.cancelled}
-                </p>
+
+            {/* Cột phải: Địa chỉ */}
+            <div className="col-md-6 mb-4">
+              <div className="profile-page-addresses">
+                <h2 className="profile-page-heading h4 font-weight-bold mb-3">
+                  Địa chỉ
+                  {!isEditing && (
+                    <i
+                      className="fas fa-edit ml-2 profile-page-edit-icon"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setIsEditing(true)}
+                    ></i>
+                  )}
+                </h2>
+                {!isEditing ? (
+                  <>
+                    <div className="row">
+                      {user?.addresses.map((address, index) => (
+                        <div key={index} className="col-md-12 mb-3">
+                          <div className="profile-page-address-card bg-light p-3 rounded shadow-sm">
+                            <h4 className="profile-page-address-title font-weight-bold">
+                              Địa chỉ {index + 1}
+                            </h4>
+                            <p className="profile-page-address-line">
+                              <strong>Số nhà, tên đường:</strong>{" "}
+                              {address.street}
+                            </p>
+                            <p className="profile-page-address-line">
+                              <strong>Phường/Xã:</strong> {address.ward}
+                            </p>
+                            <p className="profile-page-address-line">
+                              <strong>Quận/Huyện:</strong> {address.district}
+                            </p>
+                            <p className="profile-page-address-line">
+                              <strong>Tỉnh/Thành phố:</strong>{" "}
+                              {address.province}
+                            </p>
+                            <div className="mt-2">
+                              <button
+                                className="profile-page-edit-address-btn btn btn-dark mr-2"
+                                onClick={() => setIsEditing(true)}
+                              >
+                                Chỉnh sửa
+                              </button>
+                              <button
+                                className="profile-page-delete-address-btn btn btn-danger"
+                                onClick={() => handleDeleteAddress(index)}
+                              >
+                                <i className="fas fa-trash"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      className="profile-page-add-address-btn btn btn-dark mt-3"
+                      onClick={() => {
+                        setIsEditing(true);
+                        handleAddNewAddress();
+                      }}
+                    >
+                      Thêm địa chỉ mới
+                    </button>
+                  </>
+                ) : (
+                  <form onSubmit={handleSubmit}>
+                    <div className="profile-page-edit-addresses mb-4">
+                      <h3 className="profile-page-subheading h5 font-weight-bold mb-2">
+                        Chỉnh sửa địa chỉ
+                      </h3>
+                      <div className="row">
+                        {formData.addresses.map((address, index) => (
+                          <div key={index} className="col-md-12 mb-3">
+                            <div className="profile-page-address-card bg-light p-3 rounded shadow-sm">
+                              <h4 className="profile-page-address-title font-weight-bold">
+                                Địa chỉ {index + 1}
+                                <i
+                                  className="fas fa-trash-alt text-danger ml-2"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleDeleteAddress(index)}
+                                ></i>
+                              </h4>
+                              <div className="form-group">
+                                <label>Tỉnh/Thành phố</label>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  name="province"
+                                  value={address.province}
+                                  onChange={(e) =>
+                                    handleAddressChange(index, e)
+                                  }
+                                  required
+                                />
+                              </div>
+                              <div className="form-group">
+                                <label>Quận/Huyện</label>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  name="district"
+                                  value={address.district}
+                                  onChange={(e) =>
+                                    handleAddressChange(index, e)
+                                  }
+                                  required
+                                />
+                              </div>
+                              <div className="form-group">
+                                <label>Phường/Xã</label>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  name="ward"
+                                  value={address.ward}
+                                  onChange={(e) =>
+                                    handleAddressChange(index, e)
+                                  }
+                                  required
+                                />
+                              </div>
+                              <div className="form-group">
+                                <label>Số nhà, tên đường</label>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  name="street"
+                                  value={address.street}
+                                  onChange={(e) =>
+                                    handleAddressChange(index, e)
+                                  }
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="profile-page-buttons text-right mt-4">
+                      <button
+                        type="button"
+                        className="profile-page-cancel-btn btn btn-secondary mr-2"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        type="submit"
+                        className="profile-page-save-btn btn btn-primary"
+                      >
+                        {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="profile-page-user-info mb-4">
-          <h2 className="profile-page-heading h4 font-weight-bold mb-3">
-            Thông tin người dùng
-            <i
-              className="fas fa-edit ml-2 profile-page-edit-icon"
-              style={{ cursor: "pointer" }}
-              onClick={() => setIsEditing(!isEditing)}
-            ></i>
-          </h2>
-          {!isEditing ? (
-            <>
-              <div className="profile-page-personal-info mb-4">
-                <h3 className="profile-page-subheading h5 font-weight-bold mb-2">
-                  Thông tin cá nhân
-                </h3>
-                <div className="row">
-                  <div className="col-md-6">
-                    <label className="profile-page-label text-muted">
-                      Họ tên
-                    </label>
-                    <p className="profile-page-info bg-light p-2 rounded">
-                      {user.name}
-                    </p>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="profile-page-label text-muted">
-                      Số điện thoại
-                    </label>
-                    <p className="profile-page-info bg-light p-2 rounded">
-                      {user.phone}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  className="profile-page-edit-btn btn btn-dark mt-3"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Chỉnh sửa thông tin
-                </button>
-              </div>
-
-              <div className="profile-page-addresses">
-                <h3 className="profile-page-subheading h5 font-weight-bold mb-2">
-                  Địa chỉ
-                </h3>
-                <div className="row">
-                  {user.addresses.map((address, index) => (
-                    <div key={index} className="col-md-6 mb-3">
-                      <div className="profile-page-address-card bg-light p-3 rounded shadow-sm">
-                        <h4 className="profile-page-address-title font-weight-bold">
-                          Địa chỉ {index + 1}
-                        </h4>
-                        <p className="profile-page-address-line">
-                          Số nhà, tên đường: {address.street}
-                        </p>
-                        <p className="profile-page-address-line">
-                          Phường/Xã: {address.ward}
-                        </p>
-                        <p className="profile-page-address-line">
-                          Quận/Huyện: {address.district}
-                        </p>
-                        <p className="profile-page-address-line">
-                          Tỉnh/Thành phố: {address.province}
-                        </p>
-                        <div className="mt-2">
-                          <button
-                            className="profile-page-edit-address-btn btn btn-dark mr-2"
-                            onClick={() => setIsEditing(true)}
-                          >
-                            Chỉnh sửa
-                          </button>
-                          <button
-                            className="profile-page-delete-address-btn btn btn-danger"
-                            onClick={() => handleDeleteAddress(index)}
-                          >
-                            <i className="fas fa-trash"></i>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  className="profile-page-add-address-btn btn btn-dark mt-3"
-                  onClick={() => {
-                    setIsEditing(true);
-                    handleAddNewAddress();
-                  }}
-                >
-                  Thêm địa chỉ mới
-                </button>
-              </div>
-            </>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <div className="profile-page-edit-personal mb-4">
-                <h3 className="profile-page-subheading h5 font-weight-bold mb-2">
-                  Chỉnh sửa thông tin cá nhân
-                </h3>
-                <UserInfoForm formData={formData} setFormData={setFormData} />
-              </div>
-
-              <div className="profile-page-edit-addresses">
-                <h3 className="profile-page-subheading h5 font-weight-bold mb-2">
-                  Chỉnh sửa địa chỉ
-                </h3>
-                <div className="row">
-                  {formData.addresses.map((address, index) => (
-                    <div key={index} className="col-md-6 mb-3">
-                      <div className="profile-page-address-card bg-light p-3 rounded shadow-sm">
-                        <h4 className="profile-page-address-title font-weight-bold">
-                          Địa chỉ {index + 1}
-                          <i
-                            className="fas fa-trash-alt text-danger ml-2"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => handleDeleteAddress(index)}
-                          ></i>
-                        </h4>
-                        <div className="form-group">
-                          <label>Tỉnh/Thành phố</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="province"
-                            value={address.province}
-                            onChange={(e) => handleAddressChange(index, e)}
-                            required
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Quận/Huyện</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="district"
-                            value={address.district}
-                            onChange={(e) => handleAddressChange(index, e)}
-                            required
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Phường/Xã</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="ward"
-                            value={address.ward}
-                            onChange={(e) => handleAddressChange(index, e)}
-                            required
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Số nhà, tên đường</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            name="street"
-                            value={address.street}
-                            onChange={(e) => handleAddressChange(index, e)}
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="profile-page-buttons text-right mt-4">
-                  <button
-                    type="button"
-                    className="profile-page-cancel-btn btn btn-secondary mr-2"
-                    onClick={() => setIsEditing(false)}
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    className="profile-page-save-btn btn btn-primary"
-                  >
-                    {saving ? "Đang lưu..." : "Lưu thay đổi"}
-                  </button>
-                </div>
-              </div>
-            </form>
-          )}
-        </div>
-
+        {/* Toast Notification */}
         <ToastNotification
           message={toastMessage}
           show={showToast}

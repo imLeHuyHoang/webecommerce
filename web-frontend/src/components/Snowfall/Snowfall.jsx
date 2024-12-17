@@ -2,13 +2,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./Snowfall.css";
 
-const Snowfall = ({
-  snowflakeCount = 100, // Default value
-  snowflakeSize = { min: 5, max: 15 },
-  fallSpeed = { min: 5, max: 10 },
-  drift = { min: -2, max: 2 },
-  maxSnowflakes = 200,
-}) => {
+// Configuration settings moved outside the component
+const INITIAL_SNOWFLAKE_COUNT = 20; // Initial number of snowflakes
+const SNOWFLAKE_SIZE = { min: 4, max: 8 }; // Size range in pixels
+const FALL_SPEED = { min: 5, max: 10 }; // Fall speed range in seconds
+const DRIFT = { min: -50, max: 50 }; // Horizontal drift in pixels
+const MAX_SNOWFLAKES = 50; // Maximum number of snowflakes on screen
+
+const Snowfall = () => {
   const [snowflakes, setSnowflakes] = useState([]);
   const snowflakeId = useRef(0);
   const snowflakeCountRef = useRef(0);
@@ -17,15 +18,15 @@ const Snowfall = ({
     let isMounted = true;
 
     const createSnowflake = () => {
-      if (isMounted && snowflakeCountRef.current < maxSnowflakes) {
+      if (isMounted && snowflakeCountRef.current < MAX_SNOWFLAKES) {
         const size =
-          Math.random() * (snowflakeSize.max - snowflakeSize.min) +
-          snowflakeSize.min;
-        const left = Math.random() * 100;
+          Math.random() * (SNOWFLAKE_SIZE.max - SNOWFLAKE_SIZE.min) +
+          SNOWFLAKE_SIZE.min;
+        const left = Math.random() * 100; // Percentage for horizontal position
         const duration =
-          Math.random() * (fallSpeed.max - fallSpeed.min) + fallSpeed.min;
+          Math.random() * (FALL_SPEED.max - FALL_SPEED.min) + FALL_SPEED.min;
         const horizontalDrift =
-          Math.random() * (drift.max - drift.min) + drift.min;
+          Math.random() * (DRIFT.max - DRIFT.min) + DRIFT.min;
 
         const newSnowflake = {
           id: snowflakeId.current++,
@@ -40,23 +41,24 @@ const Snowfall = ({
       }
     };
 
-    // Create initial snowflakes with random delay
-    for (let i = 0; i < snowflakeCount; i++) {
+    // Initialize snowflakes with random delays
+    for (let i = 0; i < INITIAL_SNOWFLAKE_COUNT; i++) {
       setTimeout(createSnowflake, Math.random() * 10000);
     }
 
-    // Continuously create snowflakes
+    // Continuously create snowflakes at intervals
     const interval = setInterval(() => {
       createSnowflake();
     }, 2000);
 
+    // Cleanup on unmount
     return () => {
       isMounted = false;
       clearInterval(interval);
       setSnowflakes([]);
       snowflakeCountRef.current = 0;
     };
-  }, [snowflakeCount, snowflakeSize, fallSpeed, drift, maxSnowflakes]);
+  }, []); // Empty dependency array since configurations are now stable
 
   const handleAnimationEnd = (id) => {
     setSnowflakes((prev) => prev.filter((snowflake) => snowflake.id !== id));
@@ -64,7 +66,7 @@ const Snowfall = ({
   };
 
   return (
-    <div className="snow-container">
+    <div className="snow-container" aria-hidden="true">
       {snowflakes.map((snowflake) => (
         <div
           key={snowflake.id}

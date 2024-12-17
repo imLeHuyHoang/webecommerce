@@ -21,7 +21,7 @@ const ManageAttributes = () => {
     variant: "",
   });
 
-  // Lấy danh sách categories
+  // Fetch categories on component mount
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -30,12 +30,17 @@ const ManageAttributes = () => {
     try {
       const response = await apiClient.get("/category");
       setCategories(response.data);
+
+      // Automatically select the first category if available
+      if (response.data.length > 0) {
+        setSelectedCategoryId(response.data[0]._id);
+      }
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
-  // Lấy attributes khi category thay đổi
+  // Fetch attributes when selectedCategoryId changes
   useEffect(() => {
     if (selectedCategoryId) {
       fetchAttributes();
@@ -147,7 +152,8 @@ const ManageAttributes = () => {
               value={selectedCategoryId}
               onChange={(e) => setSelectedCategoryId(e.target.value)}
             >
-              <option value="">Select Category</option>
+              {/* Optionally remove the default option */}
+              {/* <option value="">Select Category</option> */}
               {categories.map((cat) => (
                 <option key={cat._id} value={cat._id}>
                   {cat.name}

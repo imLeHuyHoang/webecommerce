@@ -1,0 +1,88 @@
+/* src/pages/ManageDiscounts/ManageDiscounts.css */
+
+/* General Styles */
+.manage-discount-container {
+  background-color: #f8f9fa; /* Light background color */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.manage-discount-container h2,
+.manage-discount-container h3 {
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.manage-discount-search {
+  margin-bottom: 20px;
+}
+
+.manage-discount-search .form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 10px;
+}
+
+.btn-primary {
+  background-color: #007bff; /* Bootstrap primary color */
+  border-color: #007bff;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  border-color: #0056b3;
+}
+
+.table {
+  background-color: #ffffff; /* White background for table */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead {
+  background-color: #343a40; /* Dark gray background for table header */
+  color: #ffffff; /* White text for table header */
+}
+
+.table th,
+.table td {
+  vertical-align: middle; /* Center align text vertically */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f2f2f2; /* Light gray background for odd rows */
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e9ecef; /* Light gray background on hover */
+}
+
+.btn-warning {
+  background-color: #ffc107; /* Bootstrap warning color */
+  border-color: #ffc107;
+  color: #343a40; /* Dark gray text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800; /* Darker warning color on hover */
+  border-color: #d39e00;
+}
+
+.btn-danger {
+  background-color: #dc3545; /* Bootstrap danger color */
+  border-color: #dc3545;
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-danger:hover {
+  background-color: #c82333; /* Darker danger color on hover */
+  border-color: #bd2130;
+}
+
+.text-center {
+  color: #6c757d; /* Medium gray text */
+}

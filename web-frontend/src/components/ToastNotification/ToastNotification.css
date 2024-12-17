@@ -1,34 +1,51 @@
 /* src/components/ToastNotification/ToastNotification.css */
 
-.custom-toast {
+/* Custom styling for the toast */
+.toast-custom {
   min-width: 300px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.5s ease-out;
+  max-width: 350px;
+  background-color: white; /* Set background to white */
+  color: black; /* Set text color to black */
+  border: 5px solid; /* Set border width to 5px */
 }
 
-.toast-icon {
+/* Adjust icon size and alignment */
+.toast-header .fa-lg {
   font-size: 1.2rem;
 }
 
+/* Prevent action buttons from overflowing */
+.toast-body .btn-link {
+  white-space: nowrap;
+}
+
+/* Toast header styling */
 .toast-header {
-  display: flex;
-  align-items: center;
+  background-color: rgb(255, 255, 255); /* Set background to white */
+  color: black; /* Set text color to black */
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Toast body styling */
+.toast-body {
+  background-color: white; /* Set background to white */
+  color: black; /* Set text color to black */
 }
 
-@media (max-width: 576px) {
-  .custom-toast {
-    min-width: 250px;
-  }
+/* Optional: Add any additional custom styles here */
+
+/* Border color based on variant */
+.toast-custom.bg-success {
+  border-color: #28a745; /* Success color */
+}
+
+.toast-custom.bg-danger {
+  border-color: #dc3545; /* Danger color */
+}
+
+.toast-custom.bg-warning {
+  border-color: #ffc107; /* Warning color */
+}
+
+.toast-custom.bg-info {
+  border-color: #17a2b8; /* Info color */
 }

@@ -71,7 +71,7 @@ const ManageCategories = () => {
 
   return (
     <>
-      <div className="container mt-4 mb-2">
+      <div className="manage-category-container mt-4 mb-2">
         <div className="row">
           <div className="col-12 col-md-6">
             <h2>Quản lý danh mục</h2>
@@ -105,7 +105,7 @@ const ManageCategories = () => {
                             key={index}
                             src={getCategoryImageUrl(img)} // Sử dụng helper
                             alt={cat.name}
-                            className="category-image"
+                            className="manage-category-image"
                           />
                         ))}
                       </td>

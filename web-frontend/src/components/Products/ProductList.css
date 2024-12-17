@@ -1,41 +1,109 @@
-.product-list-section {
-  padding: 20px 0;
-  background-color: #f8f9fa;
-}
+/* src/components/ProductPage/ProductList.css */
 
-.product-list-container {
-  background: #fff;
-  border-radius: 5px;
-  padding: 20px;
-}
-
-.product-list-row {
-  margin-bottom: 20px;
-}
-
-.product-list-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.product-list-loading {
-  margin: 50px 0;
-}
-
-.product-list-error-container {
-  margin: 50px 0;
+/* Loading and Error States */
+.product-list-loading,
+.product-list-error-container,
+.product-list-empty {
+  text-align: center;
+  padding: 2rem 0;
+  color: #6c757d;
 }
 
 .product-list-error-alert {
-  margin-bottom: 20px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.25rem;
 }
 
+/* Product List Section */
+.product-list-section {
+  padding: 2rem 0;
+}
+
+/* Product Grid */
+.product-list-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.75rem;
+}
+
+.product-list-col {
+  padding: 0.75rem;
+}
+
+/* Pagination */
 .product-list-pagination {
-  margin-top: 30px;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
 }
 
-.product-list-empty {
-  margin: 50px 0;
-  font-size: 1.2rem;
-  color: #555;
+.product-list-pagination .pagination {
+  background-color: transparent;
+}
+
+.product-list-pagination .pagination .page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #ffffff;
+}
+
+.product-list-pagination .pagination .page-link {
+  color: #343a40;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  margin: 0 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.product-list-pagination .pagination .page-link:hover {
+  background-color: #f8f9fa;
+}
+
+/* Product Card */
+.product-list-col .card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.product-list-col .card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.product-list-col .card-img-top {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.product-list-col .card-body {
+  padding: 1rem;
+}
+
+.product-list-col .card-title {
+  font-size: 1.125rem;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+}
+
+.product-list-col .card-text {
+  color: #6c757d;
+}
+
+.product-list-col .btn {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.product-list-col .btn:hover {
+  background-color: #0056b3;
 }

@@ -11,8 +11,7 @@ const UserInfoSection = ({
 }) => {
   const handleUserInfoSubmit = (e) => {
     e.preventDefault();
-    const updatedUserInfo = { ...userInfo, ...checkoutFormData };
-    onSubmit(updatedUserInfo);
+    onSubmit(checkoutFormData); // Truyền đúng formData thay vì merged userInfo
   };
 
   return (

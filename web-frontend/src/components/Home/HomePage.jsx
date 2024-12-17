@@ -6,7 +6,7 @@ import FeatureProduct from "./FeatureProduct";
 import ServicesSection from "./ServicesSection";
 import TestimonialsSection from "./TestimonialsSection";
 import NewsletterSection from "./NewsletterSection";
-import imgBackground from "../../../public/techstore.jpg";
+import imgBackground from "../../assets/techstore.jpg";
 const HomePage = () => {
   return (
     <div>

@@ -1,0 +1,51 @@
+.login-page-bg-light {
+  background-color: #f8f9fa;
+}
+
+.login-page-bg-white {
+  background-color: #ffffff;
+}
+
+.login-page-google-login-container {
+  max-width: 400px;
+}
+
+.login-page-text-login {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.login-page-forget-pass {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.login-page-forget-pass:hover {
+  text-decoration: underline;
+}
+
+.login-page-google-login {
+  margin-top: 1rem;
+}
+
+.login-page-google-login-btn {
+  background-color: #db4437;
+  color: #ffffff;
+}
+
+.login-page-google-login-btn:hover {
+  background-color: #c23321;
+}
+
+.login-page-two-button {
+  margin-top: 1rem;
+}
+
+.login-page-two-button a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.login-page-two-button a:hover {
+  text-decoration: underline;
+}

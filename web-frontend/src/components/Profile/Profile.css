@@ -1,118 +1,212 @@
+/* src/components/Profile.css */
+
+/* General Styles */
 .profile-page-section {
-  background-color: #f8f9fa;
-  padding: 30px 0;
+  background-color: #f8f9fa; /* Light background color */
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
 }
 
 .profile-page-container {
-  background: #fff;
-  border-radius: 5px;
-  padding: 20px;
-}
-
-.profile-page-welcome {
-  margin-bottom: 30px;
-}
-
-.profile-page-title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.profile-page-subtitle {
-  color: #666;
-  font-size: 1rem;
-}
-
-.profile-page-heading {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.profile-page-edit-icon {
-  margin-left: 10px;
-  font-size: 1rem;
-  color: #333;
-}
-
-.profile-page-order-status {
-  margin-bottom: 30px;
-}
-
-.profile-page-status-card {
-  background: #f8f9fa;
-  border-radius: 5px;
-  padding: 15px;
-  text-align: center;
-}
-
-.profile-page-status-title {
-  font-size: 1rem;
-  margin-bottom: 10px;
-  color: #555;
-}
-
-.profile-page-status-count {
-  color: #333;
-  font-weight: bold;
-}
-
-.profile-page-user-info {
-  margin-bottom: 30px;
-}
-
-.profile-page-subheading {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 15px;
-}
-
-.profile-page-label {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.profile-page-info {
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.profile-page-edit-btn,
-.profile-page-add-address-btn,
-.profile-page-edit-address-btn,
-.profile-page-delete-address-btn {
-  font-size: 0.9rem;
-}
-
-.profile-page-address-card {
-  background: #f8f9fa;
-  border-radius: 5px;
-  padding: 15px;
-}
-
-.profile-page-address-title {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.profile-page-address-line {
-  font-size: 0.9rem;
-  color: #555;
-  margin: 2px 0;
+  background-color: #ffffff; /* White background */
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  max-width: 1200px;
 }
 
 .profile-page-loading-text {
-  text-align: center;
-  font-size: 1rem;
-  color: #555;
-  margin: 50px 0;
+  font-size: 1.2rem;
+  color: #6c757d; /* Medium gray text */
 }
 
-.profile-page-cancel-btn,
+/* Welcome Section */
+.profile-page-welcome {
+  margin-bottom: 20px;
+}
+
+.profile-page-title {
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.profile-page-subtitle {
+  color: #6c757d; /* Medium gray text */
+}
+
+/* Order Status Section */
+.profile-page-order-status {
+  margin-bottom: 20px;
+}
+
+.profile-page-heading {
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.profile-page-status-card {
+  background-color: #f8f9fa; /* Light background color */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.profile-page-status-title {
+  text-wrap: nowrap;
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.profile-page-status-count {
+  color: #007bff; /* Bootstrap primary color */
+  font-weight: bold;
+}
+
+/* User Info Section */
+.profile-page-user-info {
+  margin-bottom: 20px;
+}
+
+.profile-page-subheading {
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.profile-page-label {
+  color: #6c757d; /* Medium gray text */
+}
+
+.profile-page-info {
+  background-color: #f8f9fa; /* Light background color */
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.profile-page-edit-btn {
+  background-color: #343a40; /* Dark gray background */
+  border-color: #343a40;
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.profile-page-edit-btn:hover {
+  background-color: #23272b; /* Darker gray on hover */
+  border-color: #1d2124;
+}
+
+/* Address Section */
+.profile-page-addresses {
+  margin-bottom: 20px;
+}
+
+.profile-page-address-card {
+  background-color: #f8f9fa; /* Light background color */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.profile-page-address-title {
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.profile-page-address-line {
+  color: #6c757d; /* Medium gray text */
+}
+
+.profile-page-edit-address-btn {
+  background-color: #343a40; /* Dark gray background */
+  border-color: #343a40;
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.profile-page-edit-address-btn:hover {
+  background-color: #23272b; /* Darker gray on hover */
+  border-color: #1d2124;
+}
+
+.profile-page-delete-address-btn {
+  background-color: #dc3545; /* Bootstrap danger color */
+  border-color: #dc3545;
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.profile-page-delete-address-btn:hover {
+  background-color: #c82333; /* Darker danger color on hover */
+  border-color: #bd2130;
+}
+
+.profile-page-add-address-btn {
+  background-color: #343a40; /* Dark gray background */
+  border-color: #343a40;
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.profile-page-add-address-btn:hover {
+  background-color: #23272b; /* Darker gray on hover */
+  border-color: #1d2124;
+}
+
+/* Edit Form Section */
+.profile-page-edit-personal,
+.profile-page-edit-addresses {
+  margin-bottom: 20px;
+}
+
+.profile-page-buttons {
+  text-align: right;
+}
+
+.profile-page-cancel-btn {
+  background-color: #6c757d; /* Bootstrap secondary color */
+  border-color: #6c757d;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.profile-page-cancel-btn:hover {
+  background-color: #5a6268; /* Darker secondary color on hover */
+  border-color: #545b62;
+}
+
 .profile-page-save-btn {
-  font-size: 0.9rem;
+  background-color: #007bff; /* Bootstrap primary color */
+  border-color: #007bff;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.profile-page-save-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  border-color: #0056b3;
+}
+
+/* Toast Notification */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+.toast {
+  background-color: #343a40; /* Dark gray background for toast */
+  color: #ffffff; /* White text for toast */
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.hide {
+  opacity: 0;
+  transform: translateY(-20px);
 }

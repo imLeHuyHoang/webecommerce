@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     setAuth({ user: null, accessToken: null, isLoading: false });
   }, []);
 
-  // Khởi tạo trạng thái auth
+  // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -48,30 +48,34 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, [clearAuthData]);
 
-  // Cơ chế refresh token
+  // Refresh Token Mechanism
   useEffect(() => {
     let refreshInterval;
 
     const refreshToken = async () => {
       try {
         const response = await apiClient.get("/user/refreshToken");
-        const { accessToken } = response.data;
+        const { accessToken, user } = response.data;
 
-        localStorage.setItem("accessToken", accessToken);
-        setAuth((prev) => ({
-          ...prev,
-          accessToken,
-        }));
+        if (accessToken && user) {
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("user", JSON.stringify(user));
+          setAuth((prev) => ({
+            ...prev,
+            accessToken,
+            user,
+          }));
+        }
       } catch (error) {
         console.error("Token refresh error:", error);
         clearAuthData();
-        // Không navigate, chỉ xóa dữ liệu auth
+        // Optionally, navigate to login or show a notification
       }
     };
 
     if (auth.accessToken) {
-      refreshInterval = setInterval(refreshToken, 10 * 60 * 1000); // 10 phút
-      // Refresh ngay lần đầu
+      refreshInterval = setInterval(refreshToken, 10 * 60 * 1000); // 10 minutes
+      // Refresh immediately upon setting accessToken
       refreshToken();
     }
 
@@ -101,7 +105,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout error:", error);
     } finally {
       clearAuthData();
-      // Không navigate, việc chuyển hướng sẽ do component khác xử lý
+      // Navigation handled by the component invoking logout
     }
   }, [clearAuthData]);
 

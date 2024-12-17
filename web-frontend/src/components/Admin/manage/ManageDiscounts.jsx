@@ -19,6 +19,7 @@ const ManageDiscount = () => {
   const [products, setProducts] = useState([]);
   const [productSearchResults, setProductSearchResults] = useState([]);
   const [productSearchTerm, setProductSearchTerm] = useState("");
+  const [discountSearchTerm, setDiscountSearchTerm] = useState("");
   const [editingDiscountId, setEditingDiscountId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
@@ -115,6 +116,10 @@ const ManageDiscount = () => {
     setProductSearchResults(results);
   };
 
+  const handleDiscountSearch = (e) => {
+    setDiscountSearchTerm(e.target.value);
+  };
+
   const handleAddProduct = (product) => {
     if (!form.applicableProducts.includes(product._id)) {
       setForm({
@@ -154,9 +159,23 @@ const ManageDiscount = () => {
     }
   };
 
+  const filteredDiscounts = discounts.filter((discount) =>
+    discount.code.toLowerCase().includes(discountSearchTerm.toLowerCase())
+  );
+
   return (
-    <div className="container my-5">
+    <div className="manage-discount-container my-5">
       <h2>Quản lý mã giảm giá</h2>
+
+      <div className="manage-discount-search mb-4">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Tìm kiếm mã giảm giá..."
+          value={discountSearchTerm}
+          onChange={handleDiscountSearch}
+        />
+      </div>
 
       {!showForm && (
         <button
@@ -387,7 +406,7 @@ const ManageDiscount = () => {
           </tr>
         </thead>
         <tbody>
-          {discounts.map((discount) => (
+          {filteredDiscounts.map((discount) => (
             <tr key={discount._id}>
               <td>{discount.code}</td>
               <td>{discount.type}</td>

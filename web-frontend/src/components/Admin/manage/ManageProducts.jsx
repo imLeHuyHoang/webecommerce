@@ -150,19 +150,19 @@ const ManageProducts = () => {
 
   return (
     <>
-      <div className="container mt-5">
+      <div className="manage-product-container mt-5">
         {/* Header Section */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1>Quản lý sản phẩm</h1>
           <div>
             <button
-              className="btn btn-secondary me-2 btn-filter"
+              className="btn btn-secondary me-2 manage-product-btn-filter"
               onClick={toggleFilters}
             >
               {showFilters ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
             </button>
             <button
-              className="btn btn-primary btn-add-product"
+              className="btn btn-primary manage-product-btn-add-product"
               onClick={handleAddProduct}
             >
               Thêm sản phẩm mới
@@ -172,14 +172,14 @@ const ManageProducts = () => {
 
         {/* Filter Section */}
         {showFilters && (
-          <div className="mb-4 filter-container">
-            <form className="row filter-form">
-              <div className="col-md-2 one-div-filter ">
-                <label className="form-label " htmlFor="filterCode">
+          <div className="mb-4 manage-product-filter-container">
+            <form className="row manage-product-filter-form">
+              <div className="col-md-2 manage-product-one-div-filter">
+                <label className="form-label" htmlFor="filterCode">
                   Mã
                 </label>
                 <input
-                  className="form-control form-code"
+                  className="form-control manage-product-form-code"
                   id="filterCode"
                   type="text"
                   name="code"
@@ -187,12 +187,12 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2 one-div-filter">
-                <label className="form-label " htmlFor="filterName">
+              <div className="col-md-2 manage-product-one-div-filter">
+                <label className="form-label" htmlFor="filterName">
                   Tên
                 </label>
                 <input
-                  className="form-control form-name"
+                  className="form-control manage-product-form-name"
                   id="filterName"
                   type="text"
                   name="name"
@@ -200,15 +200,15 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2 one-div-filter">
+              <div className="col-md-2 manage-product-one-div-filter">
                 <label
-                  className="form-label form-trademark-filter "
+                  className="form-label manage-product-form-trademark-filter"
                   htmlFor="filterBrand"
                 >
                   Thương hiệu
                 </label>
                 <input
-                  className="form-control form-trademark"
+                  className="form-control manage-product-form-trademark"
                   id="filterBrand"
                   type="text"
                   name="brand"
@@ -216,12 +216,12 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2 one-div-filter">
-                <label className="form-label " htmlFor="filterPrice">
+              <div className="col-md-2 manage-product-one-div-filter">
+                <label className="form-label" htmlFor="filterPrice">
                   Giá
                 </label>
                 <input
-                  className="form-control form-price"
+                  className="form-control manage-product-form-price"
                   id="filterPrice"
                   type="number"
                   name="price"
@@ -229,12 +229,12 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2 one-div-filter">
+              <div className="col-md-2 manage-product-one-div-filter">
                 <label className="form-label" htmlFor="filterCategory">
                   Danh mục
                 </label>
                 <input
-                  className="form-control form-category"
+                  className="form-control manage-product-form-category"
                   id="filterCategory"
                   type="text"
                   name="category"
@@ -242,16 +242,16 @@ const ManageProducts = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-2 d-flex ">
+              <div className="col-md-2 d-flex manage-product-filter-buttons">
                 <button
-                  className="btn btn-secondary me-2 btn-clear"
+                  className="btn btn-secondary me-2 manage-product-btn-clear"
                   type="button"
                   onClick={clearFilters}
                 >
                   Xóa bộ lọc
                 </button>
                 <button
-                  className="btn btn-primary btn-apply"
+                  className="btn btn-primary manage-product-btn-apply"
                   type="button"
                   onClick={applyFilters}
                 >
@@ -263,8 +263,8 @@ const ManageProducts = () => {
         )}
 
         {/* Product Table Section */}
-        <div className="table-responsive">
-          <table className="table table-bordered">
+        <div className="table-responsive manage-product-table-responsive">
+          <table className="table table-bordered manage-product-table">
             <thead className="table-dark">
               <tr>
                 <th>Mã</th>
@@ -304,20 +304,20 @@ const ManageProducts = () => {
                           key={index}
                           src={getProductImageUrl(img)} // Sử dụng helper
                           alt={product.name}
-                          className="img-thumbnail"
+                          className="img-thumbnail manage-product-img-thumbnail"
                           style={{ width: "50px", marginRight: "5px" }}
                         />
                       ))}
                     </td>
-                    <td className="action-buttons">
+                    <td className="manage-product-action-buttons">
                       <button
-                        className="btn btn-edit"
+                        className="btn btn-edit manage-product-btn-edit"
                         onClick={() => handleEditProduct(product)}
                       >
                         Sửa
                       </button>
                       <button
-                        className="btn btn-delete"
+                        className="btn btn-delete manage-product-btn-delete"
                         onClick={() => handleDeleteProduct(product._id)}
                       >
                         Xóa
@@ -339,7 +339,7 @@ const ManageProducts = () => {
 
       {/* Modal Form for Product */}
       {showModal && (
-        <div className="modal show d-block" tabIndex="-1">
+        <div className="modal show d-block">
           <div className="modal-dialog modal-lg modal-dialog-scrollable">
             <div className="modal-content">
               <div className="modal-header">
@@ -365,12 +365,14 @@ const ManageProducts = () => {
       )}
 
       {/* Toast Notification */}
-      <ToastNotification
-        show={toast.show}
-        message={toast.message}
-        variant={toast.variant}
-        onClose={() => setToast({ ...toast, show: false })}
-      />
+      {toast.show && (
+        <ToastNotification
+          show={toast.show}
+          message={toast.message}
+          variant={toast.variant}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
+      )}
     </>
   );
 };

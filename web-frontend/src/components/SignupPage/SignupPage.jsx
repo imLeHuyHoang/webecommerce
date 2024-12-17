@@ -1,10 +1,12 @@
+// src/components/SignupPage/SignUp.jsx
 import React, { useState } from "react";
-import axios from "axios";
 import { z } from "zod";
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate and Link
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./SignupPage.css";
 import apiClient from "../../utils/api-client";
 
+// Define the signup schema using Zod
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -23,6 +25,8 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -32,12 +36,18 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Reset previous errors and messages
+    setErrors({});
+    setMessage("");
+
+    // Validate password confirmation
     if (formData.password !== formData.confirmPassword) {
       setErrors({ confirmPassword: "Passwords do not match" });
       setLoading(false);
       return;
     }
 
+    // Validate form data using Zod
     const validationResult = signupSchema.safeParse(formData);
     if (!validationResult.success) {
       const newErrors = {};
@@ -49,6 +59,7 @@ const SignUp = () => {
       return;
     }
 
+    // Prepare full form data with additional fields (if necessary)
     const fullFormData = {
       name: formData.name,
       email: formData.email,
@@ -75,67 +86,79 @@ const SignUp = () => {
       setMessage("Sign Up Successful!");
       setFormData({ name: "", email: "", password: "", confirmPassword: "" });
       setErrors({});
-      navigator.push("/home");
+      setLoading(false);
+      navigate("/home"); // Navigate to home after successful signup
     } catch (error) {
       const errMessage = error.response?.data?.message || "Sign Up Failed!";
       setMessage(errMessage);
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="container-signup">
-      <div className="container">
-        <div className="card">
-          <h2 className="text-center">Sign Up</h2>
-          {message && <div className="alert alert-info">{message}</div>}
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">
+    <section className="sign-up-page-container">
+      <div className="container sign-up-page-container-inner">
+        <div className="card sign-up-page-card">
+          <h2 className="text-center sign-up-page-title">Sign Up</h2>
+          {message && <div className="alert sign-up-page-alert">{message}</div>}
+          <form onSubmit={handleSubmit} className="sign-up-page-form">
+            <div className="mb-3 sign-up-page-form-group">
+              <label htmlFor="name" className="form-label sign-up-page-label">
                 Name
               </label>
               <input
                 type="text"
                 id="name"
                 name="name"
-                className={`form-control ${errors.name ? "is-invalid" : ""}`}
+                className={`form-control sign-up-page-input ${
+                  errors.name ? "is-invalid" : ""
+                }`}
                 placeholder="Enter your name"
                 value={formData.name}
                 onChange={handleChange}
                 required
+                autoFocus
               />
               {errors.name && (
-                <div className="invalid-feedback">{errors.name}</div>
+                <div className="invalid-feedback sign-up-page-error">
+                  {errors.name}
+                </div>
               )}
             </div>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">
+            <div className="mb-3 sign-up-page-form-group">
+              <label htmlFor="email" className="form-label sign-up-page-label">
                 Email
               </label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                className={`form-control sign-up-page-input ${
+                  errors.email ? "is-invalid" : ""
+                }`}
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
                 required
               />
               {errors.email && (
-                <div className="invalid-feedback">{errors.email}</div>
+                <div className="invalid-feedback sign-up-page-error">
+                  {errors.email}
+                </div>
               )}
             </div>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label">
+            <div className="mb-3 sign-up-page-form-group">
+              <label
+                htmlFor="password"
+                className="form-label sign-up-page-label"
+              >
                 Password
               </label>
               <input
                 type="password"
                 id="password"
                 name="password"
-                className={`form-control ${
+                className={`form-control sign-up-page-input ${
                   errors.password ? "is-invalid" : ""
                 }`}
                 placeholder="Enter your password"
@@ -144,18 +167,23 @@ const SignUp = () => {
                 required
               />
               {errors.password && (
-                <div className="invalid-feedback">{errors.password}</div>
+                <div className="invalid-feedback sign-up-page-error">
+                  {errors.password}
+                </div>
               )}
             </div>
-            <div className="mb-3">
-              <label htmlFor="confirmPassword" className="form-label">
+            <div className="mb-3 sign-up-page-form-group">
+              <label
+                htmlFor="confirmPassword"
+                className="form-label sign-up-page-label"
+              >
                 Confirm Password
               </label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
-                className={`form-control ${
+                className={`form-control sign-up-page-input ${
                   errors.confirmPassword ? "is-invalid" : ""
                 }`}
                 placeholder="Confirm your password"
@@ -164,24 +192,26 @@ const SignUp = () => {
                 required
               />
               {errors.confirmPassword && (
-                <div className="invalid-feedback">{errors.confirmPassword}</div>
+                <div className="invalid-feedback sign-up-page-error">
+                  {errors.confirmPassword}
+                </div>
               )}
             </div>
-            <div className="d-grid">
+            <div className="d-grid sign-up-page-submit-group">
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn btn-primary sign-up-page-submit-btn"
                 disabled={loading}
               >
                 {loading ? "Signing Up..." : "Sign Up"}
               </button>
             </div>
-            <div className="text-center mt-3">
+            <div className="text-center mt-3 sign-up-page-footer">
               <p>
                 Already have an account?{" "}
-                <a href="/login" className="text-primary">
+                <Link to="/login" className="sign-up-page-login-link">
                   Login here
-                </a>
+                </Link>
               </p>
             </div>
           </form>

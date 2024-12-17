@@ -1,4 +1,3 @@
-// src/components/LoginPage/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -21,25 +20,18 @@ const Login = () => {
     setError("");
     try {
       const response = await apiClient.post("/user/login", formData);
-      const { accessToken, id, user } = response.data;
+      const { accessToken, user } = response.data;
       if (!user) {
         setError("Không nhận được thông tin người dùng từ máy chủ.");
         return;
       }
-      localStorage.setItem("userId", id);
       login(user, accessToken);
       navigate("/");
       window.location.reload();
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError(error.response.data.message);
-      } else {
-        setError("Email hoặc mật khẩu không đúng!");
-      }
+      const errorMessage =
+        error.response?.data?.message || "Email hoặc mật khẩu không đúng!";
+      setError(errorMessage);
     }
   };
 
@@ -58,15 +50,9 @@ const Login = () => {
       login(user, accessToken);
       navigate("/");
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError(error.response.data.message);
-      } else {
-        setError("Đăng nhập với Google thất bại!");
-      }
+      const errorMessage =
+        error.response?.data?.message || "Đăng nhập với Google thất bại!";
+      setError(errorMessage);
     }
   };
 
@@ -76,12 +62,12 @@ const Login = () => {
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <div className="bg-light d-flex align-items-center justify-content-center min-vh-100">
+      <div className="login-page-bg-light d-flex align-items-center justify-content-center min-vh-100">
         <div
-          className="bg-white p-5 rounded shadow-lg w-100 google-login-container"
+          className="login-page-bg-white p-5 rounded shadow-lg w-100 login-page-google-login-container"
           style={{ maxWidth: "400px" }}
         >
-          <h5 className="text-center text-login">Đăng nhập</h5>
+          <h5 className="text-center login-page-text-login">Đăng nhập</h5>
           {error && <div className="alert alert-danger">{error}</div>}
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
@@ -113,7 +99,7 @@ const Login = () => {
               />
             </div>
             <div className="d-flex justify-content-between mb-3">
-              <Link to="/forgot-password" className="forget-pass">
+              <Link to="/forgot-password" className="login-page-forget-pass">
                 Quên mật khẩu?
               </Link>
             </div>
@@ -124,13 +110,13 @@ const Login = () => {
           <div className="text-center my-3">
             <span className="text-muted">hoặc</span>
           </div>
-          <div className="google-login">
+          <div className="login-page-google-login">
             <GoogleLogin
               onSuccess={handleGoogleLoginSuccess}
               onError={handleGoogleLoginFailure}
               render={(renderProps) => (
                 <button
-                  className="btn btn-danger w-100 mb-3 google-login-btn"
+                  className="btn btn-danger w-100 mb-3 login-page-google-login-btn"
                   onClick={renderProps.onClick}
                 >
                   <i className="fab fa-google me-2"></i> Đăng nhập với Google
@@ -138,7 +124,7 @@ const Login = () => {
               )}
             />
           </div>
-          <div className="d-flex justify-content-between two-button">
+          <div className="d-flex justify-content-between login-page-two-button">
             <Link to="/signup" className="text-decoration-none">
               Bạn chưa có tài khoản? Đăng ký
             </Link>

@@ -46,6 +46,7 @@ const ProductPage = () => {
             onCategoryChange={handleCategoryChange}
             onFilterChange={updateFilters}
             filters={filters}
+            showFilters={true} // Ensure that filters are shown if needed
           />
         </Col>
 

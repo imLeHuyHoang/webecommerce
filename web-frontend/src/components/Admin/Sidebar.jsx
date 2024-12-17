@@ -5,9 +5,6 @@ const Sidebar = () => {
   return (
     <div className="sidebar bg-light">
       <nav className="nav flex-column p-3">
-        <Link to="/dashboard" className="nav-link">
-          Dashboard
-        </Link>
         <Link to="/orders" className="nav-link">
           Order Management
         </Link>

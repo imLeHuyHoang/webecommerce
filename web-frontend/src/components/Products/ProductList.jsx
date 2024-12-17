@@ -13,7 +13,8 @@ import apiClient from "../../utils/api-client";
 import "./ProductList.css";
 
 function ProductList({ filters }) {
-  const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]); // All fetched products
+  const [filteredProducts, setFilteredProducts] = useState([]); // Products after client-side filtering
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,27 +25,61 @@ function ProductList({ filters }) {
       try {
         setLoading(true);
         const response = await apiClient.get("/product", {
-          params: filters,
+          params: {
+            // Send only search and brand filters to the API
+            search: filters.search || "",
+            brand: filters.brand || "",
+            category: filters.category || "",
+          },
         });
-        setProducts(response.data);
+
+        console.log("API Response Data:", response.data); // Debugging
+
+        setAllProducts(response.data);
         setLoading(false);
       } catch (error) {
+        console.error("Error fetching products:", error);
         setError("Có lỗi xảy ra khi tải sản phẩm.");
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [filters]);
+  }, [filters.search, filters.brand, filters.category]);
+
+  useEffect(() => {
+    let tempProducts = [...allProducts];
+
+    // Client-side Price Filtering
+    if (filters.price) {
+      const [min, max] = filters.price.split("-");
+      const minPrice = min ? parseInt(min, 10) : 0;
+      const maxPrice = max ? parseInt(max, 10) : Infinity;
+      tempProducts = tempProducts.filter(
+        (product) => product.price >= minPrice && product.price <= maxPrice
+      );
+    }
+
+    // Client-side Rating Filtering
+    if (filters.rating) {
+      const minRating = parseFloat(filters.rating);
+      tempProducts = tempProducts.filter(
+        (product) => product.averageRating >= minRating
+      );
+    }
+
+    setFilteredProducts(tempProducts);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [allProducts, filters.price, filters.rating]);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(
+  const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
 
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -65,6 +100,8 @@ function ProductList({ filters }) {
       </Container>
     );
   }
+
+  console.log("Filtered Products Displayed:", currentProducts); // Debugging
 
   return (
     <section className="product-list-section">

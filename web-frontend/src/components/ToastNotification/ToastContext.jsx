@@ -1,7 +1,8 @@
 // src/context/ToastContext.js
 
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useCallback } from "react";
 import ToastNotification from "./ToastNotification";
+import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is imported
 import "./ToastStyles.css"; // For any additional custom styles
 
 export const ToastContext = createContext();
@@ -10,33 +11,17 @@ export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
   // Function to add a new toast
-  const addToast = (message, variant = "info", actions = []) => {
-    const id = Date.now();
+  const addToast = useCallback((message, variant = "info", actions = []) => {
+    const id = Date.now() + Math.random(); // More unique ID
     setToasts((prevToasts) => [
       ...prevToasts,
-      { id, message, variant, progress: 100, actions },
+      { id, message, variant, actions },
     ]);
-  };
+  }, []);
 
   // Function to remove a toast by id
-  const removeToast = (id) => {
+  const removeToast = useCallback((id) => {
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
-  };
-
-  // Progress management: decrease progress over time
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setToasts((prevToasts) =>
-        prevToasts
-          .map((toast) => ({
-            ...toast,
-            progress: toast.progress > 0 ? toast.progress - 1 : 0,
-          }))
-          .filter((toast) => toast.progress > 0)
-      );
-    }, 30); // Update every 30ms for smoother progress
-
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -55,7 +40,6 @@ export const ToastProvider = ({ children }) => {
             onClose={() => removeToast(toast.id)}
             variant={toast.variant}
             actions={toast.actions}
-            progress={toast.progress}
           />
         ))}
       </div>

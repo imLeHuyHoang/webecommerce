@@ -185,9 +185,28 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleUserInfoSubmit = (updatedUserInfo) => {
-    setUserInfo(updatedUserInfo);
-    setIsEditingUserInfo(false);
+  const handleUserInfoSubmit = async (updatedUserInfo) => {
+    try {
+      setLoading(true);
+      const response = await apiClient.put("/user/profile", {
+        name: updatedUserInfo.name,
+        phone: updatedUserInfo.phone,
+        gender: updatedUserInfo.gender,
+      });
+      setUserInfo(response.data);
+      setCheckoutFormData({
+        name: response.data.name || "",
+        phone: response.data.phone || "",
+        gender: response.data.gender || "",
+      });
+      setIsEditingUserInfo(false);
+      toast.success("Thông tin người dùng đã được cập nhật thành công!");
+    } catch (error) {
+      console.error("Error updating user info:", error);
+      toast.error("Có lỗi xảy ra khi cập nhật thông tin. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {

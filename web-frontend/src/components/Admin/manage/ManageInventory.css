@@ -1,0 +1,179 @@
+/* src/pages/ManageInventory/ManageInventory.css */
+
+/* General Styles */
+.manage-inventory-container {
+  background-color: #f8f9fa; /* Light background color */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.manage-inventory-header h2 {
+  color: #343a40; /* Dark gray text */
+  font-weight: bold;
+}
+
+.manage-inventory-add-btn {
+  background-color: #007bff; /* Bootstrap primary color */
+  border-color: #007bff;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.manage-inventory-add-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  border-color: #0056b3;
+}
+
+.manage-inventory-search-input {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 10px;
+}
+
+.manage-inventory-error {
+  color: #dc3545; /* Bootstrap danger color */
+}
+
+.manage-inventory-loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #6c757d; /* Medium gray text */
+}
+
+.manage-inventory-table {
+  background-color: #ffffff; /* White background for table */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.manage-inventory-thead {
+  background-color: #343a40; /* Dark gray background for table header */
+  color: #ffffff; /* White text for table header */
+}
+
+.manage-inventory-table th,
+.manage-inventory-table td {
+  vertical-align: middle; /* Center align text vertically */
+}
+
+.manage-inventory-table tbody tr:nth-of-type(odd) {
+  background-color: #f2f2f2; /* Light gray background for odd rows */
+}
+
+.manage-inventory-table tbody tr:hover {
+  background-color: #e9ecef; /* Light gray background on hover */
+}
+
+.manage-inventory-edit-btn {
+  background-color: #ffc107; /* Bootstrap warning color */
+  border-color: #ffc107;
+  color: #343a40; /* Dark gray text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.manage-inventory-edit-btn:hover {
+  background-color: #e0a800; /* Darker warning color on hover */
+  border-color: #d39e00;
+}
+
+.manage-inventory-delete-btn {
+  background-color: #dc3545; /* Bootstrap danger color */
+  border-color: #dc3545;
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.manage-inventory-delete-btn:hover {
+  background-color: #c82333; /* Darker danger color on hover */
+  border-color: #bd2130;
+}
+
+/* Modal Styles */
+.manage-inventory-modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.manage-inventory-modal-header {
+  background-color: #343a40; /* Dark gray background for modal header */
+  color: #ffffff; /* White text for modal header */
+  border-bottom: none;
+}
+
+.manage-inventory-modal-title {
+  font-weight: bold;
+}
+
+.manage-inventory-modal-close {
+  color: #ffffff; /* White color for close button */
+  opacity: 1;
+}
+
+.manage-inventory-modal-close:hover {
+  color: #e9ecef; /* Light gray color on hover */
+}
+
+.manage-inventory-modal-body {
+  padding: 20px;
+}
+
+.manage-inventory-form-group {
+  margin-bottom: 1rem;
+}
+
+.manage-inventory-form-label {
+  font-weight: bold;
+  color: #343a40; /* Dark gray text */
+}
+
+.manage-inventory-form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 10px;
+}
+
+.manage-inventory-product-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+}
+
+.manage-inventory-product-item {
+  cursor: pointer;
+}
+
+.manage-inventory-product-item:hover {
+  background-color: #e9ecef; /* Light gray background on hover */
+}
+
+.manage-inventory-product-info p {
+  margin: 0;
+  color: #343a40; /* Dark gray text */
+}
+
+.manage-inventory-form-actions {
+  text-align: right;
+}
+
+.manage-inventory-cancel-btn {
+  background-color: #6c757d; /* Bootstrap secondary color */
+  border-color: #6c757d;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.manage-inventory-cancel-btn:hover {
+  background-color: #5a6268; /* Darker secondary color on hover */
+  border-color: #545b62;
+}
+
+.manage-inventory-submit-btn {
+  background-color: #007bff; /* Bootstrap primary color */
+  border-color: #007bff;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.manage-inventory-submit-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  border-color: #0056b3;
+}

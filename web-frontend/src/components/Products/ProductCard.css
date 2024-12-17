@@ -1,105 +1,179 @@
-/* Bao quanh thẻ sản phẩm */
+/* Container for the entire product card */
 .product-card-container {
-  background-color: #ffffff;
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
-  transition: transform 0.2s ease-in-out;
-  overflow: hidden;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s;
 }
 
 .product-card-container:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px);
 }
 
-/* Link bao quanh hình ảnh */
+/* Link styling to remove default decorations */
 .product-card-link {
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
 
-/* Khu vực hình ảnh */
+/* Image container to maintain consistent aspect ratio */
 .product-card-image-container {
   position: relative;
   width: 100%;
+  padding-top: 75%; /* 4:3 Aspect Ratio */
   overflow: hidden;
+  background-color: #f8f9fa; /* Light background for image area */
 }
 
+/* Product image styling */
 .product-card-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 100%;
-  height: auto;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain; /* Ensures the image scales properly */
+  transform: translate(-50%, -50%);
 }
 
-/* Badge hết hàng */
+/* Badge for out-of-stock indication */
 .product-card-stock-badge {
   position: absolute;
   top: 10px;
   left: 10px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  padding: 0.5em 0.75em;
+  border-radius: 0.25rem;
 }
 
-/* Nội dung thẻ sản phẩm */
+/* Card body to use flex layout for proper alignment */
 .product-card-body {
-  padding: 15px;
   display: flex;
   flex-direction: column;
+  padding: 1rem;
+  flex-grow: 1;
 }
 
-/* Tên sản phẩm */
+/* Product title styling */
 .product-card-title {
   font-size: 1.1rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  flex-grow: 1;
 }
 
-/* Giá sản phẩm */
+/* Price styling */
 .product-card-price {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #d9534f;
-  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #28a745; /* Green color for price */
+  margin-bottom: 0.5rem;
 }
 
-/* Tồn kho sản phẩm */
+/* Stock information styling */
 .product-card-stock {
   font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 10px;
+  color: #6c757d; /* Gray color for stock text */
+  margin-bottom: 0.75rem;
 }
 
-/* Rating */
+/* Rating section styling */
 .product-card-rating {
   display: flex;
   align-items: center;
-  font-size: 0.9rem;
-  color: #333;
+  margin-bottom: 0.75rem;
 }
 
+/* Star icon styling */
 .product-card-star-icon {
-  margin-right: 2px;
+  margin-right: 0.2rem;
+  font-size: 1rem;
 }
 
+/* Review count styling */
 .product-card-review-count {
   font-size: 0.9rem;
-  color: #555;
+  color: #6c757d;
 }
 
-/* Nút thêm vào giỏ hàng */
+/* Add to Cart button styling */
 .product-card-add-to-cart-btn {
-  font-size: 0.9rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-radius: 5px;
-  padding: 8px 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease-in-out;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
 }
 
-.product-card-add-to-cart-btn:hover:not(:disabled) {
-  background-color: #0069d9 !important;
-  border-color: #0062cc !important;
+/* Responsive Adjustments */
+
+/* For small devices (phones) */
+@media (max-width: 576px) {
+  .product-card-title {
+    font-size: 1rem;
+  }
+
+  .product-card-price {
+    font-size: 1.1rem;
+  }
+
+  .product-card-star-icon {
+    font-size: 0.9rem;
+  }
+
+  .product-card-review-count {
+    font-size: 0.8rem;
+  }
+
+  .product-card-add-to-cart-btn {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
+}
+
+/* For medium devices (tablets) */
+@media (min-width: 577px) and (max-width: 992px) {
+  .product-card-title {
+    font-size: 1.05rem;
+  }
+
+  .product-card-price {
+    font-size: 1.15rem;
+  }
+
+  .product-card-star-icon {
+    font-size: 0.95rem;
+  }
+
+  .product-card-review-count {
+    font-size: 0.85rem;
+  }
+
+  .product-card-add-to-cart-btn {
+    font-size: 0.95rem;
+    padding: 0.45rem;
+  }
+}
+
+/* For large devices (desktops) */
+@media (min-width: 993px) {
+  .product-card-title {
+    font-size: 1.1rem;
+  }
+
+  .product-card-price {
+    font-size: 1.2rem;
+  }
+
+  .product-card-star-icon {
+    font-size: 1rem;
+  }
+
+  .product-card-review-count {
+    font-size: 0.9rem;
+  }
+
+  .product-card-add-to-cart-btn {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
 }

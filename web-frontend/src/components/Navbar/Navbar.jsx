@@ -1,3 +1,4 @@
+// src/components/Navbar/Navbar.jsx
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -26,7 +27,12 @@ function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mar">
       <div className="container-fluid">
-        <NavLink to="/" className="navbar-brand">
+        {/* Conditionally set the 'to' prop based on admin status */}
+        <NavLink
+          to={admin ? "/admin/productmanagement" : "/"}
+          className="navbar-brand"
+          onClick={closeMenu} // Ensure the menu closes on click
+        >
           TechStore
         </NavLink>
         <button
@@ -89,14 +95,6 @@ function Navbar() {
 
             {admin && (
               <>
-                <li className="nav-item">
-                  <LinkWithIcon
-                    title="Dashboard"
-                    link="/admin"
-                    icon="fas fa-tachometer-alt"
-                    onClick={closeMenu}
-                  />
-                </li>
                 <li className="nav-item">
                   <LinkWithIcon
                     title="User Management"
