@@ -2,10 +2,13 @@
 
 /* General Styles */
 .profile-page-section {
-  background-color: #f8f9fa; /* Light background color */
   padding: 20px 0;
   display: flex;
   justify-content: center;
+  background-image: url("../../assets/giangsinh4.avif");
+  background-size: cover;
+  background-position: center;
+  min-height: 90vh; /* Ensure the element has a minimum height of 100% of the viewport height */
 }
 
 .profile-page-container {
@@ -14,6 +17,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   max-width: 1200px;
+  opacity: 0.96;
 }
 
 .profile-page-loading-text {

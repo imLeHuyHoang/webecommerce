@@ -1,6 +1,6 @@
 const CryptoJS = require("crypto-js");
 const Order = require("../models/Order");
-const zalopayConfig = require("../utils/zalopayConfig"); // Ensure this line is present
+const zalopayConfig = require("../utils/zalopayConfig"); // Đảm bảo dòng này có mặt
 const Cart = require("../models/Cart");
 const Inventory = require("../models/Inventory");
 
@@ -10,25 +10,30 @@ exports.paymentCallback = async (req, res) => {
 
     const { data: dataStr, mac: reqMac, type } = req.body;
 
+    // Kiểm tra dữ liệu, mac và type có tồn tại không
     if (!dataStr || !reqMac || type === undefined) {
-      console.error("Missing data, mac, or type in callback.");
+      console.error("Thiếu dữ liệu, mac hoặc type trong callback.");
       return res.sendStatus(400);
     }
 
+    // Tạo mã MAC từ dữ liệu nhận được và khóa
     const mac = CryptoJS.HmacSHA256(dataStr, zalopayConfig.key2).toString();
 
+    // Kiểm tra xem mã MAC có khớp với mã MAC nhận được không
     if (mac !== reqMac) {
-      console.error("MAC mismatch.");
+      console.error("MAC không khớp.");
       return res.sendStatus(400);
     }
 
+    // Phân tích file JSON
     const data = JSON.parse(dataStr);
-    console.log("Parsed Data from Callback:", data);
+    console.log("Dữ liệu đã phân tích từ Callback:", data);
 
     const { app_id, app_trans_id, zp_trans_id } = data;
 
+    // Kiểm tra xem các thông tin cần thiết có tồn tại không
     if (!app_id || !app_trans_id || !zp_trans_id) {
-      console.error("Missing necessary information in data.");
+      console.error("Thiếu thông tin cần thiết trong dữ liệu.");
       return res.sendStatus(400);
     }
 
@@ -37,7 +42,7 @@ exports.paymentCallback = async (req, res) => {
       "payment.appTransId": app_trans_id,
     });
     if (!order) {
-      console.error(`Order with appTransId: ${app_trans_id} not found`);
+      console.error(`Không tìm thấy đơn hàng với appTransId: ${app_trans_id}`);
       return res.sendStatus(404);
     }
 
@@ -48,7 +53,7 @@ exports.paymentCallback = async (req, res) => {
     order.payment.transactionId = zpTransIdStr;
 
     console.log(
-      `Order found: ${order._id}, transactionId: ${order.payment.transactionId}`
+      `Đã tìm thấy đơn hàng: ${order._id}, transactionId: ${order.payment.transactionId}`
     );
 
     // Nếu đơn hàng thanh toán thành công (type === 1)
@@ -63,16 +68,16 @@ exports.paymentCallback = async (req, res) => {
         const productId = productItem.product; // Lấy productId từ đơn hàng
         const quantitySold = productItem.quantity; // Lấy số lượng bán được
 
-        // Cập nhật kho
+        // Tìm kho hàng dựa trên productId
         const inventory = await Inventory.findOne({ product: productId });
 
         if (inventory) {
           // Kiểm tra xem kho có đủ số lượng không
           if (inventory.quantity < quantitySold) {
-            console.error(`Not enough stock for product ${productId}`);
+            console.error(`Không đủ hàng tồn kho cho sản phẩm ${productId}`);
             return res
               .status(400)
-              .send("Not enough stock for one or more products.");
+              .send("Không đủ hàng tồn kho cho một hoặc nhiều sản phẩm.");
           }
 
           // Trừ số lượng sản phẩm trong kho
@@ -80,12 +85,11 @@ exports.paymentCallback = async (req, res) => {
           inventory.lastUpdated = new Date(); // Cập nhật thời gian
           await inventory.save();
         } else {
-          console.error(`Inventory not found for product ${productId}`);
-          return res.status(404).send("Product inventory not found.");
+          console.error(`Không tìm thấy kho hàng cho sản phẩm ${productId}`);
+          return res.status(404).send("Không tìm thấy kho hàng cho sản phẩm.");
         }
       }
-
-      // Xóa giỏ hàng sau khi thanh toán thành công
+      // Xóa giỏ hàng của người dùng sau khi thanh toán thành công
       await Cart.deleteMany({ user: order.user });
     }
     // Nếu thanh toán bị huỷ (type === 2)
@@ -93,19 +97,12 @@ exports.paymentCallback = async (req, res) => {
       order.paymentStatus = "cancelled";
       order.cancelledDate = new Date();
     }
-    // Nếu thanh toán đang chờ (type === 3)
-    else if (type === 3) {
-      order.paymentStatus = "pending";
-    } else {
-      console.error(`Unknown type: ${type}`);
-      return res.sendStatus(400);
-    }
 
     // Lưu thông tin đơn hàng đã cập nhật
     await order.save();
     res.sendStatus(200);
   } catch (error) {
-    console.error("Error in payment callback:", error);
+    console.error("Lỗi trong callback thanh toán:", error);
     res.sendStatus(500);
   }
 };

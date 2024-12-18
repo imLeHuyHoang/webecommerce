@@ -1,7 +1,9 @@
 /* FeatureProduct.css */
 .featured-product {
   padding: 60px 0;
-  background-color: #f8f9fa;
+  background-image: url("../../assets/giangsinh4.avif");
+  background-size: cover;
+  background-position: center;
 }
 
 .featured-product-container {

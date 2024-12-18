@@ -14,7 +14,7 @@ import "./ProductList.css";
 
 function ProductList({ filters }) {
   const [allProducts, setAllProducts] = useState([]); // All fetched products
-  const [filteredProducts, setFilteredProducts] = useState([]); // Products after client-side filtering
+  const [filteredProducts, setFilteredProducts] = useState([]); // Products after backend filtering
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,10 +26,11 @@ function ProductList({ filters }) {
         setLoading(true);
         const response = await apiClient.get("/product", {
           params: {
-            // Send only search and brand filters to the API
+            // Send search, brand, category, and rating filters to the API
             search: filters.search || "",
             brand: filters.brand || "",
             category: filters.category || "",
+            rating: filters.rating || "",
           },
         });
 
@@ -45,7 +46,7 @@ function ProductList({ filters }) {
     };
 
     fetchProducts();
-  }, [filters.search, filters.brand, filters.category]);
+  }, [filters.search, filters.brand, filters.category, filters.rating]);
 
   useEffect(() => {
     let tempProducts = [...allProducts];
@@ -61,16 +62,19 @@ function ProductList({ filters }) {
     }
 
     // Client-side Rating Filtering
+    // Đã chuyển lọc rating sang backend, nên có thể loại bỏ phần này
+    /*
     if (filters.rating) {
       const minRating = parseFloat(filters.rating);
       tempProducts = tempProducts.filter(
-        (product) => product.averageRating >= minRating
+        (product) => product.averageRating > minRating
       );
     }
+    */
 
     setFilteredProducts(tempProducts);
     setCurrentPage(1); // Reset to first page when filters change
-  }, [allProducts, filters.price, filters.rating]);
+  }, [allProducts, filters.price /*, filters.rating */]);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;

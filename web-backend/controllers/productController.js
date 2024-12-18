@@ -13,14 +13,25 @@ const mongoose = require("mongoose");
  */
 exports.getAllProducts = async (req, res) => {
   try {
-    const { category, brand, search } = req.query;
+    const { category, brand, search, rating } = req.query;
     let filter = {};
+
+    // Lọc theo danh mục
     if (category) filter.category = category;
+
+    // Lọc theo thương hiệu
     if (brand) filter.brand = brand;
+
+    // Lọc theo tên sản phẩm (tìm kiếm chuỗi)
     if (search) filter.name = { $regex: search, $options: "i" };
 
+    // Lọc theo đánh giá (nhận rating và trả về các bản ghi có averageRating lớn hơn hoặc bằng rating)
+    if (rating) filter.averageRating = { $gte: rating };
+
+    // Truy vấn sản phẩm với bộ lọc
     const products = await Product.find(filter).populate("category", "name");
 
+    // Thêm thông tin tồn kho vào sản phẩm
     const productsWithInventory = await Promise.all(
       products.map(async (product) => {
         const inventory = await Inventory.findOne({ product: product._id });

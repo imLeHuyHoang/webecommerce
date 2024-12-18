@@ -89,7 +89,7 @@ function MyOrders() {
       }
 
       alert(
-        "Yêu cầu hoàn tiền đang được xử lý. Bạn có thể kiểm tra tình trạng refund trong chi tiết đơn hàng."
+        "Đơn hàng của bạn đã được hủy. Nếu đơn hàng là thanh toán trực tuyến, bạn có thể kiểm tra tình trạng hoàn tiền trong chi tiết đơn hàng hoặc liên hệ với nhân viên tư vấn nếu cần hỗ trợ"
       );
     } catch (error) {
       console.error("Error cancelling order:", error);

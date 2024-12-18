@@ -3,13 +3,12 @@ import React from "react";
 import HeroSection from "./HeroSection";
 import CarouselSection from "./CarouselSection";
 import FeatureProduct from "./FeatureProduct";
-import ServicesSection from "./ServicesSection";
-import TestimonialsSection from "./TestimonialsSection";
-import NewsletterSection from "./NewsletterSection";
 import imgBackground from "../../assets/techstore.jpg";
+import ServicesAndTestimonials from "./ServicesAndTestimonials.jsx";
+import "./HomePage.css";
 const HomePage = () => {
   return (
-    <div>
+    <div className="Home-page-container">
       {/* Hero Section */}
       <HeroSection
         title="Chào mừng đến với Tech Store"
@@ -24,14 +23,8 @@ const HomePage = () => {
       {/* Carousel Section */}
       <CarouselSection />
 
-      {/* Services Section */}
-      <ServicesSection />
-
-      {/* Testimonials Section */}
-      <TestimonialsSection />
-
-      {/* Newsletter Section */}
-      <NewsletterSection />
+      {/* Services and Testimonials */}
+      <ServicesAndTestimonials />
     </div>
   );
 };

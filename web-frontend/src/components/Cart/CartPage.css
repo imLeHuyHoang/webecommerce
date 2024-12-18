@@ -2,13 +2,17 @@
 .cart-page {
   background-color: #f8f6f6;
   padding: 20px 0;
+  background-image: url("../../assets/giangsinh4.avif");
+  background-size: cover;
+  background-position: center;
+  min-height: 90vh; /* Đảm bảo phần tử có chiều cao tối thiểu là 100% chiều cao của viewport */
 }
-
 /* Container tổng */
 .cart-container {
   background: #fff;
   border-radius: 5px;
   padding: 20px;
+  opacity: 0.95;
 }
 
 /* Hàng và cột trong layout */

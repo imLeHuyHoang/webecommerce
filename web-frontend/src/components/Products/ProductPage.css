@@ -3,6 +3,8 @@
 /* Container Styles */
 .product-page {
   padding: 2rem 1rem;
+  background-image: url("../../assets/giangsinh4.avif");
+  background-size: cover;
 }
 
 @media (min-width: 768px) {

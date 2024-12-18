@@ -266,10 +266,8 @@ function ProductSidebar({
               className="product-sidebar-select"
             >
               <option value="">Tất cả</option>
-              <option value="4">4 sao trở lên</option>
-              <option value="3">3 sao trở lên</option>
-              <option value="2">2 sao trở lên</option>
-              <option value="1">1 sao trở lên</option>
+              <option value="3">Hơn 3 sao</option>
+              <option value="4">Hơn 4 sao</option>
             </Form.Select>
           </Form.Group>
         </div>

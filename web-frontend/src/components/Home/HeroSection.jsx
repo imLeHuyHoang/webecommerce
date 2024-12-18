@@ -14,7 +14,7 @@ const HeroSection = ({ title, subtitle, link, image }) => {
             <h1 className="hero-title">{title}</h1>
             <h4 className="hero-subtitle">{subtitle}</h4>
             <Button variant="outline-light" size="lg" href={link}>
-              Buy now
+              Mua Ngay
             </Button>
           </Col>
         </Container>

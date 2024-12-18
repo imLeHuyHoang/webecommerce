@@ -48,6 +48,7 @@ const inventoryRoutes = require("./routes/inventoryRoutes");
 const discountRoutes = require("./routes/discountRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const shopCommentsRouter = require("./routes/shopCommentRoutes");
 
 // Route setup
 app.use("/api/user", userRoutes);
@@ -61,6 +62,7 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/discounts", discountRoutes);
 app.use("/api/products", reviewRoutes);
 app.use("/api/products", commentRoutes);
+app.use("/api/shop/comments", shopCommentsRouter);
 
 // Static file serving
 app.use("/category", express.static(__dirname + "/upload/category"));

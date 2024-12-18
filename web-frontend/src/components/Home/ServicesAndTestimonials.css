@@ -1,0 +1,131 @@
+/* src/components/HomePage/ServicesAndTestimonials.css */
+
+/* Phần Dịch Vụ */
+.sat-section {
+  background-image: url("../../assets/giangsinh4.avif");
+  background-size: cover;
+  background-position: center;
+  background-color: #ffffff;
+}
+
+.custom-modal-header {
+  margin-bottom: 20px; /* Thay đổi giá trị margin theo ý bạn */
+}
+.Container-services {
+  background-color: white;
+  border-radius: 5px;
+  opacity: 0.99;
+  padding-bottom: 20px;
+}
+.sat-section .sat-title {
+  color: #333333;
+  font-size: 2rem;
+}
+
+.sat-section .sat-service-card {
+  border: none;
+  background-color: #ffffff;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sat-section .sat-service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sat-section .sat-service-icon {
+  color: #000000; /* Màu xanh dương Bootstrap */
+}
+
+.sat-section .sat-service-title {
+  font-size: 1.25rem;
+  color: #000000;
+}
+
+.sat-section .sat-service-description {
+  color: #555555;
+  font-size: 0.95rem;
+}
+
+/* Phần Đánh Giá Khách Hàng */
+.sat-section .sat-testimonials-title {
+  color: #333333;
+  font-size: 2rem;
+}
+
+.sat-section .sat-testimonial-row {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.sat-section .sat-fade-in {
+  opacity: 1;
+}
+
+.sat-section .sat-fade-out {
+  opacity: 0;
+}
+
+.sat-section .sat-testimonial-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background-color: #ffffff;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.sat-section .sat-testimonial-text {
+  font-style: italic;
+  color: #555555;
+}
+
+.sat-section .sat-testimonial-author {
+  font-weight: bold;
+  color: #000000;
+}
+
+/* Phần Để Lại Bình Luận */
+.sat-section .sat-comment-section p {
+  color: #333333;
+  font-size: 1rem;
+}
+
+.sat-section .sat-comment-section .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.sat-section .sat-comment-section .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+/* Modal */
+.sat-section .modal-title {
+  color: #333333;
+}
+
+.sat-section .form-control {
+  border-radius: 4px;
+  border-color: #ced4da;
+}
+
+.sat-section .btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.sat-section .btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .sat-section .sat-service-card {
+    margin-bottom: 20px;
+  }
+
+  .sat-section .sat-testimonial-card {
+    margin-bottom: 20px;
+  }
+}
