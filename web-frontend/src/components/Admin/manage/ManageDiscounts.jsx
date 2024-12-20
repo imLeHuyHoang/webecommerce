@@ -1,3 +1,4 @@
+// src/components/Admin/ManageDiscounts/ManageDiscount.js
 import React, { useEffect, useState } from "react";
 import apiClient from "../../../utils/api-client";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +12,7 @@ const ManageDiscount = () => {
     value: "",
     isPercentage: false,
     minOrderValue: "",
-    maxDiscountValue: "",
+    startDate: "",
     expiryDate: "",
     isActive: true,
     applicableProducts: [],
@@ -19,7 +20,13 @@ const ManageDiscount = () => {
   const [products, setProducts] = useState([]);
   const [productSearchResults, setProductSearchResults] = useState([]);
   const [productSearchTerm, setProductSearchTerm] = useState("");
-  const [discountSearchTerm, setDiscountSearchTerm] = useState("");
+
+  // Thêm các trường lọc
+  const [filterCode, setFilterCode] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterExpiryDate, setFilterExpiryDate] = useState("");
+
   const [editingDiscountId, setEditingDiscountId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
@@ -61,7 +68,7 @@ const ManageDiscount = () => {
         value: "",
         isPercentage: false,
         minOrderValue: "",
-        maxDiscountValue: "",
+        startDate: "",
         expiryDate: "",
         isActive: true,
         applicableProducts: [],
@@ -80,7 +87,11 @@ const ManageDiscount = () => {
       type: discount.type,
       value: discount.value.toString(),
       isPercentage: discount.isPercentage,
-      expiryDate: discount.expiryDate.split("T")[0],
+      minOrderValue: discount.minOrderValue
+        ? discount.minOrderValue.toString()
+        : "",
+      startDate: discount.startDate ? discount.startDate.split("T")[0] : "",
+      expiryDate: discount.expiryDate ? discount.expiryDate.split("T")[0] : "",
       isActive: discount.isActive,
       applicableProducts: discount.applicableProducts.map((p) => p._id),
     });
@@ -116,10 +127,6 @@ const ManageDiscount = () => {
     setProductSearchResults(results);
   };
 
-  const handleDiscountSearch = (e) => {
-    setDiscountSearchTerm(e.target.value);
-  };
-
   const handleAddProduct = (product) => {
     if (!form.applicableProducts.includes(product._id)) {
       setForm({
@@ -142,10 +149,10 @@ const ManageDiscount = () => {
 
   const getMinProductPrice = () => {
     if (form.applicableProducts.length === 0) return 0;
-    const applicableProducts = products.filter((product) =>
+    const applicableProductsList = products.filter((product) =>
       form.applicableProducts.includes(product._id)
     );
-    return Math.min(...applicableProducts.map((product) => product.price));
+    return Math.min(...applicableProductsList.map((product) => product.price));
   };
 
   const validateDiscountValue = () => {
@@ -159,22 +166,82 @@ const ManageDiscount = () => {
     }
   };
 
-  const filteredDiscounts = discounts.filter((discount) =>
-    discount.code.toLowerCase().includes(discountSearchTerm.toLowerCase())
-  );
+  // Lọc discounts theo các bộ lọc
+  const filteredDiscounts = discounts.filter((discount) => {
+    const today = new Date();
+    const start = new Date(discount.startDate);
+    const end = new Date(discount.expiryDate);
+
+    let match = true;
+
+    if (filterCode.trim()) {
+      match =
+        match && discount.code.toLowerCase().includes(filterCode.toLowerCase());
+    }
+
+    if (filterType) {
+      match = match && discount.type === filterType;
+    }
+
+    // Lọc theo startDate (các mã có ngày bắt đầu >= filterStartDate)
+    if (filterStartDate) {
+      const filterStart = new Date(filterStartDate);
+      match = match && start >= filterStart;
+    }
+
+    // Lọc theo expiryDate (các mã có ngày hết hạn <= filterExpiryDate)
+    if (filterExpiryDate) {
+      const filterEnd = new Date(filterExpiryDate);
+      match = match && end <= filterEnd;
+    }
+
+    return match;
+  });
 
   return (
     <div className="manage-discount-container my-5">
       <h2>Quản lý mã giảm giá</h2>
 
-      <div className="manage-discount-search mb-4">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Tìm kiếm mã giảm giá..."
-          value={discountSearchTerm}
-          onChange={handleDiscountSearch}
-        />
+      {/* Khu vực lọc */}
+      <div className="row mb-4">
+        <div className="col-md-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Tìm kiếm theo mã..."
+            value={filterCode}
+            onChange={(e) => setFilterCode(e.target.value)}
+          />
+        </div>
+        <div className="col-md-3">
+          <select
+            className="form-select"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+          >
+            <option value="">--Loại giảm giá--</option>
+            <option value="cart">Giỏ hàng</option>
+            <option value="product">Sản phẩm</option>
+          </select>
+        </div>
+        <div className="col-md-3">
+          <input
+            type="date"
+            className="form-control"
+            placeholder="Lọc theo ngày bắt đầu"
+            value={filterStartDate}
+            onChange={(e) => setFilterStartDate(e.target.value)}
+          />
+        </div>
+        <div className="col-md-3">
+          <input
+            type="date"
+            className="form-control"
+            placeholder="Lọc theo ngày hết hạn"
+            value={filterExpiryDate}
+            onChange={(e) => setFilterExpiryDate(e.target.value)}
+          />
+        </div>
       </div>
 
       {!showForm && (
@@ -216,16 +283,14 @@ const ManageDiscount = () => {
             <div className="mb-3">
               <label className="form-label">Sản phẩm áp dụng</label>
 
-              {/* Thanh tìm kiếm sản phẩm */}
               <input
                 type="text"
                 className="form-control mb-2"
-                placeholder="Tìm kiếm sản phẩm theo mã hoặc tên..."
+                placeholder="Tìm kiếm sản phẩm..."
                 value={productSearchTerm}
                 onChange={handleProductSearch}
               />
 
-              {/* Kết quả tìm kiếm */}
               {productSearchResults.length > 0 && (
                 <ul className="list-group">
                   {productSearchResults.map((product) => (
@@ -240,7 +305,6 @@ const ManageDiscount = () => {
                 </ul>
               )}
 
-              {/* Danh sách sản phẩm đã chọn */}
               {form.applicableProducts.length > 0 && (
                 <div className="mt-3">
                   <h6>Sản phẩm đã chọn:</h6>
@@ -289,7 +353,7 @@ const ManageDiscount = () => {
             <div className="mb-3">
               <label className="form-label">Phần trăm giảm giá</label>
               <input
-                type="text"
+                type="number"
                 className="form-control"
                 value={form.value}
                 onChange={(e) => setForm({ ...form, value: e.target.value })}
@@ -307,7 +371,7 @@ const ManageDiscount = () => {
             <div className="mb-3">
               <label className="form-label">Giá trị giảm giá</label>
               <input
-                type="text"
+                type="number"
                 className="form-control"
                 value={form.value}
                 onChange={(e) => setForm({ ...form, value: e.target.value })}
@@ -325,7 +389,7 @@ const ManageDiscount = () => {
             <div className="mb-3">
               <label className="form-label">Giá trị đơn hàng tối thiểu</label>
               <input
-                type="text"
+                type="number"
                 className="form-control"
                 value={form.minOrderValue}
                 onChange={(e) =>
@@ -334,6 +398,17 @@ const ManageDiscount = () => {
               />
             </div>
           )}
+
+          <div className="mb-3">
+            <label className="form-label">Ngày bắt đầu</label>
+            <input
+              type="date"
+              className="form-control"
+              value={form.startDate}
+              onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+              required
+            />
+          </div>
 
           <div className="mb-3">
             <label className="form-label">Ngày hết hạn</label>
@@ -376,7 +451,7 @@ const ManageDiscount = () => {
                 value: "",
                 isPercentage: false,
                 minOrderValue: "",
-                maxDiscountValue: "",
+                startDate: "",
                 expiryDate: "",
                 isActive: true,
                 applicableProducts: [],
@@ -400,36 +475,45 @@ const ManageDiscount = () => {
             <th>Loại</th>
             <th>Giá trị</th>
             <th>Phần trăm</th>
-            <th>Kích hoạt</th>
+            <th>Ngày bắt đầu</th>
             <th>Ngày hết hạn</th>
+            <th>Đang hoạt động</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {filteredDiscounts.map((discount) => (
-            <tr key={discount._id}>
-              <td>{discount.code}</td>
-              <td>{discount.type}</td>
-              <td>{discount.value}</td>
-              <td>{discount.isPercentage ? "Có" : "Không"}</td>
-              <td>{discount.isActive ? "Có" : "Không"}</td>
-              <td>{new Date(discount.expiryDate).toLocaleDateString()}</td>
-              <td>
-                <button
-                  className="btn btn-sm btn-primary me-2"
-                  onClick={() => handleEdit(discount)}
-                >
-                  Sửa
-                </button>
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => handleDelete(discount._id)}
-                >
-                  Xóa
-                </button>
-              </td>
-            </tr>
-          ))}
+          {filteredDiscounts.map((discount) => {
+            const today = new Date();
+            const start = new Date(discount.startDate);
+            const end = new Date(discount.expiryDate);
+            const isCurrentlyActive =
+              discount.isActive && today >= start && today <= end;
+            return (
+              <tr key={discount._id}>
+                <td>{discount.code}</td>
+                <td>{discount.type}</td>
+                <td>{discount.value}</td>
+                <td>{discount.isPercentage ? "Có" : "Không"}</td>
+                <td>{new Date(discount.startDate).toLocaleDateString()}</td>
+                <td>{new Date(discount.expiryDate).toLocaleDateString()}</td>
+                <td>{isCurrentlyActive ? "Có" : "Không"}</td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-primary me-2"
+                    onClick={() => handleEdit(discount)}
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => handleDelete(discount._id)}
+                  >
+                    Xóa
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

@@ -11,13 +11,14 @@ exports.createDiscount = async (req, res) => {
       value,
       isPercentage,
       minOrderValue,
+      startDate,
       expiryDate,
       isActive,
       applicableProducts,
     } = req.body;
 
     // Kiểm tra các trường bắt buộc
-    if (!code || !type || !value || !expiryDate) {
+    if (!code || !type || !value || !expiryDate || !startDate) {
       return res
         .status(400)
         .json({ message: "Vui lòng nhập đầy đủ thông tin." });
@@ -29,7 +30,7 @@ exports.createDiscount = async (req, res) => {
       return res.status(400).json({ message: "Mã giảm giá đã tồn tại." });
     }
 
-    // Nếu loại giảm giá là 'product', kiểm tra danh sách sản phẩm
+    // Kiểm tra loại product
     if (type === "product") {
       if (!applicableProducts || applicableProducts.length === 0) {
         return res
@@ -46,6 +47,13 @@ exports.createDiscount = async (req, res) => {
       }
     }
 
+    // Kiểm tra startDate <= expiryDate
+    if (new Date(startDate) > new Date(expiryDate)) {
+      return res
+        .status(400)
+        .json({ message: "Ngày bắt đầu không được lớn hơn ngày hết hạn." });
+    }
+
     // Tạo mã giảm giá mới
     const discount = new Discount({
       code,
@@ -53,6 +61,7 @@ exports.createDiscount = async (req, res) => {
       value,
       isPercentage,
       minOrderValue,
+      startDate,
       expiryDate,
       isActive,
       applicableProducts: type === "product" ? applicableProducts : [],
@@ -75,19 +84,18 @@ exports.updateDiscount = async (req, res) => {
       value,
       isPercentage,
       minOrderValue,
+      startDate,
       expiryDate,
       isActive,
       applicableProducts,
     } = req.body;
 
-    // Kiểm tra các trường bắt buộc
-    if (!code || !type || !value || !expiryDate) {
+    if (!code || !type || !value || !expiryDate || !startDate) {
       return res
         .status(400)
         .json({ message: "Vui lòng nhập đầy đủ thông tin." });
     }
 
-    // Nếu loại giảm giá là 'product', kiểm tra danh sách sản phẩm
     if (type === "product") {
       if (!applicableProducts || applicableProducts.length === 0) {
         return res
@@ -95,7 +103,6 @@ exports.updateDiscount = async (req, res) => {
           .json({ message: "Vui lòng chọn ít nhất một sản phẩm áp dụng." });
       }
 
-      // Kiểm tra xem tất cả sản phẩm có tồn tại không
       const products = await Product.find({ _id: { $in: applicableProducts } });
       if (products.length !== applicableProducts.length) {
         return res
@@ -104,17 +111,24 @@ exports.updateDiscount = async (req, res) => {
       }
     }
 
+    // Kiểm tra startDate <= expiryDate
+    if (new Date(startDate) > new Date(expiryDate)) {
+      return res
+        .status(400)
+        .json({ message: "Ngày bắt đầu không được lớn hơn ngày hết hạn." });
+    }
+
     const discount = await Discount.findById(req.params.id);
     if (!discount) {
       return res.status(404).json({ message: "Mã giảm giá không tồn tại." });
     }
 
-    // Cập nhật thông tin mã giảm giá
     discount.code = code;
     discount.type = type;
     discount.value = value;
     discount.isPercentage = isPercentage;
     discount.minOrderValue = minOrderValue;
+    discount.startDate = startDate;
     discount.expiryDate = expiryDate;
     discount.isActive = isActive;
     discount.applicableProducts = type === "product" ? applicableProducts : [];

@@ -97,6 +97,14 @@ function Navbar() {
               <>
                 <li className="nav-item">
                   <LinkWithIcon
+                    title="Dashboard"
+                    link="/admin/dashboard"
+                    icon="fas fa-tachometer-alt"
+                    onClick={closeMenu}
+                  />
+                </li>
+                <li className="nav-item">
+                  <LinkWithIcon
                     title="User Management"
                     link="/admin/usermanagement"
                     icon="fas fa-users-cog"

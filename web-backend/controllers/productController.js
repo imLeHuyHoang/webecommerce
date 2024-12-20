@@ -1,9 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const Product = require("../models/Product");
-const Attribute = require("../models/Attribute");
 const Inventory = require("../models/Inventory");
-const Category = require("../models/Category");
 const mongoose = require("mongoose");
 
 /**

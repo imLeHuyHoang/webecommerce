@@ -1,0 +1,68 @@
+.manage-user-container {
+  padding: 20px;
+  background: #f9f9f9;
+}
+
+.manage-user-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.manage-user-search-row {
+  align-items: center;
+}
+
+.manage-user-search-input {
+  width: 40%;
+  height: 50px;
+  margin-left: 10px;
+}
+
+.manage-user-search-button {
+  width: 10%;
+  height: 50px;
+}
+
+.manage-user-add-user-button {
+  margin-bottom: 10px;
+}
+
+.manage-user-table {
+  background: #ffffff;
+}
+
+.manage-user-th {
+  background: #eaeaea;
+}
+
+.manage-user-tr:hover {
+  background: #f1f1f1;
+}
+
+.manage-user-input {
+  width: 100%;
+}
+
+.manage-user-form-group {
+  position: relative;
+}
+
+.manage-user-label {
+  font-weight: 600;
+}
+
+.manage-user-feedback {
+  font-size: 0.9rem;
+}
+
+.manage-user-edit-button,
+.manage-user-delete-button,
+.manage-user-ban-button {
+  margin-bottom: 5px;
+}
+
+.manage-user-save-button,
+.manage-user-close-modal-button {
+  min-width: 100px;
+}

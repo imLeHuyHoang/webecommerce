@@ -1,7 +1,7 @@
 // src/components/SignupPage/SignUp.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
-import { useNavigate, Link } from "react-router-dom"; // Import useNavigate and Link
+import { useNavigate, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./SignupPage.css";
 import apiClient from "../../utils/api-client";
@@ -24,8 +24,24 @@ const SignUp = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let timer;
+    if (isSuccess) {
+      // Nếu đăng ký thành công, sau 3 giây chuyển trang
+      timer = setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+    }
+
+    return () => {
+      // Hủy bỏ timeout nếu component bị unmount hoặc người dùng bấm nút trước khi timeout
+      if (timer) clearTimeout(timer);
+    };
+  }, [isSuccess, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,8 +51,6 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    // Reset previous errors and messages
     setErrors({});
     setMessage("");
 
@@ -59,7 +73,6 @@ const SignUp = () => {
       return;
     }
 
-    // Prepare full form data with additional fields (if necessary)
     const fullFormData = {
       name: formData.name,
       email: formData.email,
@@ -87,7 +100,7 @@ const SignUp = () => {
       setFormData({ name: "", email: "", password: "", confirmPassword: "" });
       setErrors({});
       setLoading(false);
-      navigate("/home"); // Navigate to home after successful signup
+      setIsSuccess(true);
     } catch (error) {
       const errMessage = error.response?.data?.message || "Sign Up Failed!";
       setMessage(errMessage);
@@ -95,126 +108,154 @@ const SignUp = () => {
     }
   };
 
+  const handleGoToLogin = () => {
+    // Điều hướng ngay lập tức khi bấm nút
+    navigate("/login");
+  };
+
   return (
     <section className="sign-up-page-container">
       <div className="container sign-up-page-container-inner">
         <div className="card sign-up-page-card">
-          <h2 className="text-center sign-up-page-title">Sign Up</h2>
-          {message && <div className="alert sign-up-page-alert">{message}</div>}
-          <form onSubmit={handleSubmit} className="sign-up-page-form">
-            <div className="mb-3 sign-up-page-form-group">
-              <label htmlFor="name" className="form-label sign-up-page-label">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                className={`form-control sign-up-page-input ${
-                  errors.name ? "is-invalid" : ""
-                }`}
-                placeholder="Enter your name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                autoFocus
-              />
-              {errors.name && (
-                <div className="invalid-feedback sign-up-page-error">
-                  {errors.name}
-                </div>
+          {!isSuccess ? (
+            <>
+              <h2 className="text-center sign-up-page-title">Sign Up</h2>
+              {message && (
+                <div className="alert sign-up-page-alert">{message}</div>
               )}
-            </div>
-            <div className="mb-3 sign-up-page-form-group">
-              <label htmlFor="email" className="form-label sign-up-page-label">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className={`form-control sign-up-page-input ${
-                  errors.email ? "is-invalid" : ""
-                }`}
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-              {errors.email && (
-                <div className="invalid-feedback sign-up-page-error">
-                  {errors.email}
+              <form onSubmit={handleSubmit} className="sign-up-page-form">
+                <div className="mb-3 sign-up-page-form-group">
+                  <label
+                    htmlFor="name"
+                    className="form-label sign-up-page-label"
+                  >
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    className={`form-control sign-up-page-input ${
+                      errors.name ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter your name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    autoFocus
+                  />
+                  {errors.name && (
+                    <div className="invalid-feedback sign-up-page-error">
+                      {errors.name}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="mb-3 sign-up-page-form-group">
-              <label
-                htmlFor="password"
-                className="form-label sign-up-page-label"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                className={`form-control sign-up-page-input ${
-                  errors.password ? "is-invalid" : ""
-                }`}
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              {errors.password && (
-                <div className="invalid-feedback sign-up-page-error">
-                  {errors.password}
+                <div className="mb-3 sign-up-page-form-group">
+                  <label
+                    htmlFor="email"
+                    className="form-label sign-up-page-label"
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    className={`form-control sign-up-page-input ${
+                      errors.email ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                  {errors.email && (
+                    <div className="invalid-feedback sign-up-page-error">
+                      {errors.email}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="mb-3 sign-up-page-form-group">
-              <label
-                htmlFor="confirmPassword"
-                className="form-label sign-up-page-label"
-              >
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                className={`form-control sign-up-page-input ${
-                  errors.confirmPassword ? "is-invalid" : ""
-                }`}
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-              {errors.confirmPassword && (
-                <div className="invalid-feedback sign-up-page-error">
-                  {errors.confirmPassword}
+                <div className="mb-3 sign-up-page-form-group">
+                  <label
+                    htmlFor="password"
+                    className="form-label sign-up-page-label"
+                  >
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    className={`form-control sign-up-page-input ${
+                      errors.password ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                  {errors.password && (
+                    <div className="invalid-feedback sign-up-page-error">
+                      {errors.password}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="d-grid sign-up-page-submit-group">
+                <div className="mb-3 sign-up-page-form-group">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="form-label sign-up-page-label"
+                  >
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    className={`form-control sign-up-page-input ${
+                      errors.confirmPassword ? "is-invalid" : ""
+                    }`}
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                  />
+                  {errors.confirmPassword && (
+                    <div className="invalid-feedback sign-up-page-error">
+                      {errors.confirmPassword}
+                    </div>
+                  )}
+                </div>
+                <div className="d-grid sign-up-page-submit-group">
+                  <button
+                    type="submit"
+                    className="btn btn-primary sign-up-page-submit-btn"
+                    disabled={loading}
+                  >
+                    {loading ? "Signing Up..." : "Sign Up"}
+                  </button>
+                </div>
+                <div className="text-center mt-3 sign-up-page-footer">
+                  <p>
+                    Already have an account?{" "}
+                    <Link to="/login" className="sign-up-page-login-link">
+                      Login here
+                    </Link>
+                  </p>
+                </div>
+              </form>
+            </>
+          ) : (
+            <div className="text-center p-4">
+              <h2>Đăng ký thành công!</h2>
+              <p>Bạn sẽ được chuyển đến trang đăng nhập sau 3 giây.</p>
               <button
-                type="submit"
-                className="btn btn-primary sign-up-page-submit-btn"
-                disabled={loading}
+                className="btn btn-success mt-3"
+                onClick={handleGoToLogin}
               >
-                {loading ? "Signing Up..." : "Sign Up"}
+                Chuyển đến trang đăng nhập ngay
               </button>
             </div>
-            <div className="text-center mt-3 sign-up-page-footer">
-              <p>
-                Already have an account?{" "}
-                <Link to="/login" className="sign-up-page-login-link">
-                  Login here
-                </Link>
-              </p>
-            </div>
-          </form>
+          )}
         </div>
       </div>
     </section>

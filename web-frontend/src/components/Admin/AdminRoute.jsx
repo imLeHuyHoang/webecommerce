@@ -8,8 +8,7 @@ const AdminRoute = () => {
   const { admin, isLoading } = authAdmin;
 
   if (isLoading) {
-    // Bạn có thể hiển thị spinner hoặc placeholder trong lúc chờ
-    return null; // Hoặc <LoadingSpinner />
+    return null;
   }
 
   return admin ? <Outlet /> : <Navigate to="/admin-login" replace />;

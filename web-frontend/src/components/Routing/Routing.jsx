@@ -21,6 +21,7 @@ import PaymentResult from "../PaymentResult.jsx";
 import ForgotPassword from "../ForgotPassword/ForgotPassword.jsx";
 import ResetCode from "../ForgotPassword/ResetCode.jsx";
 import ResetPassword from "../ForgotPassword/ResetPassword.jsx";
+import Dashboard from "../Admin/Dashboard.jsx";
 function Routing() {
   return (
     <Routes>
@@ -42,7 +43,8 @@ function Routing() {
 
       {/* Các route cho admin */}
       <Route path="/admin" element={<AdminRoute />}>
-        <Route index element={<ProductManagement />} />
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="usermanagement" element={<UserManagement />} />
         <Route path="productmanagement" element={<ProductManagement />} />
         <Route path="ordermanagement" element={<OrderManagement />} />

@@ -6,39 +6,43 @@ const discountSchema = new mongoose.Schema(
     code: {
       type: String,
       required: true,
-      unique: true, // Mã giảm giá là duy nhất
+      unique: true,
       trim: true,
     },
     type: {
       type: String,
-      enum: ["product", "cart"], // "product": áp dụng cho sản phẩm, "cart": áp dụng cho giỏ hàng
+      enum: ["product", "cart"],
       required: true,
     },
     value: {
       type: Number,
-      required: true, // Giá trị giảm giá
+      required: true,
     },
     isPercentage: {
       type: Boolean,
-      default: false, // true: giảm giá theo phần trăm, false: giảm giá cố định
+      default: false,
     },
     minOrderValue: {
       type: Number,
-      default: 0, // Giá trị đơn hàng tối thiểu để áp dụng mã giảm giá
+      default: 0,
     },
     applicableProducts: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product", // Sản phẩm áp dụng giảm giá (nếu có)
+        ref: "Product",
       },
     ],
+    startDate: {
+      type: Date,
+      required: true, // Ngày bắt đầu hiệu lực
+    },
     expiryDate: {
       type: Date,
-      required: true, // Ngày hết hạn của mã giảm giá
+      required: true,
     },
     isActive: {
       type: Boolean,
-      default: true, // Trạng thái của mã giảm giá
+      default: true,
     },
   },
   { timestamps: true }

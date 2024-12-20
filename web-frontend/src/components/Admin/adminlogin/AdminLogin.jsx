@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthAdmin } from "../../../context/AuthAdminContext";
 import apiClient from "../../../utils/api-client";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -26,7 +26,7 @@ const AdminLogin = () => {
       localStorage.setItem("adminAccessToken", accessToken);
 
       console.log("Admin logged in:", admin);
-      navigate("/admin"); // Điều hướng đến trang admin
+      navigate("/admin");
     } catch (error) {
       console.error("Admin login failed:", error);
       setError("Đăng nhập không thành công.");
@@ -76,6 +76,9 @@ const AdminLogin = () => {
             Đăng Nhập
           </button>
         </form>
+        <div className="text-center mt-3">
+          <Link to="/login">Quay về trang đăng nhập cho người dùng</Link>
+        </div>
       </div>
     </div>
   );

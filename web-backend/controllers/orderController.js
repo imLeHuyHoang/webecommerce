@@ -158,12 +158,10 @@ exports.createOrder = async (req, res) => {
     console.error("Error creating order:", error);
     await session.abortTransaction();
     session.endSession();
-    res
-      .status(500)
-      .json({
-        message: "Có lỗi xảy ra khi tạo đơn hàng.",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Có lỗi xảy ra khi tạo đơn hàng.",
+      error: error.message,
+    });
   }
 };
 exports.getOrderStatusCounts = async (req, res) => {
@@ -490,13 +488,30 @@ exports.getRefundStatus = async (req, res) => {
 
 // New Admin Controllers
 
+// controllers/orderController.js
+
 exports.getAllOrders = async (req, res) => {
   try {
-    const { status, startDate, endDate, page = 1, limit = 10 } = req.query;
+    const { status, startDate, endDate, orderId } = req.query;
 
     const query = {
       paymentStatus: { $ne: "pending" }, // Exclude orders with payment status "pending"
     };
+
+    // Lọc theo orderId nếu có
+    if (orderId) {
+      // Vì orderId là ObjectId, ta sẽ thử check ObjectId hợp lệ
+      const mongoose = require("mongoose");
+      if (mongoose.Types.ObjectId.isValid(orderId)) {
+        query._id = orderId;
+      } else {
+        // Nếu muốn tìm orderId dạng text (không phải ObjectId):
+        // query._id = { $regex: orderId, $options: "i" };
+        // Tuy nhiên, _id thường là ObjectId và không nên tìm bằng regex.
+        // Ở đây, ta chỉ tìm chính xác. Nếu không hợp lệ, trả về rỗng.
+        query._id = { $exists: false }; // Không match kết quả nào
+      }
+    }
 
     if (status) {
       query.shippingStatus = status;
@@ -510,8 +525,6 @@ exports.getAllOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit))
       .populate("user", "name email")
       .populate("products.product", "name price images")
       .populate("discountCode", "code value isPercentage");

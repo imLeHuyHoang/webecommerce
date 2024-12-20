@@ -32,7 +32,6 @@ const getCookieConfig = (isProduction) => ({
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
 });
 
-// Đăng ký người dùng mới
 exports.registerUser = async (req, res) => {
   const { name, email, password, phone, gender } = req.body;
 
@@ -66,9 +65,6 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ message: "Lỗi server." });
   }
 };
-
-// Đăng nhập và tạo JWT token
-// controllers/userController.js
 
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -309,6 +305,8 @@ exports.loginUserAdmin = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // Trả về thông tin đầy đủ của admin
@@ -364,14 +362,26 @@ exports.updateUser = async (req, res) => {
 };
 exports.getAllUsers = async (req, res) => {
   try {
-    // Check if the requester has the 'admin' role
-    console.log(req.user);
+    // Kiểm tra quyền admin
     if (!req.user.roles || !req.user.roles.includes("admin")) {
       return res.status(403).json({ message: "Access denied." });
     }
 
-    // Fetch all users, excluding sensitive fields
-    const users = await User.find().select("-password -refreshToken");
+    const { search } = req.query;
+    let query = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // 'i' để tìm kiếm không phân biệt hoa thường
+      query = {
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+          { phone: searchRegex },
+        ],
+      };
+    }
+
+    const users = await User.find(query).select("-password -refreshToken");
     res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching users:", error);

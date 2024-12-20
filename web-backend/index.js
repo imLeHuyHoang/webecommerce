@@ -49,6 +49,8 @@ const discountRoutes = require("./routes/discountRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const shopCommentsRouter = require("./routes/shopCommentRoutes");
+//thống kê
+const statisticRoutes = require("./routes/statisticRoutes");
 
 // Route setup
 app.use("/api/user", userRoutes);
@@ -63,6 +65,7 @@ app.use("/api/discounts", discountRoutes);
 app.use("/api/products", reviewRoutes);
 app.use("/api/products", commentRoutes);
 app.use("/api/shop/comments", shopCommentsRouter);
+app.use("/api/statistic", statisticRoutes);
 
 // Static file serving
 app.use("/category", express.static(__dirname + "/upload/category"));

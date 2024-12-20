@@ -14,6 +14,7 @@ import {
 import { z } from "zod";
 import apiClient from "../../utils/api-client";
 import ToastNotification from "../ToastNotification/ToastNotification";
+import "./UserManagement.css"; // Import file CSS mới
 
 // Validation schemas using zod
 
@@ -49,27 +50,29 @@ const UserManagement = () => {
   const [toastVariant, setToastVariant] = useState("success");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Access token from local storage or context
   const accessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch users from backend
-  const fetchUsers = async () => {
+  const fetchUsers = async (search = "") => {
     setLoading(true);
     try {
       const response = await apiClient.get("/user/users", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        params: {
+          search: search,
+        },
       });
       setUsers(response.data);
-      setToastMessage("Users fetched successfully");
-      setToastVariant("success");
-      setShowToast(true);
     } catch (error) {
       console.error("Error fetching users:", error);
       setToastMessage("Error fetching users");
@@ -121,21 +124,17 @@ const UserManagement = () => {
 
   const handleBanUser = async (userId) => {
     try {
-      // Find the user
       const user = users.find((u) => u._id === userId);
       if (!user) return;
 
-      // Toggle isActive status
       const updatedUser = { isActive: !user.isActive };
 
-      // Update user in backend
       const response = await apiClient.put(`/user/${userId}`, updatedUser, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      // Update users state
       setUsers(users.map((u) => (u._id === userId ? response.data : u)));
       setToastMessage("User status updated successfully");
       setToastVariant("success");
@@ -150,15 +149,12 @@ const UserManagement = () => {
 
   const handleSaveUser = async () => {
     try {
-      // Prepare the user data for validation and submission
       const userToSubmit = { ...selectedUser };
 
-      // If password is empty, delete it from the object (for editing)
       if (!userToSubmit.password) {
         delete userToSubmit.password;
       }
 
-      // Validation
       if (userToSubmit._id) {
         existingUserSchema.parse(userToSubmit);
       } else {
@@ -166,7 +162,6 @@ const UserManagement = () => {
       }
 
       if (userToSubmit._id) {
-        // Update existing user
         const response = await apiClient.put(
           `/user/${userToSubmit._id}`,
           userToSubmit,
@@ -184,7 +179,6 @@ const UserManagement = () => {
         setToastMessage("User updated successfully");
         setToastVariant("success");
       } else {
-        // Add new user (admin endpoint)
         const response = await apiClient.post("/user/admin", userToSubmit, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -199,14 +193,12 @@ const UserManagement = () => {
       setErrors({});
     } catch (e) {
       if (e instanceof z.ZodError) {
-        // Set validation errors
         const errorObject = {};
         e.errors.forEach((error) => {
           errorObject[error.path[0]] = error.message;
         });
         setErrors(errorObject);
       } else if (e.response && e.response.data && e.response.data.message) {
-        // Handle server validation errors
         setToastMessage(e.response.data.message);
         setToastVariant("danger");
         setShowToast(true);
@@ -235,64 +227,109 @@ const UserManagement = () => {
     setSelectedUser({ ...selectedUser, roles });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearch = () => {
+    fetchUsers(searchTerm);
+  };
+
   if (loading) {
     return (
-      <Container fluid className="text-center">
+      <Container fluid className="manage-user-container-loading text-center">
         <Spinner animation="border" />
       </Container>
     );
   }
 
   return (
-    <Container fluid>
-      <Row className="mb-4">
-        <Col>
-          <h1 className="text-center">User Management</h1>
+    <Container fluid className="manage-user-container">
+      <Row className="manage-user-row mb-4">
+        <Col className="manage-user-col-title">
+          <h1 className="manage-user-title text-center">User Management</h1>
         </Col>
       </Row>
-      <Row className="mb-4">
-        <Col>
-          <Button variant="primary" onClick={handleAddUser}>
+      <Row className="manage-user-row mb-4 manage-user-search-row">
+        <Row className="manage-user-col-search-input">
+          <Form.Control
+            type="text"
+            className="manage-user-search-input"
+            placeholder="Tìm kiếm theo tên, email hoặc số điện thoại..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          <Button
+            variant="primary"
+            className="manage-user-search-button"
+            onClick={handleSearch}
+          >
+            Tìm kiếm
+          </Button>
+        </Row>
+      </Row>
+      <Row className="manage-user-row mb-4 manage-user-add-row">
+        <Col className="manage-user-col-add-button">
+          <Button
+            variant="primary"
+            className="manage-user-add-user-button"
+            onClick={handleAddUser}
+          >
             Add New User
           </Button>
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Status</th>
-                <th>Actions</th>
+      <Row className="manage-user-row manage-user-table-row">
+        <Col className="manage-user-col-table">
+          <Table
+            striped
+            bordered
+            hover
+            responsive
+            className="manage-user-table"
+          >
+            <thead className="manage-user-thead">
+              <tr className="manage-user-tr">
+                <th className="manage-user-th">Name</th>
+                <th className="manage-user-th">Email</th>
+                <th className="manage-user-th">Phone</th>
+                <th className="manage-user-th">Roles</th>
+                <th className="manage-user-th">Status</th>
+                <th className="manage-user-th">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="manage-user-tbody">
               {users.map((user) => (
-                <tr key={user._id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.roles.join(", ")}</td>
-                  <td>{user.isActive ? "Active" : "Banned"}</td>
-                  <td>
+                <tr className="manage-user-tr" key={user._id}>
+                  <td className="manage-user-td">{user.name}</td>
+                  <td className="manage-user-td">{user.email}</td>
+                  <td className="manage-user-td">
+                    {user.phone && Array.isArray(user.phone)
+                      ? user.phone.join(", ")
+                      : user.phone || ""}
+                  </td>
+                  <td className="manage-user-td">{user.roles.join(", ")}</td>
+                  <td className="manage-user-td">
+                    {user.isActive ? "Active" : "Banned"}
+                  </td>
+                  <td className="manage-user-td">
                     <Button
                       variant="warning"
+                      className="manage-user-edit-button me-2"
                       onClick={() => handleEditUser(user)}
-                      className="me-2"
                     >
                       Edit
                     </Button>
                     <Button
                       variant="danger"
+                      className="manage-user-delete-button me-2"
                       onClick={() => handleDeleteUser(user._id)}
-                      className="me-2"
                     >
                       Delete
                     </Button>
                     <Button
                       variant={user.isActive ? "secondary" : "success"}
+                      className="manage-user-ban-button"
                       onClick={() => handleBanUser(user._id)}
                     >
                       {user.isActive ? "Ban" : "Unban"}
@@ -306,53 +343,75 @@ const UserManagement = () => {
       </Row>
 
       {/* Add/Edit User Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        className="manage-user-modal"
+      >
+        <Modal.Header closeButton className="manage-user-modal-header">
+          <Modal.Title className="manage-user-modal-title">
             {selectedUser?._id ? "Edit User" : "Add New User"}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <Form>
+        <Modal.Body className="manage-user-modal-body">
+          <Form className="manage-user-form">
             {/* Name Field */}
-            <Form.Group className="mb-3" controlId="formUserName">
-              <Form.Label>Name</Form.Label>
+            <Form.Group
+              className="manage-user-form-group mb-3"
+              controlId="formUserName"
+            >
+              <Form.Label className="manage-user-label">Name</Form.Label>
               <Form.Control
                 type="text"
                 name="name"
+                className="manage-user-input"
                 value={selectedUser?.name || ""}
                 onChange={handleChange}
                 isInvalid={!!errors.name}
                 required
               />
-              <Form.Control.Feedback type="invalid">
+              <Form.Control.Feedback
+                type="invalid"
+                className="manage-user-feedback"
+              >
                 {errors.name}
               </Form.Control.Feedback>
             </Form.Group>
 
             {/* Email Field */}
-            <Form.Group className="mb-3" controlId="formUserEmail">
-              <Form.Label>Email</Form.Label>
+            <Form.Group
+              className="manage-user-form-group mb-3"
+              controlId="formUserEmail"
+            >
+              <Form.Label className="manage-user-label">Email</Form.Label>
               <Form.Control
                 type="email"
                 name="email"
+                className="manage-user-input"
                 value={selectedUser?.email || ""}
                 onChange={handleChange}
                 isInvalid={!!errors.email}
                 required
                 disabled={!!selectedUser?._id}
               />
-              <Form.Control.Feedback type="invalid">
+              <Form.Control.Feedback
+                type="invalid"
+                className="manage-user-feedback"
+              >
                 {errors.email}
               </Form.Control.Feedback>
             </Form.Group>
 
             {/* Password Field */}
-            <Form.Group className="mb-3" controlId="formUserPassword">
-              <Form.Label>Password</Form.Label>
+            <Form.Group
+              className="manage-user-form-group mb-3"
+              controlId="formUserPassword"
+            >
+              <Form.Label className="manage-user-label">Password</Form.Label>
               <Form.Control
                 type="password"
                 name="password"
+                className="manage-user-input"
                 value={selectedUser?.password || ""}
                 onChange={handleChange}
                 isInvalid={!!errors.password}
@@ -360,18 +419,25 @@ const UserManagement = () => {
                   selectedUser?._id ? "Leave blank to keep unchanged" : ""
                 }
               />
-              <Form.Control.Feedback type="invalid">
+              <Form.Control.Feedback
+                type="invalid"
+                className="manage-user-feedback"
+              >
                 {errors.password}
               </Form.Control.Feedback>
             </Form.Group>
 
             {/* Roles Field */}
-            <Form.Group className="mb-3" controlId="formUserRoles">
-              <Form.Label>Roles</Form.Label>
+            <Form.Group
+              className="manage-user-form-group mb-3"
+              controlId="formUserRoles"
+            >
+              <Form.Label className="manage-user-label">Roles</Form.Label>
               <Form.Control
                 as="select"
                 multiple
                 name="roles"
+                className="manage-user-input"
                 value={selectedUser?.roles || []}
                 onChange={handleRolesChange}
                 isInvalid={!!errors.roles}
@@ -379,7 +445,10 @@ const UserManagement = () => {
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
               </Form.Control>
-              <Form.Control.Feedback type="invalid">
+              <Form.Control.Feedback
+                type="invalid"
+                className="manage-user-feedback"
+              >
                 {errors.roles}
               </Form.Control.Feedback>
             </Form.Group>
@@ -387,11 +456,19 @@ const UserManagement = () => {
         </Modal.Body>
 
         {/* Modal Footer */}
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+        <Modal.Footer className="manage-user-modal-footer">
+          <Button
+            variant="secondary"
+            className="manage-user-close-modal-button"
+            onClick={() => setShowModal(false)}
+          >
             Close
           </Button>
-          <Button variant="primary" onClick={handleSaveUser}>
+          <Button
+            variant="primary"
+            className="manage-user-save-button"
+            onClick={handleSaveUser}
+          >
             Save Changes
           </Button>
         </Modal.Footer>

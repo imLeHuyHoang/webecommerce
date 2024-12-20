@@ -21,15 +21,15 @@ function AboutUs() {
       </div>
       <div className="our-values">
         <button className="button_values" role="button">
-          <span class="text">Innovation</span>
+          <span className="text">Innovation</span>
           <span>Revolution</span>
         </button>
         <button className="button_values" role="button">
-          <span class="text">Quality</span>
+          <span className="text">Quality</span>
           <span>Value</span>
         </button>
         <button className="button_values" role="button">
-          <span class="text">Customer satisfaction</span>
+          <span className="text">Customer satisfaction</span>
           <span>Pleasing</span>
         </button>
       </div>
