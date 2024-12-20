@@ -167,10 +167,14 @@ exports.createOrder = async (req, res) => {
 exports.getOrderStatusCounts = async (req, res) => {
   try {
     const userId = req.user._id;
+    console.log(`Fetching order status counts for user: ${userId}`);
 
     const counts = await Order.aggregate([
       {
-        $match: { user: userId },
+        $match: {
+          user: userId,
+          paymentStatus: { $ne: "pending" },
+        },
       },
       {
         $group: {
@@ -179,6 +183,8 @@ exports.getOrderStatusCounts = async (req, res) => {
         },
       },
     ]);
+
+    console.log(`Order counts by status for user ${userId}:`, counts);
 
     const statusCounts = {
       processing: 0,
@@ -191,6 +197,8 @@ exports.getOrderStatusCounts = async (req, res) => {
       statusCounts[item._id] = item.count;
     });
 
+    console.log(`Final status counts for user ${userId}:`, statusCounts);
+
     res.status(200).json(statusCounts);
   } catch (error) {
     console.error("Error fetching order status counts:", error);
@@ -200,10 +208,11 @@ exports.getOrderStatusCounts = async (req, res) => {
 
 exports.getUserOrders = async (req, res) => {
   try {
-    const { status, startDate, endDate, page = 1, limit = 10 } = req.query;
+    const { status, startDate, endDate } = req.query; // Không dùng page, limit
+    const userId = req.user._id;
 
     const query = {
-      user: req.user.id,
+      user: userId,
       paymentStatus: { $ne: "pending" },
     };
 
@@ -219,8 +228,6 @@ exports.getUserOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit))
       .populate("products.product", "name price images")
       .populate("discountCode", "code value isPercentage");
 

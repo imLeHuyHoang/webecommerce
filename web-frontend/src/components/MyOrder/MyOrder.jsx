@@ -163,6 +163,25 @@ function MyOrders() {
     }
   };
 
+  // Hàm chuyển đổi trạng thái hoàn tiền sang tiếng Việt
+  const getRefundStatusText = (status, paymentMethod) => {
+    // Nếu không có thông tin refund hoặc status là null thì in ra "Đơn không có thông tin hoàn tiền"
+    if (!status || status === "null") {
+      return "Đơn không có thông tin hoàn tiền";
+    }
+
+    switch (status) {
+      case "success":
+        return "Thành công";
+      case "failed":
+        return "Thất bại";
+      case "processing":
+        return "Đang xử lý";
+      default:
+        return "Đơn không có thông tin hoàn tiền";
+    }
+  };
+
   return (
     <div className="my-order-page-container">
       {/* Main Content */}
@@ -240,7 +259,7 @@ function MyOrders() {
                         <strong>Tổng tiền: </strong>
                         {order.total.toLocaleString()} đ
                       </p>
-                      {order.refund && order.refund.status && (
+                      {order.refund && (
                         <p className="card-text my-order-page-order-refund">
                           <strong>Tình trạng hoàn tiền: </strong>
                           <span
@@ -248,10 +267,22 @@ function MyOrders() {
                               order.refund.status
                             )}`}
                           >
-                            {order.refund.status}
+                            {getRefundStatusText(
+                              order.refund.status,
+                              order.payment?.method
+                            )}
                           </span>
                         </p>
                       )}
+                      {!order.refund && (
+                        <p className="card-text my-order-page-order-refund">
+                          <strong>Tình trạng hoàn tiền: </strong>
+                          <span className="badge bg-secondary">
+                            Đơn không có thông tin hoàn tiền
+                          </span>
+                        </p>
+                      )}
+
                       <div className="mt-auto">
                         <button
                           className="my-order-page-view-details-btn btn btn-primary me-2"
@@ -279,8 +310,6 @@ function MyOrders() {
             )}
           </div>
         )}
-
-        {/* Refund Status Checker Removed */}
       </div>
 
       {selectedOrder && (
@@ -325,11 +354,11 @@ function MyOrders() {
                         <strong>Tổng tiền:</strong>{" "}
                         {selectedOrder.total.toLocaleString()} đ
                       </p>
-                      {selectedOrder.refund && selectedOrder.refund.status && (
+                      <h5 className="my-order-page-modal-section-title">
+                        Thông tin hoàn tiền:
+                      </h5>
+                      {selectedOrder.refund && selectedOrder.refund.status ? (
                         <>
-                          <h5 className="my-order-page-modal-section-title">
-                            Thông tin hoàn tiền:
-                          </h5>
                           <p>
                             <strong>Tình trạng hoàn tiền:</strong>{" "}
                             <span
@@ -337,7 +366,10 @@ function MyOrders() {
                                 selectedOrder.refund.status
                               )}`}
                             >
-                              {selectedOrder.refund.status}
+                              {getRefundStatusText(
+                                selectedOrder.refund.status,
+                                selectedOrder.payment?.method
+                              )}
                             </span>
                           </p>
                           {selectedOrder.refund.mRefundId && (
@@ -366,7 +398,10 @@ function MyOrders() {
                                   </p>
                                   <p>
                                     <strong>Tình trạng hoàn tiền:</strong>{" "}
-                                    {refundCheckResult.refundStatus}
+                                    {getRefundStatusText(
+                                      refundCheckResult.refundStatus,
+                                      selectedOrder.payment?.method
+                                    )}
                                   </p>
                                   <p>
                                     <strong>Thông báo:</strong>{" "}
@@ -381,6 +416,8 @@ function MyOrders() {
                             </div>
                           )}
                         </>
+                      ) : (
+                        <p>Đơn không có thông tin hoàn tiền</p>
                       )}
                     </div>
 

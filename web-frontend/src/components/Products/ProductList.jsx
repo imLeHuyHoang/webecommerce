@@ -34,8 +34,6 @@ function ProductList({ filters }) {
           },
         });
 
-        console.log("API Response Data:", response.data); // Debugging
-
         setAllProducts(response.data);
         setLoading(false);
       } catch (error) {
@@ -104,8 +102,6 @@ function ProductList({ filters }) {
       </Container>
     );
   }
-
-  console.log("Filtered Products Displayed:", currentProducts); // Debugging
 
   return (
     <section className="product-list-section">

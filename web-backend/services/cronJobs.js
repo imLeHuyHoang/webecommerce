@@ -4,7 +4,6 @@ const Order = require("../models/Order"); // Đảm bảo import đúng model Or
 
 // Cron job để hủy các đơn hàng `pending` quá hạn
 cron.schedule("*/5 * * * *", async () => {
-  // Chạy mỗi 5 phút
   try {
     const now = new Date();
 

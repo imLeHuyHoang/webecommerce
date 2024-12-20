@@ -33,7 +33,6 @@ router.get("/:id", productController.getProductById);
  */
 router.post(
   "/",
-  verifyToken,
   authAdmin,
   uploadProduct.array("images"),
   productController.createProduct
@@ -46,7 +45,6 @@ router.post(
  */
 router.put(
   "/:id",
-  verifyToken,
   authAdmin,
   uploadProduct.any(),
   productController.updateProduct
@@ -57,6 +55,6 @@ router.put(
  * @desc    Xóa sản phẩm
  * @access  Private (Admin only)
  */
-router.delete("/:id", verifyToken, authAdmin, productController.deleteProduct);
+router.delete("/:id", authAdmin, productController.deleteProduct);
 
 module.exports = router;

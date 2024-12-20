@@ -27,7 +27,6 @@ const Login = () => {
       }
       login(user, accessToken);
       navigate("/");
-      window.location.reload();
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Email hoặc mật khẩu không đúng!";
@@ -114,14 +113,7 @@ const Login = () => {
             <GoogleLogin
               onSuccess={handleGoogleLoginSuccess}
               onError={handleGoogleLoginFailure}
-              render={(renderProps) => (
-                <button
-                  className="btn btn-danger w-100 mb-3 login-page-google-login-btn"
-                  onClick={renderProps.onClick}
-                >
-                  <i className="fab fa-google me-2"></i> Đăng nhập với Google
-                </button>
-              )}
+              useOneTap
             />
           </div>
           <div className="d-flex justify-content-between login-page-two-button">

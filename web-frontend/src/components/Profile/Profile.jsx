@@ -35,7 +35,7 @@ const Profile = () => {
       try {
         const [userResponse, ordersResponse] = await Promise.all([
           apiClient.get("/user/profile"),
-          apiClient.get("/order/status-counts"),
+          apiClient.get("/order/status-counts"), // Dữ liệu từ đây sẽ được lọc theo logic backend đã sửa
         ]);
         setUser(userResponse.data);
         setFormData({
