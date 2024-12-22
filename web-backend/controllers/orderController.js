@@ -372,23 +372,6 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
-exports.requestSupport = async (req, res) => {
-  try {
-    const { message } = req.body;
-
-    await SupportRequest.create({
-      user: req.user.id,
-      order: req.params.orderId,
-      message,
-    });
-
-    res.status(200).json({ message: "Support request submitted successfully" });
-  } catch (error) {
-    console.error("Error submitting support request:", error);
-    res.status(500).json({ message: "Error submitting support request" });
-  }
-};
-
 exports.leaveReview = async (req, res) => {
   const { productId, rating, comment } = req.body;
 

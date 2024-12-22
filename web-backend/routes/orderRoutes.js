@@ -23,16 +23,7 @@ router.patch(
   authMiddleware.verifyToken,
   orderController.cancelOrder
 );
-router.post(
-  "/:orderId/support",
-  authMiddleware.verifyToken,
-  orderController.requestSupport
-);
-router.post(
-  "/:orderId/review",
-  authMiddleware.verifyToken,
-  orderController.leaveReview
-);
+
 router.get(
   "/:orderId/refund-status",
   authMiddleware.verifyToken,

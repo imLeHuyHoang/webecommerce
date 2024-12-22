@@ -3,7 +3,6 @@ const router = express.Router();
 const productController = require("../controllers/productController");
 const { uploadProduct } = require("../middleware/uploadMiddleware");
 const authAdmin = require("../middleware/authAdmin");
-const { verifyToken } = require("../middleware/auth");
 
 /**
  * @route   GET /api/products

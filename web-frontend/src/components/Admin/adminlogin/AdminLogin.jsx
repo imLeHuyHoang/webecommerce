@@ -19,13 +19,11 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
       const response = await apiClient.post("/user/loginadmin", formData);
-      const { accessToken, admin } = response.data;
-
-      // Lưu admin vào localStorage và cập nhật AuthAdminContext
-      loginAdmin(admin);
+      const { accessToken, user } = response.data;
+      // loginAdmin() nên truyền vào user
+      loginAdmin(user);
       localStorage.setItem("adminAccessToken", accessToken);
-
-      console.log("Admin logged in:", admin);
+      console.log("Admin logged in:", user);
       navigate("/admin");
     } catch (error) {
       console.error("Admin login failed:", error);

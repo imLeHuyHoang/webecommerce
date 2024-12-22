@@ -41,3 +41,18 @@ exports.getShopComments = async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 };
+exports.deleteShopComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const deletedComment = await ShopComment.findByIdAndDelete(commentId);
+
+    if (!deletedComment) {
+      return res.status(404).json({ message: "Comment not found." });
+    }
+
+    return res.status(200).json({ message: "Comment deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting shop comment:", error);
+    return res.status(500).json({ message: "Server error." });
+  }
+};

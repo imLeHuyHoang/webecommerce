@@ -30,8 +30,8 @@ const generateTokens = (user) => {
 const getCookieConfig = () => {
   return {
     httpOnly: true, // Chỉ có server mới có thể đọc được cookie
-    secure: true, // Chỉ dùng HTTP, không HTTPS (nên đặt là true trong production)
-    sameSite: "lax", // Giảm thiểu rủi ro CSRF
+    secure: true,
+    sameSite: "lax", // Giảm thiểu rủi ro CSRF(CSRF là một kỹ thuật tấn công giả mạo yêu cầu)
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày tính bằng mili giây
   };

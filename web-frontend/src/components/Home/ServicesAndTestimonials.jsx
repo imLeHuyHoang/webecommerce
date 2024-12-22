@@ -9,7 +9,7 @@ import {
   Modal,
   Form,
 } from "react-bootstrap";
-import "./ServicesAndTestimonials.css"; // Import CSS duy nhất
+import "./ServicesAndTestimonials.css";
 import apiClient from "../../utils/api-client";
 import { ToastContext } from "../ToastNotification/ToastContext";
 import { useAuth } from "../../context/AuthContext";
@@ -49,6 +49,20 @@ function ServicesAndTestimonials() {
     } catch (error) {
       console.error("Error fetching shop comments:", error);
       addToast("Không thể tải đánh giá khách hàng.", "danger");
+    }
+  };
+
+  // Xóa bình luận
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await apiClient.delete(`/shop/comments/${commentId}`);
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment._id !== commentId)
+      );
+      addToast("Đã xóa bình luận thành công!", "success");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      addToast("Không thể xóa bình luận.", "danger");
     }
   };
 
@@ -145,7 +159,7 @@ function ServicesAndTestimonials() {
 
         {/* Phần Đánh Giá Khách Hàng */}
         <h2 className="sat-testimonials-title text-center mb-4">
-          Khách hàng của chúng tôi đánh giá như nào ?
+          Khách hàng của chúng tôi đánh giá như nào?
         </h2>
         <Row
           className={`sat-testimonial-row ${
@@ -160,11 +174,23 @@ function ServicesAndTestimonials() {
                   <h5 className="sat-testimonial-author mt-3">
                     - {comment.author.name}
                   </h5>
+
+                  {/* Nút xóa (chỉ hiển thị nếu user là admin) */}
+                  {auth.user && auth.user.roles.includes("admin") && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDeleteComment(comment._id)}
+                    >
+                      Xóa
+                    </Button>
+                  )}
                 </Card.Body>
               </Card>
             </Col>
           ))}
         </Row>
+
         {/* Comment Submission Section */}
         <div className="sat-comment-section text-center mt-4 mb-4">
           <p>
@@ -186,7 +212,7 @@ function ServicesAndTestimonials() {
 
         {/* Modal for Adding a Comment */}
         <Modal show={showModal} onHide={handleCloseModal}>
-          <Modal.Header closeButton className="">
+          <Modal.Header closeButton>
             <Modal.Title>Để lại bình luận</Modal.Title>
           </Modal.Header>
           <Form onSubmit={handleSubmitComment}>

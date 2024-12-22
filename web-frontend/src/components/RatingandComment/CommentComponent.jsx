@@ -6,95 +6,99 @@ import "./CommentComponent.css";
 const CommentComponent = ({ productId }) => {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
-  const [replyingTo, setReplyingTo] = useState(null); // ID of the comment being replied to
+  const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentText, setEditingCommentText] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Fetch all comments and replies
-  const fetchComments = async () => {
-    try {
-      const response = await apiClient.get(`/products/${productId}/comments`);
-      const data = response.data;
+  const [currentUser, setCurrentUser] = useState(null);
 
-      // Build hierarchical tree from flat comment list
-      const commentTree = buildCommentTree(data);
-      setComments(commentTree);
-    } catch (error) {
-      console.error("Error fetching comments:", error);
+  useEffect(() => {
+    // Lấy userInfo từ localStorage (key "user")
+    const storedUserString = localStorage.getItem("user");
+    if (storedUserString) {
+      try {
+        const storedUser = JSON.parse(storedUserString);
+        setCurrentUser(storedUser);
+      } catch (err) {
+        console.error("Parse user error:", err);
+      }
+    }
+    fetchComments();
+  }, [productId]);
+
+  // Gọi API lấy danh sách comment
+  const fetchComments = async () => {
+    setLoading(true);
+    try {
+      const res = await apiClient.get(`/products/${productId}/comments`);
+      const data = res.data;
+      const tree = buildCommentTree(data);
+      setComments(tree);
+    } catch (err) {
+      console.error("Error fetching comments:", err);
       setMessage("Có lỗi xảy ra khi tải bình luận.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchComments();
-  }, [productId]);
-
-  // Function to build hierarchical tree from flat comment list
-  const buildCommentTree = (comments) => {
-    const commentMap = {};
+  // Tạo tree
+  const buildCommentTree = (list) => {
+    const map = {};
     const tree = [];
-
-    // Create a map for easy access to comments by ID
-    comments.forEach((comment) => {
-      comment.replies = []; // Initialize replies array
-      commentMap[comment._id] = comment;
+    list.forEach((c) => {
+      c.replies = [];
+      map[c._id] = c;
     });
-
-    // Build the tree
-    comments.forEach((comment) => {
-      if (comment.parentComment) {
-        const parent = commentMap[comment.parentComment];
+    list.forEach((c) => {
+      if (c.parentComment) {
+        const parent = map[c.parentComment];
         if (parent) {
-          parent.replies.push(comment);
+          parent.replies.push(c);
         } else {
-          // If parentComment doesn't exist, add as a top-level comment
-          tree.push(comment);
+          tree.push(c);
         }
       } else {
-        tree.push(comment);
+        tree.push(c);
       }
     });
-
     return tree;
   };
 
-  // Handle adding a new comment
+  // Thêm comment
   const handleAddComment = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       setMessage("Vui lòng đăng nhập để bình luận.");
       return;
     }
-
-    if (commentText.trim() === "") {
+    if (!commentText.trim()) {
       setMessage("Nội dung bình luận không được để trống.");
       return;
     }
 
     try {
-      const response = await apiClient.post(
+      const res = await apiClient.post(
         `/products/${productId}/comment`,
         { comment: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      if (response.status === 201) {
+      if (res.status === 201) {
         setCommentText("");
         setMessage("Bình luận thành công!");
         fetchComments();
       }
-    } catch (error) {
-      console.error("Error adding comment:", error);
+    } catch (err) {
+      console.error("Error adding comment:", err);
       setMessage("Có lỗi xảy ra khi gửi bình luận.");
     }
   };
 
-  // Handle replying to a specific comment
+  // Bật/tắt form reply
   const handleReply = (parentId) => {
-    // If replying to the same comment, toggle off
     if (replyingTo === parentId) {
       setReplyingTo(null);
       setReplyText("");
@@ -103,111 +107,261 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Handle submitting a reply
+  // Gửi reply
   const handleSubmitReply = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       setMessage("Vui lòng đăng nhập để trả lời bình luận.");
       return;
     }
-
-    if (replyText.trim() === "") {
+    if (!replyText.trim()) {
       setMessage("Nội dung trả lời không được để trống.");
       return;
     }
 
     try {
-      const response = await apiClient.post(
+      const res = await apiClient.post(
         `/products/${productId}/comment`,
         { comment: replyText, parentComment: replyingTo },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      if (response.status === 201) {
+      if (res.status === 201) {
         setReplyText("");
         setReplyingTo(null);
         setMessage("Trả lời bình luận thành công!");
         fetchComments();
       }
-    } catch (error) {
-      console.error("Error replying to comment:", error);
+    } catch (err) {
+      console.error("Error replying to comment:", err);
       setMessage("Có lỗi xảy ra khi trả lời bình luận.");
     }
   };
 
-  // Function to render each comment and its replies
-  const renderComments = (commentsList, depth = 0) => {
-    return commentsList.map((comment) => (
-      <div key={comment._id} className={`comment-item depth-${depth}`}>
-        <div className="comment-content">
-          <div className="comment-header">
-            <strong>{comment.user.name}</strong>
-            <small className="comment-time">
-              {new Date(comment.createdAt).toLocaleString()}
-            </small>
-          </div>
-          <div className="comment-body">{comment.comment}</div>
-          <button
-            className="reply-button"
-            onClick={() => handleReply(comment._id)}
-          >
-            Trả lời
-          </button>
-        </div>
+  // Chế độ sửa
+  const handleEditClick = (comment) => {
+    setEditingCommentId(comment._id);
+    setEditingCommentText(comment.comment);
+  };
 
-        {/* Reply form under each comment */}
-        <Collapse in={replyingTo === comment._id}>
-          <div className="reply-form">
-            <Form>
-              <Form.Group controlId={`reply-${comment._id}`} className="mb-2">
+  // Lưu sửa
+  const handleSaveEdit = async (commentId) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setMessage("Vui lòng đăng nhập để chỉnh sửa bình luận.");
+      return;
+    }
+    if (!editingCommentText.trim()) {
+      setMessage("Nội dung sửa không được để trống.");
+      return;
+    }
+
+    try {
+      const res = await apiClient.put(
+        `/products/${productId}/comment/${commentId}`,
+        { comment: editingCommentText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.status === 200) {
+        setMessage("Sửa bình luận thành công!");
+        setEditingCommentId(null);
+        setEditingCommentText("");
+        fetchComments();
+      }
+    } catch (err) {
+      console.error("Error editing comment:", err);
+      // Check lỗi 403 => server chặn
+      if (err.response && err.response.status === 403) {
+        setMessage("Bạn không có quyền sửa bình luận này.");
+      } else {
+        setMessage("Có lỗi xảy ra khi sửa bình luận.");
+      }
+    }
+  };
+
+  // Xóa comment
+  const handleDeleteComment = async (comment) => {
+    const confirmDelete = window.confirm("Bạn có chắc muốn xóa bình luận này?");
+    if (!confirmDelete) return;
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setMessage("Vui lòng đăng nhập để xóa bình luận.");
+      return;
+    }
+    try {
+      const res = await apiClient.delete(
+        `/products/${productId}/comment/${comment._id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.status === 200) {
+        setMessage("Xóa bình luận thành công!");
+        fetchComments();
+      }
+    } catch (err) {
+      console.error("Error deleting comment:", err);
+      // Check lỗi 403 => server chặn
+      if (err.response && err.response.status === 403) {
+        setMessage("Bạn không có quyền xóa bình luận này.");
+      } else {
+        setMessage("Có lỗi xảy ra khi xóa bình luận.");
+      }
+    }
+  };
+
+  //in ra tài khoản người dùng có vai trò gì
+  console.log(currentUser);
+
+  // Render đệ quy
+  const renderComments = (commentsList, depth = 0) => {
+    return commentsList.map((comment) => {
+      // Kiểm tra chủ sở hữu
+      // So sánh 2 khả năng, trong trường hợp user vẫn còn _id cũ
+      const userIdOnClient = currentUser?.id || currentUser?._id;
+      const userIdOnComment = comment.user?._id;
+
+      const isOwner =
+        userIdOnClient && userIdOnComment && userIdOnComment === userIdOnClient;
+
+      // Also fix the admin check:
+      const isAdmin = currentUser?.roles?.includes("admin");
+
+      // Chỉ hiển thị nút Sửa nếu là chính chủ
+      // Chỉ hiển thị nút Xóa nếu là chính chủ hoặc admin
+      const canEdit = isOwner;
+      const canDelete = isOwner || isAdmin;
+
+      return (
+        <div key={comment._id} className={`comment-item depth-${depth}`}>
+          <div className="comment-content">
+            <div className="comment-header">
+              <strong>{comment.user?.name || "Unknown"}</strong>
+              <small className="comment-time">
+                {new Date(comment.createdAt).toLocaleString()}
+              </small>
+            </div>
+
+            <div className="comment-body">
+              {editingCommentId === comment._id ? (
                 <Form.Control
                   as="textarea"
                   rows={2}
-                  placeholder="Viết trả lời"
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
+                  value={editingCommentText}
+                  onChange={(e) => setEditingCommentText(e.target.value)}
                 />
-              </Form.Group>
-              <div className="reply-buttons">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="me-2"
-                  onClick={handleSubmitReply}
-                >
-                  Gửi trả lời
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setReplyingTo(null);
-                    setReplyText("");
-                  }}
-                >
-                  Hủy
-                </Button>
-              </div>
-            </Form>
-          </div>
-        </Collapse>
+              ) : (
+                comment.comment
+              )}
+            </div>
 
-        {/* Render replies */}
-        {comment.replies && comment.replies.length > 0 && (
-          <div className="replies">
-            {renderComments(comment.replies, depth + 1)}
+            {/* Buttons */}
+            <div className="comment-actions">
+              {/* Trả lời */}
+              <button
+                className="reply-button"
+                onClick={() => handleReply(comment._id)}
+              >
+                Trả lời
+              </button>
+
+              {/* Sửa */}
+              {canEdit && editingCommentId !== comment._id && (
+                <button
+                  className="edit-button"
+                  onClick={() => handleEditClick(comment)}
+                >
+                  Sửa
+                </button>
+              )}
+
+              {editingCommentId === comment._id && (
+                <>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleSaveEdit(comment._id)}
+                  >
+                    Lưu
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setEditingCommentId(null);
+                      setEditingCommentText("");
+                    }}
+                  >
+                    Hủy
+                  </Button>
+                </>
+              )}
+
+              {/* Xóa */}
+              {canDelete && (
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteComment(comment)}
+                >
+                  Xóa
+                </button>
+              )}
+            </div>
           </div>
-        )}
-      </div>
-    ));
+
+          {/* Reply form */}
+          <Collapse in={replyingTo === comment._id}>
+            <div className="reply-form">
+              <Form>
+                <Form.Group controlId={`reply-${comment._id}`} className="mb-2">
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    placeholder="Viết trả lời..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                  />
+                </Form.Group>
+                <div className="reply-buttons">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="me-2"
+                    onClick={handleSubmitReply}
+                  >
+                    Gửi trả lời
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setReplyingTo(null);
+                      setReplyText("");
+                    }}
+                  >
+                    Hủy
+                  </Button>
+                </div>
+              </Form>
+            </div>
+          </Collapse>
+
+          {/* Render replies */}
+          {comment.replies?.length > 0 && (
+            <div className="replies">
+              {renderComments(comment.replies, depth + 1)}
+            </div>
+          )}
+        </div>
+      );
+    });
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="spinner-container">
         <Spinner animation="border" variant="primary" />
       </div>
     );
+  }
 
   return (
     <div className="comment-component">

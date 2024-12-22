@@ -30,14 +30,12 @@ const ProductCommentSchema = new Schema(
   { timestamps: true }
 );
 
-// Virtual field for replies
 ProductCommentSchema.virtual("replies", {
   ref: "ProductComment",
   localField: "_id",
   foreignField: "parentComment",
 });
 
-// Ensure virtual fields are serialized
 ProductCommentSchema.set("toObject", { virtuals: true });
 ProductCommentSchema.set("toJSON", { virtuals: true });
 
