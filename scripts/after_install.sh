@@ -5,7 +5,7 @@ set -e
 
 echo "Running AfterInstall hooks..."
 
-# Đảm bảo Docker chạy
+# Đảm bảo Docker đang chạy
 echo "Starting Docker daemon..."
 sudo systemctl start docker
 sudo systemctl enable docker
@@ -14,6 +14,7 @@ sudo systemctl status docker
 APP_DIR="/home/ec2-user/myapp"
 echo "Navigating to application directory: $APP_DIR"
 cd $APP_DIR
+
 if [ ! -f "docker-compose.yml" ]; then
     echo "docker-compose.yml not found!"
     exit 1
