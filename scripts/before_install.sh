@@ -61,7 +61,7 @@ sudo chown -R ec2-user:ec2-user $APP_DIR
 
 cd /home/ec2-user
 wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
-chmod +x ./install
+sudo chmod +x ./install
 sudo ./install auto
 sudo systemctl start codedeploy-agent
 sudo systemctl enable codedeploy-agent
