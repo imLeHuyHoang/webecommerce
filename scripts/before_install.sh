@@ -5,8 +5,6 @@ set -e
 
 echo "Running BeforeInstall hooks..."
 
-
-
 # Kiểm tra và cài đặt Git nếu chưa có
 if ! command -v git &> /dev/null
 then
@@ -58,6 +56,18 @@ fi
 
 # Thay đổi quyền sở hữu thư mục ứng dụng
 sudo chown -R ec2-user:ec2-user $APP_DIR
+
+# **Add logic to remove existing docker-compose.yml**
+echo "Checking if docker-compose.yml exists in $APP_DIR..."
+if [ -f "$APP_DIR/docker-compose.yml" ]; then
+    echo "docker-compose.yml already exists. Removing it..."
+    rm "$APP_DIR/docker-compose.yml"
+    if [ $? -ne 0 ]; then
+        echo "Failed to remove existing docker-compose.yml"
+        exit 1
+    fi
+    echo "Existing docker-compose.yml removed successfully."
+fi
 
 cd /home/ec2-user
 wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
