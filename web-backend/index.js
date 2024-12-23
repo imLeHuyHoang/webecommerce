@@ -17,6 +17,10 @@ app.get("/api/health", (req, res) => {
 // Read environment variables
 const PORT = process.env.PORT || 5000;
 const corsOrigin = process.env.corsOrigin;
+app.get("/api/unhealth", (req, res) => {
+  console.log("Unhealth check");
+  res.status(200).json({ status: "OK" });
+});
 
 if (!corsOrigin) {
   console.error("Error: corsOrigin environment variable is not set.");
@@ -75,10 +79,6 @@ app.use("/products", express.static(__dirname + "/upload/products"));
 cronJobs;
 
 // Additional health check
-app.get("/api/unhealth", (req, res) => {
-  console.log("Unhealth check");
-  res.status(200).json({ status: "OK" });
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
