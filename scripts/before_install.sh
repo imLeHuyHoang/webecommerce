@@ -47,33 +47,41 @@ fi
 docker --version
 docker-compose --version
 
-# Tạo thư mục ứng dụng nếu chưa tồn tại
+# Define the application directory
 APP_DIR="/home/ec2-user/myapp"
-if [ ! -d "$APP_DIR" ]; then
-    echo "Creating application directory: $APP_DIR"
-    mkdir -p $APP_DIR
-fi
 
-# Thay đổi quyền sở hữu thư mục ứng dụng
-sudo chown -R ec2-user:ec2-user $APP_DIR
-
-# **Add logic to remove existing docker-compose.yml**
-echo "Checking if docker-compose.yml exists in $APP_DIR..."
-if [ -f "$APP_DIR/docker-compose.yml" ]; then
-    echo "docker-compose.yml already exists. Removing it..."
-    rm "$APP_DIR/docker-compose.yml"
+# **Add logic to remove the existing application directory**
+echo "Checking if application directory exists at $APP_DIR..."
+if [ -d "$APP_DIR" ]; then
+    echo "Application directory exists. Removing it..."
+    sudo rm -rf "$APP_DIR"
     if [ $? -ne 0 ]; then
-        echo "Failed to remove existing docker-compose.yml"
+        echo "Failed to remove existing application directory: $APP_DIR"
         exit 1
     fi
-    echo "Existing docker-compose.yml removed successfully."
+    echo "Existing application directory removed successfully."
 fi
 
-cd /home/ec2-user
-wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
-sudo chmod +x ./install
-sudo ./install auto
-sudo systemctl start codedeploy-agent
-sudo systemctl enable codedeploy-agent
+# Recreate the application directory
+echo "Creating application directory: $APP_DIR"
+sudo mkdir -p "$APP_DIR"
+sudo chown ec2-user:ec2-user "$APP_DIR"
+
+# Ensure proper permissions
+sudo chown -R ec2-user:ec2-user "$APP_DIR"
+
+# Install CodeDeploy agent if not already installed
+if ! systemctl is-active --quiet codedeploy-agent; then
+    echo "Installing CodeDeploy agent..."
+    cd /home/ec2-user
+    wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
+    sudo chmod +x ./install
+    sudo ./install auto
+    sudo systemctl start codedeploy-agent
+    sudo systemctl enable codedeploy-agent
+    echo "CodeDeploy agent installed and started successfully."
+else
+    echo "CodeDeploy agent is already running."
+fi
 
 echo "BeforeInstall hooks completed successfully."
