@@ -13,7 +13,7 @@ app.get("/api/health", (req, res) => {
   console.log("Health check");
   res.status(200).json({ status: "OK" });
 });
-
+adasefdesfd;
 // Read environment variables
 const PORT = process.env.PORT || 5000;
 const corsOrigin = process.env.corsOrigin;
