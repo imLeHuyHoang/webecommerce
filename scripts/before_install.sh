@@ -3,85 +3,85 @@
 
 set -e
 
-echo "Running BeforeInstall hooks..."
+echo "Chạy các hooks BeforeInstall..."
 
 # Kiểm tra và cài đặt Git nếu chưa có
 if ! command -v git &> /dev/null
 then
-    echo "Git not found. Installing Git..."
+    echo "Không tìm thấy Git. Đang cài đặt Git..."
     sudo yum update -y
     sudo yum install git -y
-    echo "Git installed successfully."
+    echo "Cài đặt Git thành công."
 else
-    echo "Git is already installed."
+    echo "Git đã được cài đặt."
 fi
 
 # Kiểm tra và cài đặt Docker nếu chưa có
 if ! command -v docker &> /dev/null
 then
-    echo "Docker not found. Installing Docker..."
+    echo "Không tìm thấy Docker. Đang cài đặt Docker..."
     sudo yum update -y
     sudo amazon-linux-extras install docker -y
     sudo systemctl start docker
     sudo systemctl enable docker
     sudo usermod -aG docker ec2-user
-    echo "Docker installed successfully."
+    echo "Cài đặt Docker thành công."
 else
-    echo "Docker is already installed."
+    echo "Docker đã được cài đặt."
 fi
 
 # Kiểm tra và cài đặt Docker Compose nếu chưa có
 if ! command -v docker-compose &> /dev/null
 then
-    echo "Docker Compose not found. Installing Docker Compose..."
+    echo "Không tìm thấy Docker Compose. Đang cài đặt Docker Compose..."
     DOCKER_COMPOSE_VERSION="1.29.2"
     sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" \
      -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
-    echo "Docker Compose installed successfully."
+    echo "Cài đặt Docker Compose thành công."
 else
-    echo "Docker Compose is already installed."
+    echo "Docker Compose đã được cài đặt."
 fi
 
-# Kiểm tra phiên bản
+# Kiểm tra phiên bản Docker và Docker Compose
 docker --version
 docker-compose --version
 
-# Define the application directory
+# Định nghĩa thư mục ứng dụng
 APP_DIR="/home/ec2-user/myapp"
 
-# **Add logic to remove the existing application directory**
-echo "Checking if application directory exists at $APP_DIR..."
+# Kiểm tra và xóa thư mục ứng dụng hiện có
+echo "Kiểm tra xem thư mục ứng dụng có tồn tại tại $APP_DIR không..."
 if [ -d "$APP_DIR" ]; then
-    echo "Application directory exists. Removing it..."
+    echo "Thư mục ứng dụng tồn tại. Đang xóa..."
     sudo rm -rf "$APP_DIR"
     if [ $? -ne 0 ]; then 
-        echo "Failed to remove existing application directory: $APP_DIR"
+        echo "Không thể xóa thư mục ứng dụng hiện có: $APP_DIR"
         exit 1
     fi
-    echo "Existing application directory removed successfully."
+    echo "Xóa thư mục ứng dụng hiện có thành công."
 fi
 
-# Recreate the application directory
-echo "Creating application directory: $APP_DIR"
+# Tạo lại thư mục ứng dụng
+echo "Tạo thư mục ứng dụng: $APP_DIR"
 sudo mkdir -p "$APP_DIR"
 sudo chown ec2-user:ec2-user "$APP_DIR"
 
-# Ensure proper permissions
+# Đảm bảo quyền truy cập đúng
 sudo chown -R ec2-user:ec2-user "$APP_DIR"
 
-# Install CodeDeploy agent if not already installed
+# Cài đặt CodeDeploy agent nếu chưa có
 if ! systemctl is-active --quiet codedeploy-agent; then
-    echo "Installing CodeDeploy agent..."
+    echo "Đang cài đặt CodeDeploy agent..."
     cd /home/ec2-user
     wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
     sudo chmod +x ./install
     sudo ./install auto
     sudo systemctl start codedeploy-agent
     sudo systemctl enable codedeploy-agent
-    echo "CodeDeploy agent installed and started successfully."
+    echo "Cài đặt và khởi động CodeDeploy agent thành công."
 else
-    echo "CodeDeploy agent is already running."
+    echo "CodeDeploy agent đã đang chạy."
 fi
 
-echo "BeforeInstall hooks completed successfully."
+echo "Hoàn thành các hooks BeforeInstall thành công."

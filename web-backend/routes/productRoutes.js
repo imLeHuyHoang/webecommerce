@@ -40,7 +40,7 @@ router.post(
 /**
  * @route   PUT /api/products/:id
  * @desc    Cập nhật sản phẩm
- * @access  Private (Admin only)
+ * @access .env Private (Admin only)
  */
 router.put(
   "/:id",

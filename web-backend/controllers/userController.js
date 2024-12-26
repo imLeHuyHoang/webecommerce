@@ -30,8 +30,8 @@ const generateTokens = (user) => {
 const getCookieConfig = () => {
   return {
     httpOnly: true, // Chỉ có server mới có thể đọc được cookie
-    secure: true,
-    sameSite: "lax", // Giảm thiểu rủi ro CSRF(CSRF là một kỹ thuật tấn công giả mạo yêu cầu)
+    secure: false, // Cho phép gửi cookie qua HTTP
+    sameSite: "lax", // Giảm thiểu rủi ro CSRF
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày tính bằng mili giây
   };
@@ -82,7 +82,6 @@ exports.registerUser = async (req, res) => {
  */
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
-  const isProduction = process.env.NODE_ENV === "production";
 
   try {
     // Kiểm tra các trường bắt buộc
@@ -120,7 +119,7 @@ exports.loginUser = async (req, res) => {
     await user.save();
 
     // Đặt Refresh Token trong cookie
-    res.cookie("refreshToken", refreshToken, getCookieConfig(isProduction));
+    res.cookie("refreshToken", refreshToken, getCookieConfig());
 
     // Chuẩn bị dữ liệu người dùng trả về cho client
     const userResponse = {
@@ -161,7 +160,7 @@ exports.logoutUser = async (req, res) => {
     // Xóa cookie Refresh Token trên client
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false, // Nên đặt là true trong production
+      secure: false, // Đặt tương tự như khi tạo cookie
       sameSite: "lax",
       path: "/",
     });
