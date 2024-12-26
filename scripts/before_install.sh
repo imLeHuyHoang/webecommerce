@@ -55,7 +55,7 @@ echo "Checking if application directory exists at $APP_DIR..."
 if [ -d "$APP_DIR" ]; then
     echo "Application directory exists. Removing it..."
     sudo rm -rf "$APP_DIR"
-    if [ $? -ne 0 ]; then
+    if [ $? -ne 0 ]; then 
         echo "Failed to remove existing application directory: $APP_DIR"
         exit 1
     fi

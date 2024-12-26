@@ -1,23 +1,27 @@
-// src/chartSetup.js
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
-  LineElement,
   PointElement,
-  ArcElement,
+  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
+  // BỔ SUNG:
+  BarController,
+  LineController,
+  ArcElement,
 } from "chart.js";
 
-// Đăng ký tất cả các thành phần sử dụng trong biểu đồ
+// Đăng ký:
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  BarController,
   LineElement,
+  LineController,
   PointElement,
   ArcElement,
   Title,
