@@ -67,21 +67,7 @@ echo "Tạo thư mục ứng dụng: $APP_DIR"
 sudo mkdir -p "$APP_DIR"
 sudo chown ec2-user:ec2-user "$APP_DIR"
 
-# Đảm bảo quyền truy cập đúng
+# Đảm bảo quyền truy cập đúng 
 sudo chown -R ec2-user:ec2-user "$APP_DIR"
-
-# Cài đặt CodeDeploy agent nếu chưa có
-if ! systemctl is-active --quiet codedeploy-agent; then
-    echo "Đang cài đặt CodeDeploy agent..."
-    cd /home/ec2-user
-    wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
-    sudo chmod +x ./install
-    sudo ./install auto
-    sudo systemctl start codedeploy-agent
-    sudo systemctl enable codedeploy-agent
-    echo "Cài đặt và khởi động CodeDeploy agent thành công."
-else
-    echo "CodeDeploy agent đã đang chạy."
-fi
 
 echo "Hoàn thành các hooks BeforeInstall thành công."

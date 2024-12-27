@@ -59,20 +59,9 @@ function ProductList({ filters }) {
       );
     }
 
-    // Client-side Rating Filtering
-    // Đã chuyển lọc rating sang backend, nên có thể loại bỏ phần này
-    /*
-    if (filters.rating) {
-      const minRating = parseFloat(filters.rating);
-      tempProducts = tempProducts.filter(
-        (product) => product.averageRating > minRating
-      );
-    }
-    */
-
     setFilteredProducts(tempProducts);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [allProducts, filters.price /*, filters.rating */]);
+    setCurrentPage(1);
+  }, [allProducts, filters.price]);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
