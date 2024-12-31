@@ -1,13 +1,12 @@
-/* Tổng thể trang giỏ hàng */
 .cart-page {
   background-color: #f8f6f6;
   padding: 20px 0;
   background-image: url("../../assets/giangsinh4.avif");
   background-size: cover;
   background-position: center;
-  min-height: 90vh; /* Đảm bảo phần tử có chiều cao tối thiểu là 100% chiều cao của viewport */
+  min-height: 90vh;
 }
-/* Container tổng */
+
 .cart-container {
   background: #fff;
   border-radius: 5px;
@@ -15,7 +14,6 @@
   opacity: 0.95;
 }
 
-/* Hàng và cột trong layout */
 .cart-row,
 .cart-product-row,
 .cart-summary-row,
@@ -27,7 +25,6 @@
   margin-bottom: 20px;
 }
 
-/* Tiêu đề chính */
 .cart-heading {
   font-size: 1.8rem;
   font-weight: bold;
@@ -35,7 +32,6 @@
   color: #333;
 }
 
-/* Trạng thái loading và empty */
 .cart-loading {
   margin: 50px 0;
 }
@@ -50,7 +46,6 @@
   align-items: center;
 }
 
-/* Thẻ sản phẩm */
 .cart-product-card {
   border: 1px solid #eaeaea;
   border-radius: 5px;
@@ -58,12 +53,10 @@
   padding: 15px;
 }
 
-/* Nội dung card sản phẩm */
 .cart-product-card-body {
   padding: 0;
 }
 
-/* Ảnh sản phẩm */
 .cart-product-image {
   max-width: 100%;
   height: auto;
@@ -71,7 +64,6 @@
   object-fit: cover;
 }
 
-/* Tên và giá sản phẩm */
 .cart-product-name {
   font-size: 1.2rem;
   font-weight: bold;
@@ -85,13 +77,11 @@
   color: #555;
 }
 
-/* Badge giảm giá cho sản phẩm */
 .cart-product-discount-badge {
   margin-top: 5px;
   font-size: 0.9rem;
 }
 
-/* Nhóm input số lượng */
 .cart-quantity-input-group {
   display: flex;
   justify-self: flex-start;
@@ -103,7 +93,6 @@
   justify-content: flex-start;
 }
 
-/* Button styles */
 .cart-quantity-button {
   background-color: #007bff;
   color: white;
@@ -125,7 +114,6 @@
   cursor: not-allowed;
 }
 
-/* Display for the quantity */
 .cart-quantity-display {
   margin: 0 10px;
   font-size: 1rem;
@@ -134,7 +122,6 @@
   width: 40px;
 }
 
-/* Nút xóa sản phẩm */
 .cart-remove-button {
   display: inline-flex;
   align-items: center;
@@ -142,7 +129,6 @@
   font-size: 1rem;
 }
 
-/* Khu vực mã giảm giá sản phẩm */
 .cart-product-discount-row {
   margin-top: 10px;
 }
@@ -175,7 +161,6 @@
   font-size: 0.9rem;
 }
 
-/* Card tóm tắt đơn hàng */
 .cart-summary-card {
   border: 1px solid #eaeaea;
   border-radius: 5px;
@@ -233,7 +218,6 @@
   color: #d9534f;
 }
 
-/* Mã giảm giá toàn bộ giỏ hàng */
 .cart-discount-section {
   margin-top: 20px;
 }
@@ -276,7 +260,6 @@
   font-size: 0.9rem;
 }
 
-/* Nút thanh toán */
 .cart-checkout-section {
   margin-top: 30px;
   text-align: center;

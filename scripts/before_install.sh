@@ -51,9 +51,9 @@ docker-compose --version
 APP_DIR="/home/ec2-user/myapp"
 
 # Kiểm tra và xóa thư mục ứng dụng hiện có
-echo "Kiểm tra xem thư mục ứng dụng có tồn tại tại $APP_DIR không..."
+echo "Kiểm tra xem thư mục ứng dụng có tồn tại tại $APP_DIR không"
 if [ -d "$APP_DIR" ]; then
-    echo "Thư mục ứng dụng tồn tại. Đang xóa..."
+    echo "Thư mục ứng dụng tồn tại. Đang xóa."
     sudo rm -rf "$APP_DIR"
     if [ $? -ne 0 ]; then 
         echo "Không thể xóa thư mục ứng dụng hiện có: $APP_DIR"

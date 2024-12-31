@@ -1,4 +1,3 @@
-// Logout.jsx
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -12,21 +11,27 @@ const Logout = () => {
 
   useEffect(() => {
     const handleLogout = async () => {
-      // Gọi API logout server-side nếu cần (nếu có route /logout)
-      // await apiClient.post("/logout");
+      try {
+        // Gọi API logout server-side nếu có (không bắt buộc).
+        // await apiClient.post("/user/logout");
 
-      // Gọi hàm logout từ AuthContext (người dùng thường)
-      await logout();
-      // Gọi hàm logout từ AuthAdminContext (quản trị)
-      logoutAdmin();
+        // Đăng xuất user thường
+        await logout();
+        // Đăng xuất admin
+        logoutAdmin();
 
-      // Xóa token user và admin khỏi localStorage
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("adminAccessToken");
+        // Xóa hết token/key trong localStorage (quan trọng nhất)
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("adminAccessToken");
+        localStorage.removeItem("user");
+        localStorage.removeItem("admin");
 
-      // Điều hướng về trang login thường hoặc trang chủ
-      navigate("/");
+        // Chuyển hướng về trang chủ (hoặc login user)
+        navigate("/");
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
     };
 
     handleLogout();

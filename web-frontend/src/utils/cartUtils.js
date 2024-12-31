@@ -18,14 +18,6 @@ export const getCartCount = async () => {
       );
       return totalQuantity;
     } else {
-      //  Lấy giỏ hàng từ localStorage nếu chưa đăng nhập
-      // const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-      // console.log("localCart:", localCart);
-      // const totalQuantity = localCart.reduce(
-      //   (sum, item) => sum + item.quantity,
-      //   0
-      // );
-      // return totalQuantity;
     }
   } catch (error) {
     console.error("Lỗi khi tải giỏ hàng:", error);

@@ -6,12 +6,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./SignupPage.css";
 import apiClient from "../../utils/api-client";
 
-// Define the signup schema using Zod
+// Định nghĩa schema đăng ký sử dụng Zod
 const signupSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(1, "Tên là bắt buộc"),
+  email: z.string().email("Địa chỉ email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+  confirmPassword: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
 });
 
 const SignUp = () => {
@@ -54,14 +54,14 @@ const SignUp = () => {
     setErrors({});
     setMessage("");
 
-    // Validate password confirmation
+    // Xác nhận mật khẩu
     if (formData.password !== formData.confirmPassword) {
-      setErrors({ confirmPassword: "Passwords do not match" });
+      setErrors({ confirmPassword: "Mật khẩu không khớp" });
       setLoading(false);
       return;
     }
 
-    // Validate form data using Zod
+    // Xác thực dữ liệu form sử dụng Zod
     const validationResult = signupSchema.safeParse(formData);
     if (!validationResult.success) {
       const newErrors = {};
@@ -96,13 +96,13 @@ const SignUp = () => {
     try {
       await apiClient.post("/user/register", fullFormData);
 
-      setMessage("Sign Up Successful!");
+      setMessage("Đăng ký thành công!");
       setFormData({ name: "", email: "", password: "", confirmPassword: "" });
       setErrors({});
       setLoading(false);
       setIsSuccess(true);
     } catch (error) {
-      const errMessage = error.response?.data?.message || "Sign Up Failed!";
+      const errMessage = error.response?.data?.message || "Đăng ký thất bại!";
       setMessage(errMessage);
       setLoading(false);
     }
@@ -119,7 +119,7 @@ const SignUp = () => {
         <div className="card sign-up-page-card">
           {!isSuccess ? (
             <>
-              <h2 className="text-center sign-up-page-title">Sign Up</h2>
+              <h2 className="text-center sign-up-page-title">Đăng ký</h2>
               {message && (
                 <div className="alert sign-up-page-alert">{message}</div>
               )}
@@ -129,7 +129,7 @@ const SignUp = () => {
                     htmlFor="name"
                     className="form-label sign-up-page-label"
                   >
-                    Name
+                    Tên
                   </label>
                   <input
                     type="text"
@@ -138,7 +138,7 @@ const SignUp = () => {
                     className={`form-control sign-up-page-input ${
                       errors.name ? "is-invalid" : ""
                     }`}
-                    placeholder="Enter your name"
+                    placeholder="Nhập tên của bạn"
                     value={formData.name}
                     onChange={handleChange}
                     required
@@ -164,7 +164,7 @@ const SignUp = () => {
                     className={`form-control sign-up-page-input ${
                       errors.email ? "is-invalid" : ""
                     }`}
-                    placeholder="Enter your email"
+                    placeholder="Nhập email của bạn"
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -180,7 +180,7 @@ const SignUp = () => {
                     htmlFor="password"
                     className="form-label sign-up-page-label"
                   >
-                    Password
+                    Mật khẩu
                   </label>
                   <input
                     type="password"
@@ -189,7 +189,7 @@ const SignUp = () => {
                     className={`form-control sign-up-page-input ${
                       errors.password ? "is-invalid" : ""
                     }`}
-                    placeholder="Enter your password"
+                    placeholder="Nhập mật khẩu của bạn"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -205,7 +205,7 @@ const SignUp = () => {
                     htmlFor="confirmPassword"
                     className="form-label sign-up-page-label"
                   >
-                    Confirm Password
+                    Xác nhận mật khẩu
                   </label>
                   <input
                     type="password"
@@ -214,7 +214,7 @@ const SignUp = () => {
                     className={`form-control sign-up-page-input ${
                       errors.confirmPassword ? "is-invalid" : ""
                     }`}
-                    placeholder="Confirm your password"
+                    placeholder="Xác nhận mật khẩu của bạn"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
@@ -231,14 +231,14 @@ const SignUp = () => {
                     className="btn btn-primary sign-up-page-submit-btn"
                     disabled={loading}
                   >
-                    {loading ? "Signing Up..." : "Sign Up"}
+                    {loading ? "Đang đăng ký..." : "Đăng ký"}
                   </button>
                 </div>
                 <div className="text-center mt-3 sign-up-page-footer">
                   <p>
-                    Already have an account?{" "}
+                    Đã có tài khoản?{" "}
                     <Link to="/login" className="sign-up-page-login-link">
-                      Login here
+                      Đăng nhập tại đây
                     </Link>
                   </p>
                 </div>

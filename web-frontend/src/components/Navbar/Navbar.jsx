@@ -27,11 +27,11 @@ function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mar">
       <div className="container-fluid">
-        {/* Conditionally set the 'to' prop based on admin status */}
+        {/* Điều kiện để đặt thuộc tính 'to' dựa trên trạng thái admin */}
         <NavLink
           to={admin ? "/admin/productmanagement" : "/"}
           className="navbar-brand"
-          onClick={closeMenu} // Ensure the menu closes on click
+          onClick={closeMenu} // Đảm bảo menu đóng khi nhấp vào
         >
           TechStore
         </NavLink>
@@ -55,7 +55,7 @@ function Navbar() {
               <>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="Home"
+                    title="Trang Chủ"
                     link="/"
                     icon="fas fa-home"
                     onClick={closeMenu}
@@ -63,7 +63,7 @@ function Navbar() {
                 </li>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="Products"
+                    title="Sản Phẩm"
                     link="/product"
                     icon="fas fa-box"
                     onClick={closeMenu}
@@ -76,7 +76,7 @@ function Navbar() {
               <>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="Login"
+                    title="Đăng Nhập"
                     link="/login"
                     icon="fas fa-sign-in-alt"
                     onClick={closeMenu}
@@ -84,7 +84,7 @@ function Navbar() {
                 </li>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="Sign Up"
+                    title="Đăng Ký"
                     link="/signup"
                     icon="fas fa-user-plus"
                     onClick={closeMenu}
@@ -97,7 +97,7 @@ function Navbar() {
               <>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="Dashboard"
+                    title="Bảng Điều Khiển"
                     link="/admin/dashboard"
                     icon="fas fa-tachometer-alt"
                     onClick={closeMenu}
@@ -105,7 +105,7 @@ function Navbar() {
                 </li>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="User Management"
+                    title="Quản Lý Người Dùng"
                     link="/admin/usermanagement"
                     icon="fas fa-users-cog"
                     onClick={closeMenu}
@@ -113,7 +113,7 @@ function Navbar() {
                 </li>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="Product Management"
+                    title="Quản Lý Sản Phẩm"
                     link="/admin/productmanagement"
                     icon="fas fa-boxes"
                     onClick={closeMenu}
@@ -121,7 +121,7 @@ function Navbar() {
                 </li>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="Order Management"
+                    title="Quản Lý Đơn Hàng"
                     link="/admin/ordermanagement"
                     icon="fas fa-shopping-cart"
                     onClick={closeMenu}
@@ -136,7 +136,7 @@ function Navbar() {
                       navigate("/admin-login", { replace: true });
                     }}
                   >
-                    <i className="fas fa-sign-out-alt"></i> Logout
+                    <i className="fas fa-sign-out-alt"></i> Đăng Xuất
                   </button>
                 </li>
               </>
@@ -146,12 +146,13 @@ function Navbar() {
               <>
                 <li className="nav-item">
                   <NavLink to="/cart" className="nav-link" onClick={closeMenu}>
-                    <i className="fas fa-shopping-cart"></i> Cart ({cartCount})
+                    <i className="fas fa-shopping-cart"></i> Giỏ Hàng (
+                    {cartCount})
                   </NavLink>
                 </li>
                 <li className="nav-item">
                   <LinkWithIcon
-                    title="My Orders"
+                    title="Đơn Hàng Của Tôi"
                     link="/my-order"
                     icon="fas fa-shopping-bag"
                     onClick={closeMenu}
@@ -174,7 +175,7 @@ function Navbar() {
                       navigate("/login", { replace: true });
                     }}
                   >
-                    <i className="fas fa-sign-out-alt"></i> Logout
+                    <i className="fas fa-sign-out-alt"></i> Đăng Xuất
                   </button>
                 </li>
               </>

@@ -1,5 +1,3 @@
-// src/components/AdditionalContent/AdditionalContent.js
-
 import React from "react";
 import { Carousel } from "react-bootstrap";
 import "./AdditionalContent.css";

@@ -1,3 +1,5 @@
+// src/pages/ManageInventory/ManageInventory.jsx
+
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../utils/api-client";
 import "./ManageInventory.css";
@@ -19,7 +21,7 @@ const ManageInventory = () => {
   const [productInfo, setProductInfo] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [activeSearchField, setActiveSearchField] = useState(null); // 'code' or 'name'
+  const [activeSearchField, setActiveSearchField] = useState(null); // 'code' hoặc 'name'
 
   useEffect(() => {
     fetchInventories();
@@ -87,10 +89,10 @@ const ManageInventory = () => {
     e.preventDefault();
     try {
       if (selectedInventory) {
-        // Update existing inventory
+        // Cập nhật tồn kho
         await apiClient.put(`/inventory/${selectedInventory._id}`, form);
       } else {
-        // Add new inventory
+        // Thêm tồn kho mới
         await apiClient.post("/inventory", form);
       }
       setShowModal(false);
@@ -113,7 +115,7 @@ const ManageInventory = () => {
     setForm({
       ...form,
       productCode: code,
-      productName: "", // Reset productName if user is typing code
+      productName: "",
     });
     setActiveSearchField("code");
 
@@ -125,7 +127,6 @@ const ManageInventory = () => {
       );
       setFilteredProducts(filtered);
     } else {
-      // Show all products if input is empty
       setFilteredProducts(products);
     }
   };
@@ -135,7 +136,7 @@ const ManageInventory = () => {
     setForm({
       ...form,
       productName: name,
-      productCode: "", // Reset productCode if user is typing name
+      productCode: "",
     });
     setActiveSearchField("name");
 
@@ -147,7 +148,6 @@ const ManageInventory = () => {
       );
       setFilteredProducts(filtered);
     } else {
-      // Show all products if input is empty
       setFilteredProducts(products);
     }
   };
@@ -175,8 +175,6 @@ const ManageInventory = () => {
       inventory.product?.category?.name?.toLowerCase().includes(term)
     );
   });
-
-  console.log(products);
 
   return (
     <div className="manage-inventory-container container mt-4">
@@ -211,7 +209,7 @@ const ManageInventory = () => {
           <thead className="manage-inventory-thead thead-dark">
             <tr>
               <th>Mã sản phẩm</th>
-              <th>Sản phẩm</th>
+              <th>Tên sản phẩm</th>
               <th>Địa điểm</th>
               <th>Số lượng</th>
               <th>Cập nhật lần cuối</th>
@@ -350,7 +348,7 @@ const ManageInventory = () => {
                         <strong>Danh mục:</strong> {productInfo.category.name}
                       </p>
                       <p>
-                        <strong>Giá:</strong> ${productInfo.price}
+                        <strong>Giá:</strong> {productInfo.price}
                       </p>
                     </div>
                   )}

@@ -25,13 +25,13 @@ router.get("/order-counts", getOrderCounts);
 // Lấy tổng doanh thu
 router.get("/total-revenue", getTotalRevenue);
 
-// Lấy thống kê theo tháng/năm (tham số year=?)
+// Lấy thống kê theo tháng/năm
 router.get("/monthly-statistics", getMonthlyStatistics);
 
 // Thống kê đánh giá (tổng số, trung bình)
 router.get("/reviews-statistics", getReviewsStatistics);
 
-// Thống kê khách hàng đăng ký theo tháng/năm (year=?)
+// Thống kê khách hàng đăng ký theo tháng/năm
 router.get("/customer-statistics", getCustomerStatistics);
 
 // Thống kê top 10 sản phẩm bán chạy nhất

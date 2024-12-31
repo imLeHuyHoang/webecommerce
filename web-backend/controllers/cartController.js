@@ -353,9 +353,6 @@ exports.removeProductDiscount = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// controllers/cartController.js
-
 // Apply discount to a product in the cart
 exports.applyProductDiscount = async (req, res) => {
   const { productId, discountCode } = req.body;
@@ -387,7 +384,7 @@ exports.applyProductDiscount = async (req, res) => {
     );
 
     if (itemIndex >= 0) {
-      // Check if the discount is applicable to the product
+      // kiểm tra xem mã giảm giá này có áp dụng cho sản phẩm không
       if (
         discount.applicableProducts.length > 0 &&
         !discount.applicableProducts
@@ -423,7 +420,7 @@ exports.applyProductDiscount = async (req, res) => {
 };
 exports.checkStock = async (req, res) => {
   try {
-    const { products } = req.body; // Giả sử `products` là mảng các đối tượng { productId, quantity }
+    const { products } = req.body;
     console.log(products);
 
     const outOfStockItems = [];

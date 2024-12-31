@@ -1,10 +1,11 @@
 // src/pages/ManageCategories/ManageCategories.jsx
+
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../utils/api-client";
 import CategoryForm from "../form/CategoryForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
-import { getCategoryImageUrl } from "../../../utils/image-helper"; // Import helper
-import "./ManageCategories.css"; // Import file CSS
+import { getCategoryImageUrl } from "../../../utils/image-helper"; // Helper
+import "./ManageCategories.css";
 
 const ManageCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -12,18 +13,17 @@ const ManageCategories = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", variant: "" });
 
-  // Fetch categories
+  // Lấy danh sách danh mục
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
     try {
-      // Gọi đúng endpoint, giả sử GET /category trả về danh sách categories
       const response = await apiClient.get("/category");
       setCategories(response.data);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Lỗi tải danh mục:", error);
       setToast({
         show: true,
         message: "Không thể tải danh mục",
@@ -46,7 +46,6 @@ const ManageCategories = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này không?"))
       return;
     try {
-      // Sử dụng template string đúng cách
       await apiClient.delete(`/category/${categoryId}`);
       setToast({
         show: true,
@@ -55,7 +54,7 @@ const ManageCategories = () => {
       });
       fetchCategories();
     } catch (error) {
-      console.error("Error deleting category:", error);
+      console.error("Lỗi xóa danh mục:", error);
       setToast({
         show: true,
         message: "Không thể xóa danh mục",
@@ -103,7 +102,7 @@ const ManageCategories = () => {
                         {cat.images.map((img, index) => (
                           <img
                             key={index}
-                            src={getCategoryImageUrl(img)} // Sử dụng helper
+                            src={getCategoryImageUrl(img)}
                             alt={cat.name}
                             className="manage-category-image"
                           />

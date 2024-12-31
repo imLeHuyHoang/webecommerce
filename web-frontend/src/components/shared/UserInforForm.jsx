@@ -1,3 +1,5 @@
+// src/components/shared/UserInforForm.jsx
+
 import React from "react";
 
 const UserInfoForm = ({ formData, setFormData }) => {

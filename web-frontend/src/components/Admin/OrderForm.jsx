@@ -33,7 +33,6 @@ const OrderForm = ({ order, onSuccess, onCancel }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Handle nested fields
     if (name.includes(".")) {
       const keys = name.split(".");
       setFormData((prev) => ({
@@ -55,10 +54,8 @@ const OrderForm = ({ order, onSuccess, onCancel }) => {
     e.preventDefault();
     try {
       if (order) {
-        // Update order
         await apiClient.patch(`/order/admin/${order._id}`, formData);
       } else {
-        // Create new order
         await apiClient.post("/order/create", formData);
       }
       onSuccess();

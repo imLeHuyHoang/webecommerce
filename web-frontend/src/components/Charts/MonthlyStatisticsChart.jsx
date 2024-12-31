@@ -91,6 +91,7 @@ const MonthlyStatisticsChart = () => {
 
   useEffect(() => {
     fetchData(); // Gọi lần đầu khi mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {
@@ -106,7 +107,7 @@ const MonthlyStatisticsChart = () => {
     fetchData();
   };
 
-  if (!dataChart) return <p>Loading...</p>;
+  if (!dataChart) return <p>Đang tải...</p>;
 
   const options = {
     responsive: true,
@@ -181,7 +182,7 @@ const MonthlyStatisticsChart = () => {
         <div className="filter-form-group">
           <div className="filter-form-item">
             <label>
-              Year:
+              Năm:
               <input
                 type="number"
                 name="year"
@@ -194,7 +195,7 @@ const MonthlyStatisticsChart = () => {
           </div>
           <div className="filter-form-item">
             <label>
-              Start Date:
+              Ngày bắt đầu:
               <input
                 type="date"
                 name="startDate"
@@ -205,7 +206,7 @@ const MonthlyStatisticsChart = () => {
           </div>
           <div className="filter-form-item">
             <label>
-              End Date:
+              Ngày kết thúc:
               <input
                 type="date"
                 name="endDate"
@@ -216,7 +217,7 @@ const MonthlyStatisticsChart = () => {
           </div>
           <div className="filter-form-item">
             <label>
-              Exclude Cancelled:
+              Loại trừ đơn hủy:
               <input
                 type="checkbox"
                 name="excludeCancelled"

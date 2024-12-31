@@ -76,7 +76,7 @@ exports.processZaloPayPayment = async (order, productDetails) => {
     amount: parseInt(order.total, 10),
     items: productDetails.map((item) => ({
       itemid: item.product.toString(),
-      itemname: item.name, // Đảm bảo trường này khớp với schema
+      itemname: item.name,
       itemprice: parseInt(item.price, 10),
       itemquantity: parseInt(item.quantity, 10),
     })),
@@ -89,9 +89,7 @@ exports.processZaloPayPayment = async (order, productDetails) => {
     const zaloPayResponse = await this.createOrder(orderInfo);
 
     if (zaloPayResponse.return_code === 1) {
-      // Lưu appTransId để tra cứu trong callback
       order.payment.appTransId = appTransId;
-      // Không lưu zp_trans_token vào transactionId
       await order.save();
 
       return { success: true, orderUrl: zaloPayResponse.order_url };
@@ -151,7 +149,6 @@ exports.refundOrder = async (
     zalopayConfig.appid
   }_${uid}`;
 
-  // Đảm bảo rằng zpTransId là chuỗi
   const zpTransIdStr = String(zpTransId);
 
   const data = {
@@ -166,7 +163,7 @@ exports.refundOrder = async (
   const dataString = `${data.appid}|${data.zptransid}|${data.amount}|${data.description}|${data.timestamp}`;
   data.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
 
-  console.log("Refund Request Data:", data); // Thêm log để kiểm tra
+  console.log("Refund Request Data:", data);
 
   try {
     const response = await axios.post(
@@ -178,7 +175,7 @@ exports.refundOrder = async (
         },
       }
     );
-    console.log("ZaloPay Refund Response:", response.data); // Thêm log để kiểm tra
+    console.log("ZaloPay Refund Response:", response.data);
 
     // Trả về mRefundId cùng với refundResult
     return { refundResult: response.data, mRefundId };
@@ -205,13 +202,13 @@ exports.getRefundStatus = async (mRefundId) => {
   const dataString = `${params.appid}|${params.mrefundid}|${params.timestamp}`;
   params.mac = CryptoJS.HmacSHA256(dataString, zalopayConfig.key1).toString();
 
-  console.log("Get Refund Status Request Params:", params); // Thêm log để kiểm tra
+  console.log("Get Refund Status Request Params:", params);
 
   try {
     const response = await axios.get(zalopayConfig.getRefundStatusUrl, {
       params,
     });
-    console.log("ZaloPay Get Refund Status Response:", response.data); // Thêm log để kiểm tra
+    console.log("ZaloPay Get Refund Status Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error getting refund status:", error);

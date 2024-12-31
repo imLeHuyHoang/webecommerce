@@ -1,5 +1,6 @@
+// src/components/Checkout/UserInfoSection.jsx
 import React from "react";
-import UserInfoForm from "../Profile/UserInforForm";
+import UserInfoForm from "../shared/UserInforForm";
 
 const UserInfoSection = ({
   userInfo,
@@ -11,7 +12,7 @@ const UserInfoSection = ({
 }) => {
   const handleUserInfoSubmit = (e) => {
     e.preventDefault();
-    onSubmit(checkoutFormData); // Truyền đúng formData thay vì merged userInfo
+    onSubmit(checkoutFormData);
   };
 
   return (

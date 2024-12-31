@@ -11,7 +11,6 @@
   transform: translateY(-3px);
 }
 
-/* Table Styles */
 .table-responsive {
   margin-top: 20px;
 }
@@ -118,7 +117,6 @@
   border: none;
 }
 
-/* Modal Styles */
 .modal-content {
   border-radius: 10px;
 }
@@ -139,7 +137,6 @@
   padding: 20px;
 }
 
-/* Toast Notification */
 .toast {
   position: fixed;
   top: 20px;
@@ -157,15 +154,12 @@
   font-size: 14px;
 }
 
-/* Spinner Styles */
 .spinner-border {
   width: 3rem;
   height: 3rem;
   border-width: 0.3rem;
 }
-/* src/components/ManageOrders/ManageOrders.css */
 
-/* Optional: Customize the padding and border-radius for status badges */
 .status-paid,
 .status-unpaid,
 .status-cancelled,
@@ -175,11 +169,10 @@
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   display: inline-block;
-  font-size: 0.875rem; /* 14px */
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
-/* Optional: Add hover effects */
 .status-paid:hover,
 .status-unpaid:hover,
 .status-cancelled:hover,

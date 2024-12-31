@@ -27,6 +27,7 @@ const discountSchema = new mongoose.Schema(
       default: 0,
     },
     applicableProducts: [
+      // Danh sách sản phẩm áp dụng
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
@@ -34,7 +35,7 @@ const discountSchema = new mongoose.Schema(
     ],
     startDate: {
       type: Date,
-      required: true, // Ngày bắt đầu hiệu lực
+      required: true,
     },
     expiryDate: {
       type: Date,

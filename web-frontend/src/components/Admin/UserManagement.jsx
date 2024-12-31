@@ -1,4 +1,4 @@
-// UserManagement.jsx
+// src/pages/UserManagement/UserManagement.jsx
 
 import React, { useState, useEffect } from "react";
 import {
@@ -14,32 +14,26 @@ import {
 import { z } from "zod";
 import apiClient from "../../utils/api-client";
 import ToastNotification from "../ToastNotification/ToastNotification";
-import "./UserManagement.css"; // Import file CSS mới
+import "./UserManagement.css";
 
-// Validation schemas using zod
-
-// Schema for new users
 const newUserSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  roles: z.array(z.string()).min(1, "At least one role is required"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
+  name: z.string().min(1, "Tên là bắt buộc"),
+  email: z.string().email("Email không hợp lệ"),
+  roles: z.array(z.string()).min(1, "Phải chọn ít nhất một vai trò"),
+  password: z.string().min(6, "Mật khẩu phải ít nhất 6 ký tự"),
 });
 
-// Schema for existing users
-const existingUserSchema = z
-  .object({
-    _id: z.string(),
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email address").optional(),
-    roles: z.array(z.string()).min(1, "At least one role is required"),
-    password: z
-      .string()
-      .min(6, "Password must be at least 6 characters long")
-      .optional()
-      .or(z.literal("")),
-  })
-  .nonstrict();
+const existingUserSchema = z.object({
+  _id: z.string(),
+  name: z.string().min(1, "Tên là bắt buộc"),
+  email: z.string().email("Email không hợp lệ").optional(),
+  roles: z.array(z.string()).min(1, "Phải chọn ít nhất một vai trò"),
+  password: z
+    .string()
+    .min(6, "Mật khẩu phải ít nhất 6 ký tự")
+    .optional()
+    .or(z.literal("")),
+});
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -75,7 +69,7 @@ const UserManagement = () => {
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
-      setToastMessage("Error fetching users");
+      setToastMessage("Lỗi tải người dùng");
       setToastVariant("danger");
       setShowToast(true);
     } finally {
@@ -102,7 +96,8 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này không?"))
+      return;
 
     try {
       await apiClient.delete(`/user/${userId}`, {
@@ -111,12 +106,12 @@ const UserManagement = () => {
         },
       });
       setUsers(users.filter((user) => user._id !== userId));
-      setToastMessage("User deleted successfully");
+      setToastMessage("Xóa người dùng thành công");
       setToastVariant("success");
       setShowToast(true);
     } catch (error) {
       console.error("Error deleting user:", error);
-      setToastMessage("Error deleting user");
+      setToastMessage("Lỗi xóa người dùng");
       setToastVariant("danger");
       setShowToast(true);
     }
@@ -136,12 +131,12 @@ const UserManagement = () => {
       });
 
       setUsers(users.map((u) => (u._id === userId ? response.data : u)));
-      setToastMessage("User status updated successfully");
+      setToastMessage("Cập nhật trạng thái người dùng thành công");
       setToastVariant("success");
       setShowToast(true);
     } catch (error) {
       console.error("Error updating user status:", error);
-      setToastMessage("Error updating user status");
+      setToastMessage("Lỗi cập nhật trạng thái người dùng");
       setToastVariant("danger");
       setShowToast(true);
     }
@@ -176,7 +171,7 @@ const UserManagement = () => {
             user._id === userToSubmit._id ? response.data : user
           )
         );
-        setToastMessage("User updated successfully");
+        setToastMessage("Cập nhật người dùng thành công");
         setToastVariant("success");
       } else {
         const response = await apiClient.post("/user/admin", userToSubmit, {
@@ -185,7 +180,7 @@ const UserManagement = () => {
           },
         });
         setUsers((prevUsers) => [...prevUsers, response.data]);
-        setToastMessage("User added successfully");
+        setToastMessage("Thêm người dùng thành công");
         setToastVariant("success");
       }
       setShowToast(true);
@@ -204,7 +199,7 @@ const UserManagement = () => {
         setShowToast(true);
       } else {
         console.error("Error saving user:", e);
-        setToastMessage("Error saving user");
+        setToastMessage("Lỗi lưu người dùng");
         setToastVariant("danger");
         setShowToast(true);
       }
@@ -247,7 +242,7 @@ const UserManagement = () => {
     <Container fluid className="manage-user-container">
       <Row className="manage-user-row mb-4">
         <Col className="manage-user-col-title">
-          <h1 className="manage-user-title text-center">User Management</h1>
+          <h1 className="manage-user-title text-center">Quản lý người dùng</h1>
         </Col>
       </Row>
       <Row className="manage-user-row mb-4 manage-user-search-row">
@@ -275,7 +270,7 @@ const UserManagement = () => {
             className="manage-user-add-user-button"
             onClick={handleAddUser}
           >
-            Add New User
+            Thêm người dùng mới
           </Button>
         </Col>
       </Row>
@@ -290,12 +285,12 @@ const UserManagement = () => {
           >
             <thead className="manage-user-thead">
               <tr className="manage-user-tr">
-                <th className="manage-user-th">Name</th>
+                <th className="manage-user-th">Tên</th>
                 <th className="manage-user-th">Email</th>
-                <th className="manage-user-th">Phone</th>
-                <th className="manage-user-th">Roles</th>
-                <th className="manage-user-th">Status</th>
-                <th className="manage-user-th">Actions</th>
+                <th className="manage-user-th">Số điện thoại</th>
+                <th className="manage-user-th">Vai trò</th>
+                <th className="manage-user-th">Trạng thái</th>
+                <th className="manage-user-th">Thao tác</th>
               </tr>
             </thead>
             <tbody className="manage-user-tbody">
@@ -310,7 +305,7 @@ const UserManagement = () => {
                   </td>
                   <td className="manage-user-td">{user.roles.join(", ")}</td>
                   <td className="manage-user-td">
-                    {user.isActive ? "Active" : "Banned"}
+                    {user.isActive ? "Hoạt động" : "Đã chặn"}
                   </td>
                   <td className="manage-user-td">
                     <Button
@@ -318,21 +313,21 @@ const UserManagement = () => {
                       className="manage-user-edit-button me-2"
                       onClick={() => handleEditUser(user)}
                     >
-                      Edit
+                      Sửa
                     </Button>
                     <Button
                       variant="danger"
                       className="manage-user-delete-button me-2"
                       onClick={() => handleDeleteUser(user._id)}
                     >
-                      Delete
+                      Xóa
                     </Button>
                     <Button
                       variant={user.isActive ? "secondary" : "success"}
                       className="manage-user-ban-button"
                       onClick={() => handleBanUser(user._id)}
                     >
-                      {user.isActive ? "Ban" : "Unban"}
+                      {user.isActive ? "Chặn" : "Bỏ chặn"}
                     </Button>
                   </td>
                 </tr>
@@ -350,7 +345,7 @@ const UserManagement = () => {
       >
         <Modal.Header closeButton className="manage-user-modal-header">
           <Modal.Title className="manage-user-modal-title">
-            {selectedUser?._id ? "Edit User" : "Add New User"}
+            {selectedUser?._id ? "Sửa người dùng" : "Thêm người dùng mới"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="manage-user-modal-body">
@@ -360,7 +355,7 @@ const UserManagement = () => {
               className="manage-user-form-group mb-3"
               controlId="formUserName"
             >
-              <Form.Label className="manage-user-label">Name</Form.Label>
+              <Form.Label className="manage-user-label">Tên</Form.Label>
               <Form.Control
                 type="text"
                 name="name"
@@ -407,7 +402,7 @@ const UserManagement = () => {
               className="manage-user-form-group mb-3"
               controlId="formUserPassword"
             >
-              <Form.Label className="manage-user-label">Password</Form.Label>
+              <Form.Label className="manage-user-label">Mật khẩu</Form.Label>
               <Form.Control
                 type="password"
                 name="password"
@@ -416,7 +411,7 @@ const UserManagement = () => {
                 onChange={handleChange}
                 isInvalid={!!errors.password}
                 placeholder={
-                  selectedUser?._id ? "Leave blank to keep unchanged" : ""
+                  selectedUser?._id ? "Để trống nếu không muốn thay đổi" : ""
                 }
               />
               <Form.Control.Feedback
@@ -432,7 +427,7 @@ const UserManagement = () => {
               className="manage-user-form-group mb-3"
               controlId="formUserRoles"
             >
-              <Form.Label className="manage-user-label">Roles</Form.Label>
+              <Form.Label className="manage-user-label">Vai trò</Form.Label>
               <Form.Control
                 as="select"
                 multiple
@@ -462,14 +457,14 @@ const UserManagement = () => {
             className="manage-user-close-modal-button"
             onClick={() => setShowModal(false)}
           >
-            Close
+            Đóng
           </Button>
           <Button
             variant="primary"
             className="manage-user-save-button"
             onClick={handleSaveUser}
           >
-            Save Changes
+            Lưu thay đổi
           </Button>
         </Modal.Footer>
       </Modal>

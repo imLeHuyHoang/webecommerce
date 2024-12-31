@@ -1,4 +1,5 @@
 // src/components/ManageOrders/ManageOrders.jsx
+
 import React, { useState, useEffect } from "react";
 import apiClient from "../../utils/api-client";
 import OrderForm from "./OrderForm";
@@ -17,13 +18,13 @@ const ManageOrders = () => {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
 
-  // For order detail modal
+  // Để hiển thị chi tiết đơn hàng
   const [detailOrder, setDetailOrder] = useState(null);
 
-  // Selected orders for bulk confirm
+  // Các đơn hàng được chọn để xác nhận hàng loạt
   const [selectedOrders, setSelectedOrders] = useState([]);
 
-  // Filter states
+  // Trạng thái lọc
   const [filterOrderId, setFilterOrderId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -39,10 +40,10 @@ const ManageOrders = () => {
       const response = await apiClient.get("/order/admin/all", { params });
       setOrders(response.data);
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      console.error("Lỗi tải đơn hàng:", error);
       setToast({
         show: true,
-        message: "Failed to load orders",
+        message: "Không thể tải danh sách đơn hàng",
         variant: "danger",
       });
     } finally {
@@ -72,20 +73,21 @@ const ManageOrders = () => {
   };
 
   const handleDeleteOrder = async (orderId) => {
-    if (!window.confirm("Are you sure you want to delete this order?")) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này không?"))
+      return;
     try {
       await apiClient.delete(`/order/admin/${orderId}`);
       setToast({
         show: true,
-        message: "Order deleted successfully",
+        message: "Xóa đơn hàng thành công",
         variant: "success",
       });
       applyFilters();
     } catch (error) {
-      console.error("Error deleting order:", error);
+      console.error("Lỗi xóa đơn hàng:", error);
       setToast({
         show: true,
-        message: "Failed to delete order",
+        message: "Không thể xóa đơn hàng",
         variant: "danger",
       });
     }
@@ -99,7 +101,7 @@ const ManageOrders = () => {
   const handleConfirmOrder = async (orderId) => {
     if (
       !window.confirm(
-        "Are you sure you want to confirm this order and start shipping?"
+        "Bạn có chắc chắn muốn xác nhận đơn hàng này và chuyển sang trạng thái đang giao không?"
       )
     )
       return;
@@ -113,18 +115,18 @@ const ManageOrders = () => {
       if (response.status === 200) {
         setToast({
           show: true,
-          message: "Order confirmed and shipping started successfully",
+          message: "Xác nhận đơn hàng và chuyển sang đang giao thành công",
           variant: "success",
         });
         applyFilters();
       } else {
-        throw new Error("Failed to confirm order");
+        throw new Error("Xác nhận đơn hàng thất bại");
       }
     } catch (error) {
-      console.error("Error confirming order:", error);
+      console.error("Lỗi xác nhận đơn hàng:", error);
       setToast({
         show: true,
-        message: "Failed to confirm order",
+        message: "Không thể xác nhận đơn hàng",
         variant: "danger",
       });
     } finally {
@@ -132,11 +134,11 @@ const ManageOrders = () => {
     }
   };
 
-  // Confirm multiple orders
+  // Xác nhận nhiều đơn hàng
   const handleConfirmMultipleOrders = async () => {
     if (
       !window.confirm(
-        `Are you sure you want to confirm ${selectedOrders.length} selected orders?`
+        `Bạn có chắc chắn muốn xác nhận ${selectedOrders.length} đơn hàng đã chọn không?`
       )
     )
       return;
@@ -147,17 +149,17 @@ const ManageOrders = () => {
           shippingStatus: "shipping",
         });
       } catch (error) {
-        console.error("Error confirming order:", error);
+        console.error("Lỗi xác nhận đơn hàng:", error);
         setToast({
           show: true,
-          message: `Failed to confirm order ${orderId}`,
+          message: `Không thể xác nhận đơn hàng ${orderId}`,
           variant: "danger",
         });
       }
     }
     setToast({
       show: true,
-      message: "Selected orders confirmed successfully",
+      message: "Đã xác nhận các đơn hàng được chọn",
       variant: "success",
     });
     setSelectedOrders([]);
@@ -192,7 +194,7 @@ const ManageOrders = () => {
     }
   };
 
-  // Separate orders
+  // Tách đơn hàng "processing" khỏi những đơn khác
   const processingOrders = orders.filter(
     (order) => order.shippingStatus.toLowerCase() === "processing"
   );
@@ -216,12 +218,20 @@ const ManageOrders = () => {
     }
   };
 
+  // Helper function to format currency in VND
+  const formatCurrency = (amount) => {
+    return amount.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
+
   return (
     <>
       <div className="container mt-5">
         {/* Header Section */}
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h1>Order Management</h1>
+          <h1>Quản lý đơn hàng</h1>
         </div>
 
         {/* Filter Section */}
@@ -231,7 +241,7 @@ const ManageOrders = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by Order ID"
+                placeholder="Tìm theo Mã đơn hàng"
                 value={filterOrderId}
                 onChange={(e) => setFilterOrderId(e.target.value)}
               />
@@ -254,10 +264,10 @@ const ManageOrders = () => {
             </div>
             <div className="col-md-3 d-flex align-items-center">
               <button className="btn btn-primary me-2" onClick={applyFilters}>
-                Filter
+                Lọc
               </button>
               <button className="btn btn-secondary" onClick={clearFilters}>
-                Clear
+                Xóa bộ lọc
               </button>
             </div>
           </div>
@@ -266,22 +276,22 @@ const ManageOrders = () => {
         {loadingOrders ? (
           <div className="text-center">
             <div className="spinner-border" role="status">
-              <span className="visually-hidden">Loading...</span>
+              <span className="visually-hidden">Đang tải...</span>
             </div>
           </div>
         ) : (
           <>
-            {/* Table for processing orders needing confirmation */}
+            {/* Bảng các đơn hàng đang "processing" (chờ xác nhận) */}
             {processingOrders.length > 0 && (
               <div className="mb-5">
-                <h2>Orders Needing Confirmation</h2>
+                <h2>Đơn hàng chờ xác nhận</h2>
                 <div className="d-flex justify-content-end mb-2">
                   {selectedOrders.length > 0 && (
                     <button
                       className="btn btn-success"
                       onClick={handleConfirmMultipleOrders}
                     >
-                      Confirm Selected Orders
+                      Xác nhận đơn hàng đã chọn
                     </button>
                   )}
                 </div>
@@ -289,14 +299,14 @@ const ManageOrders = () => {
                   <table className="table table-bordered">
                     <thead className="table-dark">
                       <tr>
-                        <th>Select</th>
-                        <th>Order ID</th>
-                        <th>User</th>
-                        <th>Total</th>
-                        <th>Payment Status</th>
-                        <th>Shipping Status</th>
-                        <th>Order Date</th>
-                        <th>Actions</th>
+                        <th>Chọn</th>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái giao hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -311,7 +321,7 @@ const ManageOrders = () => {
                           </td>
                           <td>{order._id}</td>
                           <td>{order.user?.name || "N/A"}</td>
-                          <td>${order.total}</td>
+                          <td>{formatCurrency(order.total)}</td>
                           <td>
                             <span
                               className={getPaymentStatusClasses(
@@ -331,7 +341,9 @@ const ManageOrders = () => {
                             </span>
                           </td>
                           <td>
-                            {new Date(order.createdAt).toLocaleDateString()}
+                            {new Date(order.createdAt).toLocaleDateString(
+                              "vi-VN"
+                            )}
                           </td>
                           <td className="Actions">
                             <button
@@ -353,7 +365,7 @@ const ManageOrders = () => {
                                   aria-hidden="true"
                                 ></span>
                               ) : (
-                                "Confirm Order"
+                                "Xác nhận"
                               )}
                             </button>
 
@@ -361,14 +373,14 @@ const ManageOrders = () => {
                               className="btn btn-warning btn-sm me-2 btn-edit"
                               onClick={() => handleEditOrder(order)}
                             >
-                              Edit
+                              Sửa
                             </button>
 
                             <button
                               className="btn btn-danger btn-sm btn-delete"
                               onClick={() => handleDeleteOrder(order._id)}
                             >
-                              Delete
+                              Xóa
                             </button>
                           </td>
                         </tr>
@@ -379,19 +391,19 @@ const ManageOrders = () => {
               </div>
             )}
 
-            {/* Table for other orders */}
-            <h2>All Other Orders</h2>
+            {/* Bảng các đơn hàng còn lại */}
+            <h2>Danh sách đơn hàng khác</h2>
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="table-dark">
                   <tr>
-                    <th>Order ID</th>
-                    <th>User</th>
-                    <th>Total</th>
-                    <th>Payment Status</th>
-                    <th>Shipping Status</th>
-                    <th>Order Date</th>
-                    <th>Actions</th>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Thanh toán</th>
+                    <th>Trạng thái giao hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -400,7 +412,7 @@ const ManageOrders = () => {
                       <tr key={order._id}>
                         <td>{order._id}</td>
                         <td>{order.user?.name || "N/A"}</td>
-                        <td>${order.total}</td>
+                        <td>{formatCurrency(order.total)}</td>
                         <td>
                           <span
                             className={getPaymentStatusClasses(
@@ -420,7 +432,9 @@ const ManageOrders = () => {
                           </span>
                         </td>
                         <td>
-                          {new Date(order.createdAt).toLocaleDateString()}
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "vi-VN"
+                          )}
                         </td>
                         <td className="Actions">
                           <button
@@ -434,14 +448,14 @@ const ManageOrders = () => {
                             className="btn btn-warning btn-sm me-2 btn-edit"
                             onClick={() => handleEditOrder(order)}
                           >
-                            Edit
+                            Sửa
                           </button>
 
                           <button
                             className="btn btn-danger btn-sm btn-delete"
                             onClick={() => handleDeleteOrder(order._id)}
                           >
-                            Delete
+                            Xóa
                           </button>
                         </td>
                       </tr>
@@ -449,7 +463,7 @@ const ManageOrders = () => {
                   ) : (
                     <tr>
                       <td colSpan="7" className="text-center">
-                        No orders found.
+                        Không có đơn hàng nào.
                       </td>
                     </tr>
                   )}
@@ -460,14 +474,14 @@ const ManageOrders = () => {
         )}
       </div>
 
-      {/* Modal Form for Order (Add/Edit) */}
+      {/* Modal Form (Thêm/Sửa đơn hàng) */}
       {showModal && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog modal-lg modal-dialog-scrollable">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {selectedOrder ? "Edit Order" : "Add New Order"}
+                  {selectedOrder ? "Sửa đơn hàng" : "Thêm đơn hàng mới"}
                 </h5>
                 <button
                   type="button"
@@ -487,7 +501,7 @@ const ManageOrders = () => {
         </div>
       )}
 
-      {/* Detail Modal */}
+      {/* Chi tiết đơn hàng */}
       {detailOrder && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog modal-xl modal-dialog-scrollable">
@@ -546,8 +560,8 @@ const ManageOrders = () => {
                         <tr key={idx}>
                           <td>{item.name}</td>
                           <td>{item.quantity}</td>
-                          <td>${item.price}</td>
-                          <td>${item.price * item.quantity}</td>
+                          <td>{formatCurrency(item.price)}</td>
+                          <td>{formatCurrency(item.price * item.quantity)}</td>
                         </tr>
                       ))}
                       <tr>
@@ -555,7 +569,7 @@ const ManageOrders = () => {
                           <strong>Tổng đơn hàng:</strong>
                         </td>
                         <td>
-                          <strong>${detailOrder.total}</strong>
+                          <strong>{formatCurrency(detailOrder.total)}</strong>
                         </td>
                       </tr>
                     </tbody>

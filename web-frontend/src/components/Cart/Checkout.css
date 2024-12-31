@@ -18,7 +18,6 @@
   margin-bottom: 20px;
 }
 
-/* Heading */
 .checkout-page-heading {
   font-size: 1.5rem;
   font-weight: bold;
@@ -26,7 +25,6 @@
   color: #333;
 }
 
-/* User Info Card */
 .checkout-page-user-card {
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -54,7 +52,6 @@
   padding: 0;
 }
 
-/* Address Editing */
 .checkout-page-address-edit-btn,
 .checkout-page-add-address-btn,
 .checkout-page-new-address-btn,
@@ -84,7 +81,6 @@
   color: #666;
 }
 
-/* Payment Method Card */
 .checkout-page-payment-card {
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -103,7 +99,6 @@
   font-size: 0.9rem;
 }
 
-/* Order Information */
 .checkout-page-order-card {
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -128,7 +123,6 @@
   color: #999;
 }
 
-/* Order Total Card */
 .checkout-page-total-card {
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -144,13 +138,11 @@
   color: #333;
 }
 
-/* Place Order Button */
 .checkout-page-placeorder-btn {
   font-size: 1rem;
   font-weight: bold;
 }
 
-/* Loading State */
 .checkout-page-loading-container {
   text-align: center;
 }

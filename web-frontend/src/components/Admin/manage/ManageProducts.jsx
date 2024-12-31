@@ -1,9 +1,10 @@
 // src/pages/ManageProducts/ManageProducts.jsx
+
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../utils/api-client";
 import ProductForm from "../form/ProductForm";
 import ToastNotification from "../../ToastNotification/ToastNotification";
-import { getProductImageUrl } from "../../../utils/image-helper"; // Import helper
+import { getProductImageUrl } from "../../../utils/image-helper"; // Helper lấy đường dẫn ảnh
 import "./ManageProducts.css";
 
 const ManageProducts = () => {
@@ -27,23 +28,22 @@ const ManageProducts = () => {
     attributes: "",
   });
 
-  // Fetch product list
+  // Lấy danh sách sản phẩm
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  // Apply filters whenever products or filters change
+  // Áp dụng bộ lọc khi products hoặc filters thay đổi
   useEffect(() => {
     applyFilters();
   }, [products, filters]);
 
   const fetchProducts = async () => {
     try {
-      // Gọi API với đường dẫn tương đối
       const response = await apiClient.get("/product");
       setProducts(response.data);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Lỗi tải sản phẩm:", error);
       setToast({
         show: true,
         message: "Không thể tải sản phẩm",
@@ -74,7 +74,7 @@ const ManageProducts = () => {
       });
       fetchProducts();
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error("Lỗi xóa sản phẩm:", error);
       setToast({
         show: true,
         message: "Không thể xóa sản phẩm",
@@ -302,7 +302,7 @@ const ManageProducts = () => {
                       {product.images.map((img, index) => (
                         <img
                           key={index}
-                          src={getProductImageUrl(img)} // Sử dụng helper
+                          src={getProductImageUrl(img)}
                           alt={product.name}
                           className="img-thumbnail manage-product-img-thumbnail"
                           style={{ width: "50px", marginRight: "5px" }}

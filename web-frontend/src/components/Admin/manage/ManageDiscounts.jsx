@@ -1,4 +1,5 @@
 // src/components/Admin/ManageDiscounts/ManageDiscount.js
+
 import React, { useEffect, useState } from "react";
 import apiClient from "../../../utils/api-client";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +22,7 @@ const ManageDiscount = () => {
   const [productSearchResults, setProductSearchResults] = useState([]);
   const [productSearchTerm, setProductSearchTerm] = useState("");
 
-  // Thêm các trường lọc
+  // Các trường lọc
   const [filterCode, setFilterCode] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterStartDate, setFilterStartDate] = useState("");
@@ -41,7 +42,7 @@ const ManageDiscount = () => {
       const response = await apiClient.get("/discounts");
       setDiscounts(response.data);
     } catch (error) {
-      console.error("Error fetching discounts:", error);
+      console.error("Lỗi tải mã giảm giá:", error);
     }
   };
 
@@ -50,7 +51,7 @@ const ManageDiscount = () => {
       const response = await apiClient.get("/product");
       setProducts(response.data);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Lỗi tải sản phẩm:", error);
     }
   };
 
@@ -77,7 +78,7 @@ const ManageDiscount = () => {
       setShowForm(false);
       fetchDiscounts();
     } catch (error) {
-      console.error("Error saving discount:", error);
+      console.error("Lỗi lưu mã giảm giá:", error);
     }
   };
 
@@ -105,7 +106,7 @@ const ManageDiscount = () => {
         await apiClient.delete(`/discounts/${id}`);
         fetchDiscounts();
       } catch (error) {
-        console.error("Error deleting discount:", error);
+        console.error("Lỗi xóa mã giảm giá:", error);
       }
     }
   };
@@ -166,7 +167,7 @@ const ManageDiscount = () => {
     }
   };
 
-  // Lọc discounts theo các bộ lọc
+  // Lọc discount theo bộ lọc
   const filteredDiscounts = discounts.filter((discount) => {
     const today = new Date();
     const start = new Date(discount.startDate);
@@ -183,13 +184,11 @@ const ManageDiscount = () => {
       match = match && discount.type === filterType;
     }
 
-    // Lọc theo startDate (các mã có ngày bắt đầu >= filterStartDate)
     if (filterStartDate) {
       const filterStart = new Date(filterStartDate);
       match = match && start >= filterStart;
     }
 
-    // Lọc theo expiryDate (các mã có ngày hết hạn <= filterExpiryDate)
     if (filterExpiryDate) {
       const filterEnd = new Date(filterExpiryDate);
       match = match && end <= filterEnd;
@@ -208,7 +207,7 @@ const ManageDiscount = () => {
           <input
             type="text"
             className="form-control"
-            placeholder="Tìm kiếm theo mã..."
+            placeholder="Tìm theo mã giảm giá..."
             value={filterCode}
             onChange={(e) => setFilterCode(e.target.value)}
           />
@@ -219,16 +218,15 @@ const ManageDiscount = () => {
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
           >
-            <option value="">--Loại giảm giá--</option>
-            <option value="cart">Giỏ hàng</option>
-            <option value="product">Sản phẩm</option>
+            <option value="">--Chọn loại giảm giá--</option>
+            <option value="cart">Giảm giá cho giỏ hàng</option>
+            <option value="product">Giảm giá cho sản phẩm</option>
           </select>
         </div>
         <div className="col-md-3">
           <input
             type="date"
             className="form-control"
-            placeholder="Lọc theo ngày bắt đầu"
             value={filterStartDate}
             onChange={(e) => setFilterStartDate(e.target.value)}
           />
@@ -237,7 +235,6 @@ const ManageDiscount = () => {
           <input
             type="date"
             className="form-control"
-            placeholder="Lọc theo ngày hết hạn"
             value={filterExpiryDate}
             onChange={(e) => setFilterExpiryDate(e.target.value)}
           />
@@ -249,7 +246,7 @@ const ManageDiscount = () => {
           className="btn btn-primary mb-4"
           onClick={() => setShowForm(true)}
         >
-          Tạo mới
+          Tạo mã giảm giá mới
         </button>
       )}
 
@@ -274,15 +271,14 @@ const ManageDiscount = () => {
               onChange={(e) => setForm({ ...form, type: e.target.value })}
               required
             >
-              <option value="cart">Giỏ hàng</option>
-              <option value="product">Sản phẩm</option>
+              <option value="cart">Giảm giá cho giỏ hàng</option>
+              <option value="product">Giảm giá cho sản phẩm</option>
             </select>
           </div>
 
           {form.type === "product" && (
             <div className="mb-3">
               <label className="form-label">Sản phẩm áp dụng</label>
-
               <input
                 type="text"
                 className="form-control mb-2"
@@ -345,7 +341,7 @@ const ManageDiscount = () => {
               }
             />
             <label className="form-check-label" htmlFor="isPercentage">
-              Giảm giá theo phần trăm
+              Giảm giá theo %
             </label>
           </div>
 
@@ -369,7 +365,7 @@ const ManageDiscount = () => {
 
           {!form.isPercentage && (
             <div className="mb-3">
-              <label className="form-label">Giá trị giảm giá</label>
+              <label className="form-label">Giá trị giảm giá (VNĐ)</label>
               <input
                 type="number"
                 className="form-control"
@@ -379,7 +375,7 @@ const ManageDiscount = () => {
               />
               {form.type === "product" && form.value > getMinProductPrice() && (
                 <div className="text-danger">
-                  Giá trị giảm giá không được lớn hơn giá trị sản phẩm nhỏ nhất
+                  Giá trị giảm giá không được lớn hơn giá trị sản phẩm thấp nhất
                 </div>
               )}
             </div>
@@ -387,7 +383,9 @@ const ManageDiscount = () => {
 
           {form.type === "cart" && (
             <div className="mb-3">
-              <label className="form-label">Giá trị đơn hàng tối thiểu</label>
+              <label className="form-label">
+                Giá trị đơn hàng tối thiểu (VNĐ)
+              </label>
               <input
                 type="number"
                 className="form-control"
@@ -474,7 +472,7 @@ const ManageDiscount = () => {
             <th>Mã</th>
             <th>Loại</th>
             <th>Giá trị</th>
-            <th>Phần trăm</th>
+            <th>Giảm giá %</th>
             <th>Ngày bắt đầu</th>
             <th>Ngày hết hạn</th>
             <th>Đang hoạt động</th>

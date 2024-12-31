@@ -1,3 +1,5 @@
+// src/components/MyOrder/MyOrders.jsx
+
 import React, { useEffect, useState } from "react";
 import apiClient from "../../utils/api-client";
 import { useAuth } from "../../context/AuthContext";
@@ -12,7 +14,10 @@ function MyOrders() {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [filterStatus, setFilterStatus] = useState(""); // Default to "all" statuses
+
+  // Đặt filterStatus mặc định là "processing"
+  const [filterStatus, setFilterStatus] = useState("processing");
+
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [orderIdToCancel, setOrderIdToCancel] = useState("");
   const [confirmOrderId, setConfirmOrderId] = useState("");
@@ -29,9 +34,12 @@ function MyOrders() {
     // Filter orders based on search term and status
     const filtered = orders.filter((order) => {
       const matchesSearch = order._id.includes(searchTerm);
+      // Nếu filterStatus là "processing" thì chỉ hiển thị đơn "processing"
+      // Nếu filterStatus = "" (Tất cả), thì bỏ qua
       const matchesStatus = filterStatus
         ? order.shippingStatus === filterStatus
         : true;
+
       return matchesSearch && matchesStatus;
     });
     setFilteredOrders(filtered);
@@ -169,7 +177,6 @@ function MyOrders() {
     if (!status || status === "null") {
       return "Đơn không có thông tin hoàn tiền";
     }
-
     switch (status) {
       case "success":
         return "Thành công";
@@ -211,12 +218,12 @@ function MyOrders() {
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="">Tất cả trạng thái</option>
               <option value="processing">Đang xử lý</option>
               <option value="shipping">Đang giao hàng</option>
               <option value="shipped">Đã giao</option>
               <option value="delivered">Đã nhận</option>
               <option value="cancelled">Đã hủy</option>
+              <option value="">Tất cả trạng thái</option>
             </select>
           </div>
         </div>
