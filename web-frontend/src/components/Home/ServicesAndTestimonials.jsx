@@ -15,7 +15,7 @@ import { ToastContext } from "../ToastNotification/ToastContext";
 import { useAuth } from "../../context/AuthContext";
 
 function ServicesAndTestimonials() {
-  // States cho phần Testimonials
+  // States for Testimonials
   const [comments, setComments] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showModal, setShowModal] = useState(false);
@@ -24,24 +24,52 @@ function ServicesAndTestimonials() {
   const { addToast } = useContext(ToastContext);
   const { auth } = useAuth();
 
+  // State to detect mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767.98); // Bootstrap's mobile breakpoint
+    };
+
+    handleResize(); // Set initial state
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Fetch comments on mount
   useEffect(() => {
     fetchComments();
   }, []);
 
+  // Automatic sliding
   useEffect(() => {
     const interval = setInterval(() => {
-      if (comments.length > 4 && !isFading) {
-        setIsFading(true);
-        setTimeout(() => {
-          setCurrentSlide((prev) => (prev + 4) % comments.length);
-          setIsFading(false);
-        }, 500);
+      if (isMobile) {
+        if (comments.length > 1 && !isFading) {
+          setIsFading(true);
+          setTimeout(() => {
+            setCurrentSlide((prev) => (prev + 1) % comments.length);
+            setIsFading(false);
+          }, 500);
+        }
+      } else {
+        if (comments.length > 4 && !isFading) {
+          setIsFading(true);
+          setTimeout(() => {
+            setCurrentSlide((prev) => (prev + 4) % comments.length);
+            setIsFading(false);
+          }, 500);
+        }
       }
-    }, 2000);
+    }, 2000); // Slide every 2 seconds
 
     return () => clearInterval(interval);
-  }, [comments, isFading]);
+  }, [comments, isFading, isMobile]);
 
+  // Fetch comments from API
   const fetchComments = async () => {
     try {
       const response = await apiClient.get("/shop/comments");
@@ -52,7 +80,7 @@ function ServicesAndTestimonials() {
     }
   };
 
-  // Xóa bình luận
+  // Delete comment
   const handleDeleteComment = async (commentId) => {
     try {
       await apiClient.delete(`/shop/comments/${commentId}`);
@@ -66,12 +94,14 @@ function ServicesAndTestimonials() {
     }
   };
 
+  // Show and hide modal
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => {
     setShowModal(false);
     setNewComment("");
   };
 
+  // Submit new comment
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (newComment.trim() === "") {
@@ -92,13 +122,7 @@ function ServicesAndTestimonials() {
     }
   };
 
-  // Xác định các bình luận hiển thị trong slide hiện tại
-  const displayedComments = comments.slice(currentSlide, currentSlide + 4);
-  if (displayedComments.length < 4 && comments.length >= 4) {
-    displayedComments.push(...comments.slice(0, 4 - displayedComments.length));
-  }
-
-  // Dữ liệu dịch vụ
+  // Define services data
   const services = [
     {
       icon: "fas fa-shipping-fast",
@@ -132,10 +156,13 @@ function ServicesAndTestimonials() {
     },
   ];
 
+  // Calculate total slides for desktop
+  const totalSlidesDesktop = Math.ceil(comments.length / 4);
+
   return (
     <section className="sat-section py-5 bg-light">
       <Container className="Container-services">
-        {/* Phần Dịch Vụ */}
+        {/* Services Section */}
         <h2 className="sat-title text-center mb-5">Dịch Vụ Của Chúng Tôi</h2>
         <Row>
           {services.map((service, index) => (
@@ -157,39 +184,53 @@ function ServicesAndTestimonials() {
           ))}
         </Row>
 
-        {/* Phần Đánh Giá Khách Hàng */}
+        {/* Testimonials Section */}
         <h2 className="sat-testimonials-title text-center mb-4">
           Khách hàng của chúng tôi đánh giá như nào?
         </h2>
-        <Row
-          className={`sat-testimonial-row ${
-            isFading ? "sat-fade-out" : "sat-fade-in"
-          }`}
-        >
-          {displayedComments.map((comment) => (
-            <Col key={comment._id} md={3} sm={6} className="mb-4">
-              <Card className="sat-testimonial-card h-100">
-                <Card.Body>
-                  <p className="sat-testimonial-text">"{comment.text}"</p>
-                  <h5 className="sat-testimonial-author mt-3">
-                    - {comment.author.name}
-                  </h5>
+        <div className="sat-testimonial-container">
+          <Row
+            className={`sat-testimonial-row ${
+              isFading ? "sat-fade-out" : "sat-fade-in"
+            }`}
+            style={{
+              transform: isMobile
+                ? `translateX(-${currentSlide * 100}%)`
+                : `translateX(-${currentSlide * (100 / 4)}%)`,
+              transition: "transform 0.5s ease-in-out",
+              width: isMobile ? `${comments.length * 100}%` : "100%",
+            }}
+          >
+            {comments.map((comment) => (
+              <Col
+                key={comment._id}
+                md={3}
+                sm={6}
+                className="mb-4 sat-testimonial-col"
+              >
+                <Card className="sat-testimonial-card h-100">
+                  <Card.Body>
+                    <p className="sat-testimonial-text">"{comment.text}"</p>
+                    <h5 className="sat-testimonial-author mt-3">
+                      - {comment.author.name}
+                    </h5>
 
-                  {/* Nút xóa (chỉ hiển thị nếu user là admin) */}
-                  {auth.user && auth.user.roles.includes("admin") && (
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDeleteComment(comment._id)}
-                    >
-                      Xóa
-                    </Button>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                    {/* Delete button (admin only) */}
+                    {auth.user && auth.user.roles.includes("admin") && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDeleteComment(comment._id)}
+                      >
+                        Xóa
+                      </Button>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
 
         {/* Comment Submission Section */}
         <div className="sat-comment-section text-center mt-4 mb-4">

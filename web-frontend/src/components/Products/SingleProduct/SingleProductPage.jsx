@@ -12,104 +12,105 @@ import {
   Image,
 } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import apiClient from "../../../utils/api-client";
+import apiClient from "../../../utils/api-client"; // <-- kiểm tra file này coi có interceptor không
 import { useCart } from "../../../context/CartContext";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import RatingComponent from "../../RatingandComment/RatingComponent";
 import CommentComponent from "../../RatingandComment/CommentComponent";
-import CompareModal from "./CompareModel"; // Ensure the path is correct
-import AdditionalContent from "../../AdditionalContent/AddtionalContent"; // Adjust the path
-import { getProductImageUrl } from "../../../utils/image-helper"; // Import helper
+import CompareModal from "./CompareModel";
+import AdditionalContent from "../../AdditionalContent/AddtionalContent";
+import { getProductImageUrl } from "../../../utils/image-helper";
 import "./SingleProductPage.css";
-import imgSale from "../../../assets/giangsinh1.jpg";
 
 const SingleProductPage = () => {
-  const { id } = useParams(); // Get product ID from URL
-  const navigate = useNavigate(); // For navigation
-  const { incrementCartCount } = useCart(); // Cart context
-  const [product, setProduct] = useState(null); // Product details
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(""); // Error state
-  const [quantity, setQuantity] = useState(1); // Quantity selected
-  const [mainImage, setMainImage] = useState(""); // Main image to display
-  const [currentSlide, setCurrentSlide] = useState(0); // Current slide in image carousel
-  const [toastMessage, setToastMessage] = useState(""); // Toast message
-  const [showToast, setShowToast] = useState(false); // Show/hide toast
-  const [showModal, setShowModal] = useState(false); // Show/hide attributes modal
-  const [showCompareModal, setShowCompareModal] = useState(false); // Show/hide compare modal
+  const { id } = useParams(); // Lấy ID sản phẩm từ URL
+  const navigate = useNavigate(); // Dùng để chuyển trang
+  const { incrementCartCount } = useCart(); // Context giỏ hàng
 
+  // State quản lý dữ liệu & hiển thị
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [mainImage, setMainImage] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+
+  // Lấy thông tin sản phẩm
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await apiClient.get(`/product/${id}`); // Ensure endpoint is correct
-        setProduct(response.data); // Set product data
-        setMainImage(response.data.images[0]); // Set the first image as main
+        const response = await apiClient.get(`/product/${id}`);
+        setProduct(response.data);
+        setMainImage(response.data.images[0]);
       } catch (err) {
-        setError("Không thể tải sản phẩm."); // Set error message
-        console.error("Error fetching product:", err); // Log error
+        setError("Không thể tải sản phẩm.");
+        console.error("Lỗi khi tải sản phẩm:", err);
       } finally {
-        setLoading(false); // Set loading to false after fetch
+        setLoading(false);
       }
     };
     fetchProduct();
   }, [id]);
 
-  // Handle quantity increase
+  // Tăng/giảm số lượng
   const handleIncrease = () =>
     setQuantity((prev) => Math.min(prev + 1, product.stock));
-
-  // Handle quantity decrease
   const handleDecrease = () => setQuantity((prev) => Math.max(prev - 1, 1));
 
-  // Handle adding product to cart
+  // Hàm thêm vào giỏ hàng
   const addToCart = async (productId, quantity) => {
-    const token = localStorage.getItem("accessToken"); // Get token
-    const cartItem = { productId, quantity }; // Cart item details
+    const token = localStorage.getItem("accessToken");
+    const cartItem = { productId, quantity };
 
     try {
       if (token) {
+        // Gửi request thêm vào giỏ
         await apiClient.post("/cart/add", cartItem, {
           headers: { Authorization: `Bearer ${token}` },
-        }); // Add to cart via API
-        incrementCartCount(quantity); // Update cart count in context
-        setToastMessage("Sản phẩm đã được thêm vào giỏ hàng!"); // Success message
+        });
+        // Nếu không lỗi => cập nhật context, báo thành công
+        incrementCartCount(quantity);
+        setToastMessage("Sản phẩm đã được thêm vào giỏ hàng!");
       } else {
-        setToastMessage("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng."); // Prompt login
+        setToastMessage("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
       }
     } catch (error) {
-      setToastMessage("Có lỗi xảy ra khi thêm vào giỏ hàng."); // Error message
-      console.error("Error adding to cart:", error); // Log error
+      // Nếu request bị ném lỗi => thông báo thất bại
+      setToastMessage("Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng.");
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
     } finally {
-      setShowToast(true); // Show toast
-      setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
+      // Dù thành công hay thất bại thì cũng show toast
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
-  // Handle main image click
+  // Xử lý thay đổi hình ảnh chính khi click hình nhỏ
   const handleImageClick = (img) => setMainImage(img);
 
-  const imagesPerSlide = 5; // Number of images per carousel slide
-
-  // Handle next carousel slide
+  // Chuyển slide carousel
+  const imagesPerSlide = 5;
   const handleNextSlide = () => {
     setCurrentSlide((prev) =>
       Math.min(prev + 1, Math.ceil(product.images.length / imagesPerSlide) - 1)
     );
   };
-
-  // Handle previous carousel slide
   const handlePrevSlide = () => {
     setCurrentSlide((prev) => Math.max(prev - 1, 0));
   };
 
-  // Show attributes modal
+  // Mở/đóng modal
   const handleShowAttributes = () => setShowModal(true);
   const handleCloseAttributes = () => setShowModal(false);
 
-  // Show compare modal
   const handleShowCompareModal = () => setShowCompareModal(true);
   const handleCloseCompareModal = () => setShowCompareModal(false);
 
+  // Loading hay có lỗi => hiển thị tương ứng
   if (loading)
     return (
       <div className="text-center my-5">
@@ -123,34 +124,34 @@ const SingleProductPage = () => {
       </div>
     );
 
-  // Slice images for the current carousel slide
+  // Cắt mảng hình ảnh theo slide
   const displayedImages = product.images.slice(
     currentSlide * imagesPerSlide,
     currentSlide * imagesPerSlide + imagesPerSlide
   );
 
-  // Sử dụng hàm helper để xây dựng URL hình ảnh
+  // Xây dựng URL
   const mainImageUrl = getProductImageUrl(mainImage);
   const smallImageUrls = displayedImages.map((img) => getProductImageUrl(img));
 
   return (
     <div className="single-product-page">
-      <Container className=" container-single-product">
-        {/* Breadcrumb Navigation */}
+      <Container className="container-single-product">
+        {/* Thanh breadcrumb */}
         <Row className="mb-4">
           <Col>
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb">
-                <li className="breadcrumb-item custom-breadcrumb-item ">
+                <li className="breadcrumb-item custom-breadcrumb-item">
                   <button
                     onClick={() => navigate("/product")}
-                    className="button-74"
+                    className="back-button"
                   >
                     <i className="fas fa-arrow-left"></i> Quay lại
                   </button>
                 </li>
                 <li
-                  className="custom-breadcrumb-item active "
+                  className="custom-breadcrumb-item active"
                   aria-current="page"
                 >
                   Bạn đang xem sản phẩm: {product.name}
@@ -160,12 +161,11 @@ const SingleProductPage = () => {
           </Col>
         </Row>
 
-        {/* Main Content Row with 3 Columns */}
+        {/* 3 cột: (1) ảnh, (2) chi tiết, (3) comment */}
         <Row>
-          {/* Image Gallery */}
+          {/* Cột ảnh */}
           <Col md={4} className="mb-4">
             <div className="image-gallery">
-              {/* Main Image */}
               <div className="main-image mb-3">
                 <Image
                   src={mainImageUrl}
@@ -176,9 +176,8 @@ const SingleProductPage = () => {
                 />
               </div>
 
-              {/* Small Images Carousel with Controls */}
+              {/* Carousel ảnh nhỏ */}
               <div className="carousel-controls d-flex justify-content-center align-items-center">
-                {/* Previous Button */}
                 <Button
                   variant="outline-secondary"
                   size="sm"
@@ -188,7 +187,6 @@ const SingleProductPage = () => {
                   <i className="fas fa-chevron-left"></i>
                 </Button>
 
-                {/* Small Images */}
                 <div className="small-images-container d-flex mx-2">
                   {smallImageUrls.map((imgUrl, idx) => (
                     <Image
@@ -205,7 +203,6 @@ const SingleProductPage = () => {
                   ))}
                 </div>
 
-                {/* Next Button */}
                 <Button
                   variant="outline-secondary"
                   size="sm"
@@ -219,13 +216,12 @@ const SingleProductPage = () => {
                 </Button>
               </div>
 
-              {/* Additional Content */}
+              {/* Nội dung bổ sung */}
               <AdditionalContent />
-              <img src={imgSale} className="img-sale" alt="sale-image" />
             </div>
           </Col>
 
-          {/* Product Details */}
+          {/* Cột chi tiết */}
           <Col md={4} className="mb-4">
             <div className="product-details">
               <h2>{product.name}</h2>
@@ -240,13 +236,11 @@ const SingleProductPage = () => {
                 <Badge bg={product.stock > 0 ? "success" : "danger"}>
                   {product.stock > 0 ? "Còn hàng" : "Hết hàng"}
                 </Badge>
-                <span> số lượng: {product.stock}</span>
+                <span> (số lượng: {product.stock})</span>
               </p>
-
-              {/* Description */}
               <p>{product.description}</p>
 
-              {/* Quantity Controls and Compare Button */}
+              {/* Nút tăng/giảm + So sánh */}
               <div className="quantity-controls">
                 <button
                   className="btn-decrease"
@@ -255,18 +249,15 @@ const SingleProductPage = () => {
                 >
                   -
                 </button>
-
                 <p className="text-quantity">{quantity}</p>
-
                 <button
-                  className=" btn-increase"
+                  className="btn-increase"
                   onClick={handleIncrease}
                   disabled={quantity >= product.stock}
                 >
                   +
                 </button>
 
-                {/* Compare Button */}
                 <button
                   className="button compare-btn"
                   onClick={handleShowCompareModal}
@@ -275,8 +266,13 @@ const SingleProductPage = () => {
                 </button>
               </div>
 
-              {/* Add to Cart & Attributes Buttons */}
-              <div className="d-flex mb-3">
+              {/* Nút Thêm vào giỏ + Chi tiết kỹ thuật */}
+              <div className="d-flex mb-3 add-and-attributes">
+                {/* 
+                  Option 1: Sử dụng variant, 
+                  nhưng nếu bị override .btn-primary, 
+                  bạn cần !important CSS hoặc selector cụ thể 
+                */}
                 <Button
                   variant={product.stock > 0 ? "primary" : "secondary"}
                   onClick={() => addToCart(product._id, quantity)}
@@ -285,6 +281,8 @@ const SingleProductPage = () => {
                 >
                   Thêm vào giỏ hàng
                 </Button>
+
+                {/* Nút mở modal Thông số kỹ thuật */}
                 <Button
                   variant="info"
                   onClick={handleShowAttributes}
@@ -294,14 +292,14 @@ const SingleProductPage = () => {
                 </Button>
               </div>
 
-              {/* Rating Component */}
+              {/* Rating */}
               <div className="d-flex align-items-center">
                 <RatingComponent productId={id} />
               </div>
             </div>
           </Col>
 
-          {/* Comment Component */}
+          {/* Cột comment */}
           <Col md={4} className="mb-4">
             <div className="comment-section">
               <CommentComponent productId={id} />
@@ -310,14 +308,14 @@ const SingleProductPage = () => {
         </Row>
       </Container>
 
-      {/* Toast Notification */}
+      {/* Thông báo dạng Toast */}
       <ToastNotification
         message={toastMessage}
         show={showToast}
         onClose={() => setShowToast(false)}
       />
 
-      {/* Attributes Modal */}
+      {/* Modal thuộc tính */}
       <Modal show={showModal} onHide={handleCloseAttributes} centered>
         <Modal.Header closeButton>
           <Modal.Title>Chi tiết kỹ thuật</Modal.Title>
@@ -338,7 +336,7 @@ const SingleProductPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Compare Modal */}
+      {/* Modal so sánh */}
       <CompareModal
         show={showCompareModal}
         handleClose={handleCloseCompareModal}

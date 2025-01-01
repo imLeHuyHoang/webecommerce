@@ -1,3 +1,4 @@
+// src/pages/form/CategoryForm.jsx
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import apiClient from "../../../utils/api-client";
@@ -6,6 +7,7 @@ import { z } from "zod";
 const categorySchema = z.object({
   name: z.string().min(1, "Name is required"),
   descriptions: z.string().optional(),
+  // Ở đây mình không ép buộc 'images' = array, mà cho optional
   images: z.array(z.any()).optional(),
 });
 
@@ -28,15 +30,20 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
     }
   }, [category]);
 
+  // --- ĐIỂM ĐÃ SỬA ---
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
     if (name === "images") {
       if (files.length > 1) {
         setImageError("Category chỉ cần 1 ảnh.");
-      } else {
+      } else if (files.length === 0) {
+        // Không chọn ảnh -> Giữ nguyên formData.images
         setImageError("");
-        setFormData({ ...formData, images: files ? Array.from(files) : [] });
+      } else {
+        // Chọn đúng 1 ảnh -> setFormData.images = files
+        setImageError("");
+        setFormData({ ...formData, images: Array.from(files) });
       }
     } else {
       setFormData({ ...formData, [name]: value });
@@ -46,14 +53,16 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Validate data
+      // Validate data bằng Zod
       const validatedData = categorySchema.parse(formData);
 
-      // Prepare form data
+      // Tạo FormData để gửi lên server
       const data = new FormData();
       data.append("name", validatedData.name);
       data.append("descriptions", validatedData.descriptions || "");
-      if (validatedData.images) {
+
+      // Chỉ append ảnh nếu có file thực sự
+      if (validatedData.images && validatedData.images.length > 0) {
         validatedData.images.forEach((image) => {
           data.append("images", image);
         });
@@ -70,6 +79,7 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
+
       onSuccess();
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -118,7 +128,9 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
           accept="image/*"
         />
         {imageError && <Alert variant="danger">{imageError}</Alert>}
-        {category && category.images && (
+
+        {/* Hiển thị ảnh cũ (nếu có) */}
+        {category && category.images && category.images.length > 0 && (
           <div className="mt-2">
             {category.images.map((img, index) => (
               <img

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Spinner, Form, Button, Collapse } from "react-bootstrap";
+import { Spinner, Form, Collapse } from "react-bootstrap"; // Removed Button import
 import apiClient from "../../utils/api-client";
 import "./CommentComponent.css";
 
@@ -16,7 +16,7 @@ const CommentComponent = ({ productId }) => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Lấy userInfo từ localStorage (key "user")
+    // Retrieve userInfo from localStorage (key "user")
     const storedUserString = localStorage.getItem("user");
     if (storedUserString) {
       try {
@@ -29,7 +29,7 @@ const CommentComponent = ({ productId }) => {
     fetchComments();
   }, [productId]);
 
-  // Gọi API lấy danh sách comment
+  // Fetch comments from API
   const fetchComments = async () => {
     setLoading(true);
     try {
@@ -45,7 +45,7 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Tạo tree
+  // Build comment tree
   const buildCommentTree = (list) => {
     const map = {};
     const tree = [];
@@ -68,7 +68,7 @@ const CommentComponent = ({ productId }) => {
     return tree;
   };
 
-  // Thêm comment
+  // Add new comment
   const handleAddComment = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -97,7 +97,7 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Bật/tắt form reply
+  // Toggle reply form
   const handleReply = (parentId) => {
     if (replyingTo === parentId) {
       setReplyingTo(null);
@@ -107,7 +107,7 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Gửi reply
+  // Submit reply
   const handleSubmitReply = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -137,13 +137,13 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Chế độ sửa
+  // Enter edit mode
   const handleEditClick = (comment) => {
     setEditingCommentId(comment._id);
     setEditingCommentText(comment.comment);
   };
 
-  // Lưu sửa
+  // Save edited comment
   const handleSaveEdit = async (commentId) => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -169,7 +169,7 @@ const CommentComponent = ({ productId }) => {
       }
     } catch (err) {
       console.error("Error editing comment:", err);
-      // Check lỗi 403 => server chặn
+      // Check for 403 error
       if (err.response && err.response.status === 403) {
         setMessage("Bạn không có quyền sửa bình luận này.");
       } else {
@@ -178,7 +178,7 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  // Xóa comment
+  // Delete comment
   const handleDeleteComment = async (comment) => {
     const confirmDelete = window.confirm("Bạn có chắc muốn xóa bình luận này?");
     if (!confirmDelete) return;
@@ -199,7 +199,7 @@ const CommentComponent = ({ productId }) => {
       }
     } catch (err) {
       console.error("Error deleting comment:", err);
-      // Check lỗi 403 => server chặn
+      // Check for 403 error
       if (err.response && err.response.status === 403) {
         setMessage("Bạn không có quyền xóa bình luận này.");
       } else {
@@ -208,25 +208,23 @@ const CommentComponent = ({ productId }) => {
     }
   };
 
-  //in ra tài khoản người dùng có vai trò gì
+  // Log current user roles
   console.log(currentUser);
 
-  // Render đệ quy
+  // Recursive render for comments
   const renderComments = (commentsList, depth = 0) => {
     return commentsList.map((comment) => {
-      // Kiểm tra chủ sở hữu
-      // So sánh 2 khả năng, trong trường hợp user vẫn còn _id cũ
+      // Check ownership
       const userIdOnClient = currentUser?.id || currentUser?._id;
       const userIdOnComment = comment.user?._id;
 
       const isOwner =
         userIdOnClient && userIdOnComment && userIdOnComment === userIdOnClient;
 
-      // Also fix the admin check:
+      // Admin check
       const isAdmin = currentUser?.roles?.includes("admin");
 
-      // Chỉ hiển thị nút Sửa nếu là chính chủ
-      // Chỉ hiển thị nút Xóa nếu là chính chủ hoặc admin
+      // Permissions
       const canEdit = isOwner;
       const canDelete = isOwner || isAdmin;
 
@@ -255,18 +253,18 @@ const CommentComponent = ({ productId }) => {
 
             {/* Buttons */}
             <div className="comment-actions">
-              {/* Trả lời */}
+              {/* Reply */}
               <button
-                className="reply-button"
+                className="comment-button comment-button-reply"
                 onClick={() => handleReply(comment._id)}
               >
                 Trả lời
               </button>
 
-              {/* Sửa */}
+              {/* Edit */}
               {canEdit && editingCommentId !== comment._id && (
                 <button
-                  className="edit-button"
+                  className="comment-button comment-button-edit"
                   onClick={() => handleEditClick(comment)}
                 >
                   Sửa
@@ -275,30 +273,28 @@ const CommentComponent = ({ productId }) => {
 
               {editingCommentId === comment._id && (
                 <>
-                  <Button
-                    variant="primary"
-                    size="sm"
+                  <button
+                    className="comment-button comment-button-save"
                     onClick={() => handleSaveEdit(comment._id)}
                   >
                     Lưu
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
+                  </button>
+                  <button
+                    className="comment-button comment-button-cancel"
                     onClick={() => {
                       setEditingCommentId(null);
                       setEditingCommentText("");
                     }}
                   >
                     Hủy
-                  </Button>
+                  </button>
                 </>
               )}
 
-              {/* Xóa */}
+              {/* Delete */}
               {canDelete && (
                 <button
-                  className="delete-button"
+                  className="comment-button comment-button-delete"
                   onClick={() => handleDeleteComment(comment)}
                 >
                   Xóa
@@ -321,24 +317,21 @@ const CommentComponent = ({ productId }) => {
                   />
                 </Form.Group>
                 <div className="reply-buttons">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="me-2"
+                  <button
+                    className="comment-button comment-button-primary"
                     onClick={handleSubmitReply}
                   >
                     Gửi trả lời
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
+                  </button>
+                  <button
+                    className="comment-button comment-button-secondary"
                     onClick={() => {
                       setReplyingTo(null);
                       setReplyText("");
                     }}
                   >
                     Hủy
-                  </Button>
+                  </button>
                 </div>
               </Form>
             </div>
@@ -390,9 +383,12 @@ const CommentComponent = ({ productId }) => {
               onChange={(e) => setCommentText(e.target.value)}
             />
           </Form.Group>
-          <Button variant="primary" onClick={handleAddComment}>
+          <button
+            className="comment-button comment-button-primary"
+            onClick={handleAddComment}
+          >
             Gửi bình luận
-          </Button>
+          </button>
         </Form>
       </div>
     </div>

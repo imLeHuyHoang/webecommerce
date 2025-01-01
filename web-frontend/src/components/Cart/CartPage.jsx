@@ -24,12 +24,15 @@ import "./CartPage.css";
 const CartPage = () => {
   const [cart, setCart] = useState({ products: [] });
   const [loading, setLoading] = useState(false);
+
   const { updateCart } = useCart();
   const { auth } = useAuth();
   const navigate = useNavigate();
+
   const [discountCode, setDiscountCode] = useState("");
   const [discountError, setDiscountError] = useState("");
   const [productDiscountCodes, setProductDiscountCodes] = useState({});
+
   const { addToast } = useContext(ToastContext);
 
   useEffect(() => {
@@ -49,6 +52,7 @@ const CartPage = () => {
     fetchCart();
   }, [auth.user]);
 
+  // Tăng hoặc giảm số lượng
   const updateQuantity = async (productId, increment) => {
     try {
       if (increment > 0) {
@@ -66,6 +70,7 @@ const CartPage = () => {
     }
   };
 
+  // Xóa sản phẩm khỏi giỏ
   const removeItem = async (productId) => {
     try {
       await apiClient.delete(`/cart/product/${productId}`);
@@ -79,6 +84,7 @@ const CartPage = () => {
     }
   };
 
+  // Áp dụng mã giảm giá cho cả giỏ hàng
   const applyCartDiscount = async () => {
     try {
       const response = await apiClient.post("/cart/apply-discount", {
@@ -101,6 +107,7 @@ const CartPage = () => {
     }
   };
 
+  // Bỏ mã giảm giá (giỏ hàng)
   const removeCartDiscount = async () => {
     try {
       const response = await apiClient.post("/cart/remove-discount");
@@ -113,6 +120,7 @@ const CartPage = () => {
     }
   };
 
+  // Áp dụng mã giảm giá cho 1 sản phẩm
   const applyProductDiscount = async (productId, discountCode) => {
     try {
       const response = await apiClient.post("/cart/product/apply-discount", {
@@ -120,6 +128,7 @@ const CartPage = () => {
         discountCode,
       });
       setCart(response.data);
+      // Xóa input discountCode cho sản phẩm đó
       setProductDiscountCodes((prevCodes) => {
         const newCodes = { ...prevCodes };
         delete newCodes[productId];
@@ -136,6 +145,7 @@ const CartPage = () => {
     }
   };
 
+  // Bỏ mã giảm giá trên 1 sản phẩm
   const removeProductDiscount = async (productId) => {
     try {
       const response = await apiClient.delete(
@@ -149,14 +159,49 @@ const CartPage = () => {
     }
   };
 
+  // ------------ Tính toán hiển thị -------------
+  // 1. Lấy giá tổng từ backend (đã trừ discount)
   const getTotalPrice = () => {
+    // cart.totalAmount = Giá cuối cùng sau khi backend đã tính discount
     return cart ? cart.totalAmount : 0;
   };
 
-  const getTotalQuantity = () => {
-    return cart ? cart.totalQuantity : 0;
+  // 2. Lấy tổng discount (chỉ để hiển thị, KHÔNG trừ thêm)
+  const getTotalDiscount = () => {
+    if (!cart || !cart.products) return 0;
+    let totalDiscount = 0;
+
+    // Discount trên từng sản phẩm
+    totalDiscount += cart.products.reduce((sum, item) => {
+      if (item.discount) {
+        const discountAmount = item.discount.isPercentage
+          ? (item.price * item.discount.value * item.quantity) / 100
+          : item.discount.value * item.quantity;
+        return sum + discountAmount;
+      }
+      return sum;
+    }, 0);
+
+    // Discount cho cả giỏ
+    if (cart.discountCode) {
+      // Để tính "hiển thị" discount code giỏ hàng,
+      // ta tính: discount.value (hoặc phần trăm) áp trên total cart BEFORE discount.
+      // Nếu backend đã gộp discount product + cart, ta chỉ hiển thị tham khảo.
+
+      const cartTotalBeforeDiscount = cart.products.reduce((sum, item) => {
+        return sum + item.price * item.quantity;
+      }, 0);
+
+      const cartDiscountAmount = cart.discountCode.isPercentage
+        ? (cartTotalBeforeDiscount * cart.discountCode.value) / 100
+        : cart.discountCode.value;
+      totalDiscount += cartDiscountAmount;
+    }
+
+    return totalDiscount;
   };
 
+  // Format tiền VNĐ
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN", {
       style: "currency",
@@ -164,6 +209,7 @@ const CartPage = () => {
     });
   };
 
+  // Kiểm tra kho + điều hướng sang checkout
   const handleProceedToCheckout = async () => {
     if (!cart || cart.products.length === 0) {
       addToast("Giỏ hàng của bạn đang trống.", "warning");
@@ -180,8 +226,18 @@ const CartPage = () => {
         products: cartProducts,
       });
 
-      if (response.data.message === "Tất cả sản phẩm có sẵn trong kho.") {
+      // Kiểm tra message server trả về
+      if (
+        response.data.message === "Tất cả sản phẩm đều còn trong kho." ||
+        response.data.message === "Tất cả sản phẩm có sẵn trong kho."
+      ) {
         navigate("/checkout", { state: { cartItems: cart.products } });
+      } else {
+        // Trường hợp message khác => có thể do server trả cảnh báo
+        addToast(
+          response.data.message || "Không thể chuyển sang thanh toán",
+          "danger"
+        );
       }
     } catch (error) {
       if (error.response && error.response.data) {
@@ -191,6 +247,11 @@ const CartPage = () => {
             `Các sản phẩm ${nameOfOutOfStockItems.join(", ")} đã hết hàng.`,
             "danger"
           );
+        } else {
+          addToast(
+            error.response.data.message || "Lỗi khi kiểm tra tồn kho.",
+            "danger"
+          );
         }
       } else {
         addToast("Lỗi khi kiểm tra tồn kho. Vui lòng thử lại sau.", "danger");
@@ -198,38 +259,12 @@ const CartPage = () => {
     }
   };
 
-  const getTotalDiscount = () => {
-    if (!cart || !cart.products) return 0;
-    let totalDiscount = 0;
-
-    totalDiscount += cart.products.reduce((total, item) => {
-      if (item.discount) {
-        const discountAmount = item.discount.isPercentage
-          ? (item.price * item.discount.value * item.quantity) / 100
-          : item.discount.value * item.quantity;
-        return total + discountAmount;
-      }
-      return total;
-    }, 0);
-
-    if (cart.discountCode) {
-      const cartTotalBeforeDiscount = cart.products.reduce((total, item) => {
-        return total + item.price * item.quantity;
-      }, 0);
-
-      const cartDiscountAmount = cart.discountCode.isPercentage
-        ? (cartTotalBeforeDiscount * cart.discountCode.value) / 100
-        : cart.discountCode.value;
-      totalDiscount += cartDiscountAmount;
-    }
-
-    return totalDiscount;
-  };
-
+  // ------------- Render -------------
   return (
     <div className="cart-page">
       <Container className="cart-container my-5">
         <Row className="cart-row">
+          {/* Cột danh sách sản phẩm */}
           <Col xl={8} className="cart-col">
             {loading ? (
               <div className="cart-loading text-center" id="loading">
@@ -406,6 +441,7 @@ const CartPage = () => {
             )}
           </Col>
 
+          {/* Cột tóm tắt đơn hàng */}
           <Col xl={4} className="cart-col">
             <Card border="light" className="cart-summary-card">
               <Card.Header className="cart-summary-header">
@@ -417,7 +453,14 @@ const CartPage = () => {
                     <Row className="cart-summary-row">
                       <Col className="cart-summary-label">Thành tiền:</Col>
                       <Col className="cart-summary-value text-end">
-                        {formatPrice(getTotalPrice())}
+                        {/* Nếu bạn muốn hiển thị tổng trước giảm giá, 
+                            có thể tính ở FE: sum(item.price * item.quantity) */}
+                        {formatPrice(
+                          cart.products.reduce(
+                            (sum, item) => sum + item.price * item.quantity,
+                            0
+                          )
+                        )}
                       </Col>
                     </Row>
                     <Row className="cart-summary-row">
@@ -433,7 +476,8 @@ const CartPage = () => {
                       </Col>
                       <Col className="cart-summary-total-value text-end">
                         <strong>
-                          {formatPrice(getTotalPrice() - getTotalDiscount())}
+                          {/* Sử dụng cart.totalAmount trực tiếp từ backend */}
+                          {formatPrice(getTotalPrice())}
                         </strong>
                       </Col>
                     </Row>
@@ -457,6 +501,7 @@ const CartPage = () => {
                           Áp dụng
                         </Button>
                       </InputGroup>
+                      {/* Nếu đã có mã discountCode được áp, hiển thị */}
                       {cart.discountCode && (
                         <div className="cart-discount-applied">
                           <Badge

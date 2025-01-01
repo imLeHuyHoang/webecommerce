@@ -1,216 +1,121 @@
-/* src/components/Profile.css */
+/* Profile.css */
 
-/* General Styles */
+/* General Styles for the Profile Page Section */
 .profile-page-section {
-  padding: 20px 0;
-  display: flex;
-  justify-content: center;
-  background-image: url("../../assets/giangsinh4.avif");
+  width: 100%;
+  min-height: 100vh;
+  background-image: url("../../assets/giangsinh4.avif"); /* Background image */
   background-size: cover;
   background-position: center;
-  min-height: 90vh; /* Ensure the element has a minimum height of 100% of the viewport height */
+  padding: 2rem 0;
+  box-sizing: border-box;
+  opacity: 0.8;
 }
 
+/* Container to center content and provide padding */
 .profile-page-container {
-  background-color: #ffffff; /* White background */
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   max-width: 1200px;
-  opacity: 0.96;
+  margin: 0 auto;
+  background-color: #ffffff; /* White background for content */
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
-.profile-page-loading-text {
-  font-size: 1.2rem;
-  color: #6c757d; /* Medium gray text */
-}
-
-/* Welcome Section */
+/* Welcome Section Styles */
 .profile-page-welcome {
-  margin-bottom: 20px;
+  margin-bottom: 2.5rem;
+  text-align: center;
 }
 
 .profile-page-title {
-  color: #343a40; /* Dark gray text */
-  font-weight: bold;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
 .profile-page-subtitle {
-  color: #6c757d; /* Medium gray text */
+  font-size: 1rem;
+  color: #6c757d; /* Muted text color */
 }
 
-/* Order Status Section */
-.profile-page-order-status {
-  margin-bottom: 20px;
+/* New Layout Container */
+.profile-page-new-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.profile-page-heading {
-  color: #343a40; /* Dark gray text */
-  font-weight: bold;
+/* Row Styles */
+.profile-page-row {
+  width: 100%;
 }
 
-.profile-page-status-card {
-  background-color: #f8f9fa; /* Light background color */
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+/* Row 2: User Info and Addresses */
+.row-user-info-address {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
 }
 
-.profile-page-status-title {
-  text-wrap: nowrap;
-  color: #343a40; /* Dark gray text */
-  font-weight: bold;
+/* Column Styles */
+.profile-page-col {
+  flex: 1;
 }
 
-.profile-page-status-count {
-  color: #007bff; /* Bootstrap primary color */
-  font-weight: bold;
-}
+/* Specific Column Styles (Optional) */
 
-/* User Info Section */
-.profile-page-user-info {
-  margin-bottom: 20px;
-}
-
-.profile-page-subheading {
-  color: #343a40; /* Dark gray text */
-  font-weight: bold;
-}
-
-.profile-page-label {
-  color: #6c757d; /* Medium gray text */
-}
-
-.profile-page-info {
-  background-color: #f8f9fa; /* Light background color */
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.profile-page-edit-btn {
-  background-color: #343a40; /* Dark gray background */
-  border-color: #343a40;
-  color: #ffffff; /* White text */
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-.profile-page-edit-btn:hover {
-  background-color: #23272b; /* Darker gray on hover */
-  border-color: #1d2124;
-}
-
-/* Address Section */
-.profile-page-addresses {
-  margin-bottom: 20px;
-}
-
-.profile-page-address-card {
-  background-color: #f8f9fa; /* Light background color */
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-}
-
-.profile-page-address-title {
-  color: #343a40; /* Dark gray text */
-  font-weight: bold;
-}
-
-.profile-page-address-line {
-  color: #6c757d; /* Medium gray text */
-}
-
-.profile-page-edit-address-btn {
-  background-color: #343a40; /* Dark gray background */
-  border-color: #343a40;
-  color: #ffffff; /* White text */
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-.profile-page-edit-address-btn:hover {
-  background-color: #23272b; /* Darker gray on hover */
-  border-color: #1d2124;
-}
-
-.profile-page-delete-address-btn {
-  background-color: #dc3545; /* Bootstrap danger color */
-  border-color: #dc3545;
-  color: #ffffff; /* White text */
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-.profile-page-delete-address-btn:hover {
-  background-color: #c82333; /* Darker danger color on hover */
-  border-color: #bd2130;
-}
-
-.profile-page-add-address-btn {
-  background-color: #343a40; /* Dark gray background */
-  border-color: #343a40;
-  color: #ffffff; /* White text */
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-.profile-page-add-address-btn:hover {
-  background-color: #23272b; /* Darker gray on hover */
-  border-color: #1d2124;
-}
-
-/* Edit Form Section */
-.profile-page-edit-personal,
-.profile-page-edit-addresses {
-  margin-bottom: 20px;
-}
-
-.profile-page-buttons {
-  text-align: right;
-}
-
-.profile-page-cancel-btn {
-  background-color: #6c757d; /* Bootstrap secondary color */
-  border-color: #6c757d;
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-.profile-page-cancel-btn:hover {
-  background-color: #5a6268; /* Darker secondary color on hover */
-  border-color: #545b62;
-}
-
-.profile-page-save-btn {
-  background-color: #007bff; /* Bootstrap primary color */
-  border-color: #007bff;
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-.profile-page-save-btn:hover {
-  background-color: #0056b3; /* Darker blue on hover */
-  border-color: #0056b3;
-}
-
-/* Toast Notification */
-.toast-container {
+/* Toast Notification Styles (Assuming basic styles) */
+.ToastNotification {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
-  z-index: 1050;
+  background-color: #333333;
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 4px;
+  opacity: 0.9;
+  z-index: 1000;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.toast {
-  background-color: #343a40; /* Dark gray background for toast */
-  color: #ffffff; /* White text for toast */
-  border-radius: 8px;
-  padding: 15px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.toast.hide {
+.ToastNotification.hide {
   opacity: 0;
-  transform: translateY(-20px);
+  visibility: hidden;
+}
+
+/* Responsive Styles */
+
+/* Tablets and above */
+@media (min-width: 768px) {
+  .row-user-info-address {
+    flex-direction: row;
+  }
+}
+
+/* Mobile Devices */
+@media (max-width: 767px) {
+  .row-user-info-address {
+    flex-direction: column;
+  }
+
+  .profile-page-container {
+    padding: 1.5rem;
+  }
+
+  .profile-page-welcome h1 {
+    font-size: 1.5rem;
+  }
+
+  .profile-page-welcome p {
+    font-size: 0.9rem;
+  }
+
+  .ToastNotification {
+    bottom: 10px;
+    right: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
 }

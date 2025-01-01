@@ -1,25 +1,33 @@
 /* CarouselSection.css */
 
-.carousel-image {
-  height: 65vh;
-  object-fit: cover;
-}
 .carousel-items {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+.carousel-image {
+  width: 100%;
+  height: 60vh;
+  object-fit: cover;
+  border: solid #ddd;
+  border-radius: 10px;
+}
+
+/* Caption Styling */
 .carousel-caption {
   background-color: rgba(0, 0, 0, 0.5);
-  padding: 20px;
+  padding: 20px 30px;
   border-radius: 10px;
+  max-width: 80%;
+  margin: 0 auto;
 }
 
 .carousel-caption h3 {
   font-size: 2rem;
   font-weight: bold;
   color: #fff;
+  margin-bottom: 10px;
 }
 
 .carousel-caption p {
@@ -27,7 +35,77 @@
   color: #ddd;
 }
 
-.carousel-image {
-  border: solid #ddd;
-  border-radius: 10px;
+/* Responsive Styles */
+
+/* Tablet Devices */
+@media (max-width: 992px) {
+  .carousel-image {
+    height: 55vh;
+  }
+
+  .carousel-caption {
+    padding: 18px 25px;
+  }
+
+  .carousel-caption h3 {
+    font-size: 1.8rem;
+  }
+
+  .carousel-caption p {
+    font-size: 1.1rem;
+  }
+}
+
+/* Landscape Phones and Smaller Devices */
+@media (max-width: 768px) {
+  .carousel-image {
+    height: 45vh;
+  }
+
+  .carousel-caption {
+    padding: 15px 20px;
+  }
+
+  .carousel-caption h3 {
+    font-size: 1.6rem;
+  }
+
+  .carousel-caption p {
+    font-size: 1rem;
+  }
+}
+
+/* Portrait Phones */
+@media (max-width: 576px) {
+  .carousel-image {
+    height: 35vh;
+  }
+
+  .carousel-caption {
+    padding: 12px 15px;
+  }
+
+  .carousel-caption h3 {
+    font-size: 1.4rem;
+  }
+
+  .carousel-caption p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Additional Enhancements */
+
+/* Ensure the carousel takes full width on smaller devices */
+@media (max-width: 768px) {
+  .carousel-section {
+    padding: 0 10px;
+  }
+}
+
+/* Adjust image border radius on very small screens */
+@media (max-width: 576px) {
+  .carousel-image {
+    border-radius: 5px;
+  }
 }

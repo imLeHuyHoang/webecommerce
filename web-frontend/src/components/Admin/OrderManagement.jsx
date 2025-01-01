@@ -166,6 +166,40 @@ const ManageOrders = () => {
     applyFilters();
   };
 
+  // =============== ( Mới thêm ) ===============
+  // Admin bấm "Đã giao hàng" -> chuyển shippingStatus = "shipped"
+  const handleMarkAsShipped = async (orderId) => {
+    if (!window.confirm("Xác nhận đã giao hàng?")) return;
+
+    setUpdatingOrderId(orderId);
+    try {
+      const response = await apiClient.patch(`/order/admin/${orderId}`, {
+        shippingStatus: "shipped",
+      });
+
+      if (response.status === 200) {
+        setToast({
+          show: true,
+          message: "Đơn hàng đã chuyển sang trạng thái shipped",
+          variant: "success",
+        });
+        applyFilters();
+      } else {
+        throw new Error("Cập nhật đơn hàng thất bại");
+      }
+    } catch (error) {
+      console.error("Lỗi đánh dấu đã giao hàng:", error);
+      setToast({
+        show: true,
+        message: "Không thể đánh dấu đã giao hàng",
+        variant: "danger",
+      });
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+  // =============== ( Hết mới thêm ) ===============
+
   const getPaymentStatusClasses = (status) => {
     switch (status.toLowerCase()) {
       case "paid":
@@ -450,6 +484,25 @@ const ManageOrders = () => {
                           >
                             Sửa
                           </button>
+
+                          {/* ( Mới thêm ) Nút "Đã giao hàng" cho admin */}
+                          {order.shippingStatus === "shipping" && (
+                            <button
+                              className="btn btn-success btn-sm me-2"
+                              onClick={() => handleMarkAsShipped(order._id)}
+                              disabled={updatingOrderId === order._id}
+                            >
+                              {updatingOrderId === order._id ? (
+                                <span
+                                  className="spinner-border spinner-border-sm"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></span>
+                              ) : (
+                                "Đã giao hàng"
+                              )}
+                            </button>
+                          )}
 
                           <button
                             className="btn btn-danger btn-sm btn-delete"

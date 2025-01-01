@@ -5,11 +5,17 @@ import apiClient from "../../utils/api-client";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import "./LoginPage.css";
 
+// **CHỈNH SỬA**: import useCart để gọi updateCart
+import { useCart } from "../../context/CartContext";
+
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // **CHỈNH SỬA**: Lấy updateCart từ CartContext
+  const { updateCart } = useCart();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -25,7 +31,13 @@ const Login = () => {
         setError("Không nhận được thông tin người dùng từ máy chủ.");
         return;
       }
+
+      // Gọi hàm login từ AuthContext
       login(user, accessToken);
+
+      // **CHỈNH SỬA**: Sau khi login, gọi updateCart() để đồng bộ giỏ hàng
+      await updateCart();
+
       navigate("/");
     } catch (error) {
       const errorMessage =
@@ -46,7 +58,12 @@ const Login = () => {
         setError("Không nhận được thông tin người dùng từ máy chủ.");
         return;
       }
+
       login(user, accessToken);
+
+      // **CHỈNH SỬA**: Đồng bộ cartCount ngay sau khi login google
+      await updateCart();
+
       navigate("/");
     } catch (error) {
       const errorMessage =

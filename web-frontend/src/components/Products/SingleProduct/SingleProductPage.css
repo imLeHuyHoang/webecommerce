@@ -1,4 +1,5 @@
 /* src/components/SingleProductPage/SingleProductPage.css */
+
 /* General Styles */
 .single-product-page {
   background-size: cover;
@@ -8,9 +9,6 @@
 }
 
 .container-single-product {
-  /* Path to your background image */
-  /* set độ mờ cho background */
-
   background-color: white;
   margin-top: 0px;
   padding: 40px;
@@ -18,46 +16,46 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
 }
+
 .quantity-controls p {
   margin: 0px;
 }
+
 .container-single-product:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* QuantityControls.css */
-
-/* Container for Quantity Controls and Compare Button */
+/* Quantity Controls */
 .quantity-controls {
   display: flex;
   align-items: center;
   justify-content: left;
-  margin-bottom: 1rem; /* Equivalent to mb-3 */
+  margin-bottom: 1rem;
 }
 
 /* Common Button Styles */
 .button {
-  background-color: #f0f0f0; /* Light gray background */
-  border: 1px solid #ccc; /* Light gray border */
-  color: #333; /* Dark text color */
-  padding: 0.5rem 1rem; /* Padding for better click area */
-  font-size: 1rem; /* Font size */
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #333;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
   margin-left: 20px;
-  cursor: pointer; /* Pointer cursor on hover */
-  border-radius: 20px; /* Rounded corners */
-  transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+  cursor: pointer;
+  border-radius: 20px;
+  transition: background-color 0.3s, color 0.3s;
 }
-/* Decrease button specific styles */
+
+/* Decrease Button */
 .btn-decrease {
   padding: 5px 20px;
   border: 1px solid #000;
   border-radius: 25px;
-  background-color: #f0f0f0;
+  background-color: #ffffff;
   color: #000;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
-  background-color: #ffffff;
   margin-right: 10px;
 }
 
@@ -71,18 +69,17 @@
   cursor: not-allowed;
 }
 
-/* Increase button specific styles */
+/* Increase Button */
 .btn-increase {
   margin-left: 10px;
   padding: 5px 20px;
   border: 1px solid #000;
   border-radius: 25px;
-  background-color: #f0f0f0;
+  background-color: #ffffff;
   color: #000;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
-  background-color: #ffffff;
 }
 
 .btn-increase:hover {
@@ -90,45 +87,42 @@
   transform: translateY(-2px);
 }
 
-.img-sale {
-  width: 100%;
-  height: 160px;
-}
 .btn-increase:disabled {
   background-color: #e0e0e0;
   cursor: not-allowed;
 }
 
-/* Quantity text styles */
+/* Quantity Text */
 .text-quantity {
   display: inline-block;
   margin: 0 10px;
   font-size: 18px;
   font-weight: bold;
 }
+
 /* Disabled Button Styles */
 .button:disabled {
-  background-color: #e0e0e0; /* Slightly darker gray */
-  color: #a0a0a0; /* Gray text */
-  cursor: not-allowed; /* Not-allowed cursor */
+  background-color: #e0e0e0;
+  color: #a0a0a0;
+  cursor: not-allowed;
 }
 
-/* Compare Button Specific Styles */
+/* Compare Button */
 .compare-btn {
-  background-color: #007bff; /* Bootstrap primary color */
-  border: none; /* Remove border */
-  color: #fff; /* White text */
+  background-color: #007bff;
+  border: none;
+  color: #fff;
 }
 
 .compare-btn:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #0056b3;
 }
 
 /* Quantity Text Styling */
 .text-quantity {
   margin-top: 7px;
-  font-size: 1rem; /* Font size */
-  color: #000000; /* Text color */
+  font-size: 1rem;
+  color: #000000;
   background-color: white;
 }
 
@@ -137,46 +131,15 @@
   background-color: transparent;
   padding: 0;
 }
+
 .button-plus {
   margin-right: 20px;
-}
-
-.button-74 {
-  background-color: #333333; /* Dark background color */
-  border: 2px solid #888888; /* Grey border color */
-  border-radius: 30px;
-  height: 40px;
-  box-shadow: #888888 4px 4px 0 0; /* Grey shadow color */
-  color: #ffffff; /* White text color */
-  cursor: pointer;
-  display: inline-block;
-  font-weight: 500;
-  font-size: 16px;
-  text-align: center;
-  text-decoration: none;
-  user-select: none;
-  transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
-}
-
-.button-74:hover {
-  background-color: #444444; /* Slightly lighter dark background on hover */
-  color: #ffffff;
-  box-shadow: #666666 4px 4px 0 0; /* Darker grey shadow on hover */
-}
-
-.button-74:active {
-  box-shadow: #666666 2px 2px 0 0; /* Darker grey shadow on active */
-  transform: translate(2px, 2px);
 }
 
 @media (min-width: 768px) {
   .custom-breadcrumb-item {
     padding: 0;
     margin-right: 25px;
-  }
-  .button-74 {
-    min-width: 120px;
-    padding: 0 30px;
   }
 }
 
@@ -200,7 +163,7 @@
   font-weight: 500;
 }
 
-/* Image Gallery Styles */
+/* Image Gallery */
 .image-gallery {
   text-align: center;
 }
@@ -255,7 +218,7 @@
   text-decoration: none !important;
 }
 
-/* Product Details Styles */
+/* Product Details */
 .product-details {
   padding: 15px;
 }
@@ -298,12 +261,12 @@
   border-radius: 5px;
 }
 
-/* Buttons */
-.add-to-cart-btn {
+/* Add to Cart Button */
+.add-and-attributes .add-to-cart-btn {
   width: 100%;
   padding: 12px;
-  font-size: 1.1rem;
-  border-radius: 8px;
+  font-size: 0.9rem;
+  border-radius: 25px !important;
   transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
 }
 
@@ -317,11 +280,12 @@
   transform: translateY(0);
 }
 
+/* Attributes Button */
 .attributes-btn {
   width: 100%;
   padding: 12px;
-  font-size: 1.1rem;
-  border-radius: 8px;
+  font-size: 0.9rem;
+  border-radius: 25px;
   background-color: #17a2b8;
   color: #ffffff;
   transition: background-color 0.3s, transform 0.2s;
@@ -336,7 +300,7 @@
   transform: translateY(0);
 }
 
-/* Attributes Modal Styles */
+/* Attributes Modal */
 .list-group-item {
   background-color: #f8f9fa;
   border: none;
@@ -379,6 +343,28 @@
 .toast.hide {
   opacity: 0;
   transform: translateY(-20px);
+}
+
+/* Back Button */
+.back-button {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.3s;
+}
+
+.back-button i {
+  margin-right: 5px;
+}
+
+.back-button:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.1);
 }
 
 /* Responsive Styles */

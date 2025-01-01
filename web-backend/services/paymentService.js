@@ -89,6 +89,7 @@ exports.processZaloPayPayment = async (order, productDetails) => {
     const zaloPayResponse = await this.createOrder(orderInfo);
 
     if (zaloPayResponse.return_code === 1) {
+      // Lưu appTransId
       order.payment.appTransId = appTransId;
       await order.save();
 
@@ -107,21 +108,20 @@ exports.refundZaloPayOrder = async (order) => {
   try {
     console.log("Using zptransid for refund:", order.payment.transactionId);
 
+    // Gọi hàm refundOrder
     const { refundResult, mRefundId } = await this.refundOrder(
-      order.payment.transactionId, // Đây phải là zp_trans_id từ callback
+      order.payment.transactionId,
       parseInt(order.total, 10),
       "Order Cancellation Refund"
     );
 
-    // Update refund information in the order
+    // Update refund fields:
     order.refund = {
       refundId: refundResult.refundid,
       mRefundId: mRefundId,
       status: "processing",
       amount: parseInt(order.total, 10),
     };
-
-    // Save the order with updated refund information
     await order.save();
 
     return {
@@ -143,18 +143,15 @@ exports.refundOrder = async (
   description = "Customer Refund"
 ) => {
   const timestamp = Date.now();
-
-  const uid = `${timestamp}${Math.floor(111 + Math.random() * 999)}`; // unique id
+  const uid = `${timestamp}${Math.floor(111 + Math.random() * 999)}`;
   const mRefundId = `${moment().format("YYMMDD")}_${
     zalopayConfig.appid
   }_${uid}`;
 
-  const zpTransIdStr = String(zpTransId);
-
   const data = {
     appid: parseInt(zalopayConfig.appid, 10),
     mrefundid: mRefundId,
-    zptransid: zpTransIdStr, // Sử dụng chuỗi
+    zptransid: String(zpTransId),
     amount: parseInt(amount, 10),
     timestamp: parseInt(timestamp, 10),
     description: description,
@@ -177,7 +174,6 @@ exports.refundOrder = async (
     );
     console.log("ZaloPay Refund Response:", response.data);
 
-    // Trả về mRefundId cùng với refundResult
     return { refundResult: response.data, mRefundId };
   } catch (error) {
     console.error(

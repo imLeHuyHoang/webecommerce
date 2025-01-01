@@ -3,6 +3,7 @@ const router = express.Router();
 const orderController = require("../controllers/orderController");
 const authMiddleware = require("../middleware/auth");
 const authAdminMiddleware = require("../middleware/authAdmin");
+
 // Public routes
 router.post("/create", authMiddleware.verifyToken, orderController.createOrder);
 
@@ -23,7 +24,6 @@ router.patch(
   authMiddleware.verifyToken,
   orderController.cancelOrder
 );
-
 router.get(
   "/:orderId/refund-status",
   authMiddleware.verifyToken,

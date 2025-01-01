@@ -142,6 +142,25 @@ function MyOrders() {
     }
   };
 
+  // =============== ( Mới Thêm ) ===============
+  // Xử lý user bấm "Tôi đã nhận được hàng"
+  const handleMarkAsReceived = async (orderId) => {
+    try {
+      // Gọi API chuyển trạng thái sang shipped
+      await apiClient.patch(`/order/admin/${orderId}`, {
+        shippingStatus: "shipped",
+      });
+
+      alert("Cảm ơn bạn! Đơn hàng đã được đánh dấu là đã nhận.");
+      // Gọi lại fetchOrders() để cập nhật danh sách
+      fetchOrders();
+    } catch (error) {
+      console.error("Error marking order as received:", error);
+      alert("Không thể cập nhật trạng thái đơn hàng. Vui lòng thử lại!");
+    }
+  };
+  // =============== ( Hết Mới Thêm ) ===============
+
   if (!auth.user) {
     return (
       <p className="my-order-page-no-login text-center">
@@ -221,7 +240,6 @@ function MyOrders() {
               <option value="processing">Đang xử lý</option>
               <option value="shipping">Đang giao hàng</option>
               <option value="shipped">Đã giao</option>
-              <option value="delivered">Đã nhận</option>
               <option value="cancelled">Đã hủy</option>
               <option value="">Tất cả trạng thái</option>
             </select>
@@ -303,6 +321,15 @@ function MyOrders() {
                             onClick={() => openCancelModal(order)}
                           >
                             Hủy đơn hàng
+                          </button>
+                        )}
+                        {/* ( Mới Thêm ) Nút "Tôi đã nhận được hàng" */}
+                        {order.shippingStatus === "shipping" && (
+                          <button
+                            className="btn btn-success mt-2"
+                            onClick={() => handleMarkAsReceived(order._id)}
+                          >
+                            Tôi đã nhận được hàng
                           </button>
                         )}
                       </div>
@@ -413,10 +440,6 @@ function MyOrders() {
                                   <p>
                                     <strong>Thông báo:</strong>{" "}
                                     {refundCheckResult.message}
-                                  </p>
-                                  <p>
-                                    <strong>Mã hoàn tiền (mRefundId):</strong>{" "}
-                                    {refundCheckResult.mRefundId}
                                   </p>
                                 </div>
                               )}

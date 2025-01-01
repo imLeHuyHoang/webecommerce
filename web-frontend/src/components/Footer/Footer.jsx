@@ -56,7 +56,7 @@ function Footer() {
                 Bắc Từ Liêm, Hà Nội
               </li>
               <li>
-                <i className="fas fa-envelope mr-3"></i> support@example.com
+                <i className="fas fa-envelope mr-3"></i> support@gmail.com
               </li>
               <li>
                 <i className="fas fa-phone mr-3"></i> +123 456 789

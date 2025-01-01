@@ -5,12 +5,7 @@ import "./ProductSidebar.css";
 import apiClient from "../../utils/api-client";
 import ProductSidebarSkeleton from "./Skeleton/ProductSidebarSkeleton";
 
-function ProductSidebar({
-  onCategoryChange,
-  onFilterChange,
-  filters,
-  showFilters,
-}) {
+function ProductSidebar({ onCategoryChange, onFilterChange, filters }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,6 +57,9 @@ function ProductSidebar({
       onCategoryChange(categoryId);
       onFilterChange("category", categoryId);
     }
+
+    // Khi người dùng chọn xong trên mobile thì ẩn sidebar
+    setIsSidebarVisible(false);
   };
 
   const handleSearchSubmit = (e) => {
@@ -90,7 +88,7 @@ function ProductSidebar({
 
   return (
     <>
-      {/* Nút Bộ lọc chỉ hiển thị trên thiết bị di động */}
+      {/* Nút Bộ lọc chỉ hiển thị trên thiết bị di động (d-md-none) */}
       <Button
         className="product-sidebar-filter-toggle-button d-md-none"
         onClick={() => setIsSidebarVisible(true)}
@@ -107,10 +105,17 @@ function ProductSidebar({
       ></div>
 
       <div
-        className={`product-sidebar-container ${showFilters ? "show" : ""} ${
+        className={`product-sidebar-container ${
           isSidebarVisible ? "show" : ""
         }`}
       >
+        {/* Nút đóng chỉ hiển thị trên mobile (tự quy ước class d-md-none) */}
+        <div className="d-md-none text-end">
+          <Button variant="light" onClick={handleCloseSidebar}>
+            Đóng
+          </Button>
+        </div>
+
         {/* Categories */}
         <h4 className="product-sidebar-title">Danh mục</h4>
         {error && (

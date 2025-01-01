@@ -89,20 +89,39 @@
   margin-bottom: 10px;
 }
 
-/* Reply Button */
-.reply-button {
-  background: none;
-  border: none;
-  color: #007bff; /* Bootstrap primary color */
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.3s, text-decoration 0.3s;
+/* Base Button Style */
+.comment-button {
+  background-color: #ffffff; /* White background */
+  color: #000000; /* Black text */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 5px 10px; /* Padding for size */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Ellipsis for overflowing text */
+  font-size: 0.9rem; /* Consistent font size */
+  display: inline-block; /* Inline-block for proper spacing */
+  text-align: center; /* Center text */
+  max-width: 150px; /* Adjust as needed */
 }
 
-.reply-button:hover {
-  color: #0056b3; /* Darker blue on hover */
-  text-decoration: underline;
+/* Hover Effect for Base Buttons */
+.comment-button:hover {
+  background-color: #6c757d; /* Gray background on hover */
+  color: #ffffff; /* White text on hover */
+}
+
+/* Delete Button Specific Styles */
+.comment-button.delete-button {
+  color: #d9534f; /* Red text */
+  border: none; /* Remove border */
+}
+
+.comment-button.delete-button:hover {
+  background-color: #d9534f; /* Red background on hover */
+  color: #ffffff; /* White text on hover */
 }
 
 /* Reply Form */
@@ -128,40 +147,6 @@
   margin-top: 10px;
 }
 
-.reply-buttons .btn {
-  border-radius: 20px; /* Rounded buttons */
-  padding: 5px 15px;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.reply-buttons .btn-primary {
-  background-color: #007bff;
-  border: none;
-  color: #fff; /* White text */
-}
-
-.reply-buttons .btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.reply-buttons .btn-primary:active {
-  transform: scale(0.98);
-}
-
-.reply-buttons .btn-secondary {
-  background-color: #fff;
-  border: 1px solid #007bff;
-  color: #007bff; /* Blue text */
-}
-
-.reply-buttons .btn-secondary:hover {
-  background-color: #e0e0e0;
-}
-
-.reply-buttons .btn-secondary:active {
-  transform: scale(0.98);
-}
-
 /* Replies Container */
 .replies {
   margin-top: 15px;
@@ -183,24 +168,14 @@
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-.add-comment-form .btn {
+.add-comment-form .comment-button {
   border-radius: 20px; /* Rounded buttons */
   padding: 10px 20px;
-  transition: background-color 0.3s, transform 0.2s;
+  max-width: none; /* Remove max-width for larger buttons */
 }
 
-.add-comment-form .btn-primary {
-  background-color: #007bff; /* Blue background */
-  border: none;
-  color: #fff; /* White text */
-}
-
-.add-comment-form .btn-primary:hover {
+.add-comment-form .comment-button:hover {
   background-color: #0056b3;
-}
-
-.add-comment-form .btn-primary:active {
-  transform: scale(0.98);
 }
 
 /* Spinner Container */
@@ -261,58 +236,13 @@
     font-size: 0.85rem;
   }
 
-  .reply-buttons .btn {
+  .reply-buttons .comment-button {
     padding: 5px 10px;
     font-size: 0.8rem;
   }
 
-  .add-comment-form .btn {
+  .add-comment-form .comment-button {
     padding: 8px 16px;
     font-size: 0.9rem;
   }
-}
-
-/* Comment Actions */
-.comment-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 5px;
-}
-
-/* Edit and Delete Buttons */
-.edit-button,
-.delete-button {
-  background: none;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.3s, transform 0.2s;
-}
-
-/* Edit Button */
-.edit-button {
-  color: #007bff; /* Blue for edit */
-}
-
-.edit-button:hover {
-  color: #0056b3;
-  text-decoration: underline;
-}
-
-/* Delete Button */
-.delete-button {
-  color: #007bff; /* Blue for delete */
-}
-
-.delete-button:hover {
-  color: #0056b3;
-  text-decoration: underline;
-}
-
-/* Active click effect */
-.edit-button:active,
-.delete-button:active {
-  transform: scale(0.95);
 }

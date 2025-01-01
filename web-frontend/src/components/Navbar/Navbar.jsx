@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useAuthAdmin } from "../../context/AuthAdminContext";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/CartContext"; // <-- CHỈNH SỬA
 import "./Navbar.css";
 import LinkWithIcon from "./LinkWithIcon";
 
@@ -13,7 +13,10 @@ function Navbar() {
 
   const { authAdmin, logoutAdmin } = useAuthAdmin();
   const { admin, isLoading } = authAdmin;
-  const { cartCount } = useCart();
+
+  // **CHỈNH SỬA**: Lấy cartCount, resetCartCount (hoặc updateCart)
+  const { cartCount, resetCartCount } = useCart();
+
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -27,11 +30,10 @@ function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mar">
       <div className="container-fluid">
-        {/* Điều kiện để đặt thuộc tính 'to' dựa trên trạng thái admin */}
         <NavLink
           to={admin ? "/admin/productmanagement" : "/"}
           className="navbar-brand"
-          onClick={closeMenu} // Đảm bảo menu đóng khi nhấp vào
+          onClick={closeMenu}
         >
           TechStore
         </NavLink>
@@ -132,6 +134,8 @@ function Navbar() {
                     className="nav-link btn btn-link"
                     onClick={() => {
                       logoutAdmin();
+                      // **CHỈNH SỬA**: Sau khi admin logout => resetCartCount (nếu muốn)
+                      resetCartCount();
                       closeMenu();
                       navigate("/admin-login", { replace: true });
                     }}
@@ -171,6 +175,8 @@ function Navbar() {
                     className="nav-link btn btn-link"
                     onClick={() => {
                       logout();
+                      // **CHỈNH SỬA**: Sau khi user logout => resetCartCount
+                      resetCartCount();
                       closeMenu();
                       navigate("/login", { replace: true });
                     }}

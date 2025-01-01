@@ -6,6 +6,9 @@ const Inventory = require("../models/Inventory");
 const mongoose = require("mongoose");
 const Cart = require("../models/Cart");
 
+/**
+ * Tạo đơn hàng
+ */
 exports.createOrder = async (req, res) => {
   const session = await mongoose.startSession();
   try {
@@ -21,7 +24,7 @@ exports.createOrder = async (req, res) => {
         .json({ message: "Thông tin đơn hàng không hợp lệ." });
     }
 
-    // Đảm bảo phone là string
+    // Đảm bảo phone là string (nhiều framework gửi phone dạng array)
     if (Array.isArray(shippingAddress.phone)) {
       shippingAddress.phone = shippingAddress.phone[0];
     }
@@ -29,7 +32,7 @@ exports.createOrder = async (req, res) => {
     let totalAmount = 0;
     let cartDiscount = null;
 
-    // Xử lý chi tiết sản phẩm với discount
+    // Lấy chi tiết sản phẩm (kèm logic discount)
     const productDetails = await Promise.all(
       products.map(async (item) => {
         const product = await Product.findById(item.product).session(session);
@@ -40,7 +43,6 @@ exports.createOrder = async (req, res) => {
         let price = product.price;
         let discount = null;
 
-        // Xử lý discount sản phẩm nếu có
         if (item.discount) {
           discount = await Discount.findById(item.discount).session(session);
           if (discount) {
@@ -63,7 +65,7 @@ exports.createOrder = async (req, res) => {
       })
     );
 
-    // Xử lý discount cho toàn bộ giỏ hàng nếu có
+    // Discount cho toàn giỏ
     if (cartDiscountCode) {
       cartDiscount = await Discount.findById(cartDiscountCode).session(session);
       if (cartDiscount) {
@@ -74,7 +76,7 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // Tạo đơn hàng
+    // Tạo order
     const order = new Order({
       user: req.user._id,
       shippingAddress,
@@ -94,11 +96,11 @@ exports.createOrder = async (req, res) => {
       },
     });
 
-    // Lưu đơn hàng trước khi xử lý thanh toán
+    // Lưu order
     await order.save({ session });
 
+    // Nếu là ZaloPay -> xử lý thanh toán
     if (paymentMethod === "zalopay") {
-      // Gọi dịch vụ thanh toán ZaloPay sau khi đơn hàng đã được lưu
       const paymentResult = await paymentService.processZaloPayPayment(
         order,
         productDetails
@@ -108,15 +110,16 @@ exports.createOrder = async (req, res) => {
         session.endSession();
         return res.status(201).json({ orderUrl: paymentResult.orderUrl });
       } else {
+        // Thất bại -> rollback
         await session.abortTransaction();
         session.endSession();
         return res.status(400).json({ message: paymentResult.message });
       }
     }
 
+    // Nếu là COD -> giảm tồn kho, xóa giỏ
     if (paymentMethod === "cod") {
-      // Xử lý giảm tồn kho và xóa giỏ hàng
-      // 1. Kiểm tra và giảm tồn kho
+      // Giảm tồn kho
       for (const item of productDetails) {
         const inventory = await Inventory.findOne({
           product: item.product,
@@ -133,22 +136,20 @@ exports.createOrder = async (req, res) => {
           );
         }
 
-        // Giảm số lượng tồn kho
         inventory.quantity -= item.quantity;
         inventory.lastUpdated = new Date();
         await inventory.save({ session });
       }
 
-      // 2. Xóa giỏ hàng của người dùng
+      // Xóa giỏ
       await Cart.findOneAndDelete({ user: req.user._id }).session(session);
 
       await session.commitTransaction();
       session.endSession();
-
       return res.status(201).json({ message: "Đặt hàng thành công.", order });
     }
 
-    // Nếu phương thức thanh toán không hợp lệ
+    // Thanh toán không hợp lệ
     await session.abortTransaction();
     session.endSession();
     return res
@@ -158,12 +159,18 @@ exports.createOrder = async (req, res) => {
     console.error("Error creating order:", error);
     await session.abortTransaction();
     session.endSession();
-    res.status(500).json({
-      message: "Có lỗi xảy ra khi tạo đơn hàng.",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({
+        message: "Có lỗi xảy ra khi tạo đơn hàng.",
+        error: error.message,
+      });
   }
 };
+
+/**
+ * Đếm số đơn hàng theo trạng thái (user)
+ */
 exports.getOrderStatusCounts = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -206,9 +213,12 @@ exports.getOrderStatusCounts = async (req, res) => {
   }
 };
 
+/**
+ * Lấy danh sách đơn hàng của người dùng
+ */
 exports.getUserOrders = async (req, res) => {
   try {
-    const { status, startDate, endDate } = req.query; // Không dùng page, limit
+    const { status, startDate, endDate } = req.query;
     const userId = req.user._id;
 
     const query = {
@@ -238,6 +248,9 @@ exports.getUserOrders = async (req, res) => {
   }
 };
 
+/**
+ * Lấy chi tiết 1 đơn hàng của user
+ */
 exports.getOrderDetails = async (req, res) => {
   try {
     const order = await Order.findOne({
@@ -258,10 +271,9 @@ exports.getOrderDetails = async (req, res) => {
   }
 };
 
-// controllers/orderController.js
-
-// controllers/orderController.js
-
+/**
+ * User hủy đơn hàng (khi shippingStatus = processing)
+ */
 exports.cancelOrder = async (req, res) => {
   const session = await mongoose.startSession();
   try {
@@ -284,13 +296,14 @@ exports.cancelOrder = async (req, res) => {
 
     console.log("Order found:", order);
 
+    // Chỉ cho hủy nếu shippingStatus = processing
     if (order.shippingStatus !== "processing") {
       console.log("Order cannot be cancelled due to its shipping status.");
       await session.abortTransaction();
       return res.status(400).json({ message: "Cannot cancel this order" });
     }
 
-    // Process ZaloPay Refund if payment is done via ZaloPay and status is 'paid'
+    // Trường hợp đã trả tiền ZaloPay
     if (order.paymentStatus === "paid" && order.payment.method === "zalopay") {
       console.log("Processing ZaloPay refund...");
       const refundResult = await paymentService.refundZaloPayOrder(order);
@@ -305,50 +318,27 @@ exports.cancelOrder = async (req, res) => {
         });
       }
 
-      // Update order refund status
+      // (1) Cập nhật trạng thái đơn
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
-      // Cập nhật thông tin hoàn tiền từ refundResult
       order.refund = {
-        refundId: refundResult.refundId, // ID hoàn tiền từ ZaloPay
-        mRefundId: refundResult.mRefundId, // Mã hoàn tiền bổ sung nếu có
-        status: "processing", // Trạng thái ban đầu
-        amount: refundResult.amount, // Số tiền hoàn lại
+        refundId: refundResult.refundId,
+        mRefundId: refundResult.mRefundId,
+        status: "processing",
+        amount: refundResult.amount,
       };
       order.orderTimestamps.cancellation = new Date();
 
-      console.log("Updated Order with Refund Information:", order);
-
-      // Lưu đơn hàng với các thay đổi
-      await order.save({ session });
-
-      await session.commitTransaction();
-
-      return res.status(200).json({
-        message: "Order cancelled and refund initiated successfully",
-      });
-    } else {
-      // For unpaid orders or COD payment method
-      console.log("Cancelling order without refund (unpaid or COD).");
-      order.paymentStatus = "cancelled";
-      order.shippingStatus = "cancelled";
-      order.orderTimestamps.cancellation = new Date();
-
-      // Step 2: Update Inventory (since no ZaloPay refund is involved)
+      // (2) **(NEW) Restock logic** cho ZaloPay
       const productDetails = order.products;
-
       for (const item of productDetails) {
         const inventory = await Inventory.findOne({
           product: item.product,
         }).session(session);
 
         if (inventory) {
-          // Increase the inventory by the quantity of the cancelled order
-          inventory.quantity += item.quantity; // Refund means we restock the products
-
-          // Update the last updated timestamp
+          inventory.quantity += item.quantity;
           inventory.lastUpdated = new Date();
-
           await inventory.save({ session });
         } else {
           console.error(`Inventory not found for product ${item.product}`);
@@ -357,7 +347,36 @@ exports.cancelOrder = async (req, res) => {
       }
 
       await order.save({ session });
+      await session.commitTransaction();
 
+      return res.status(200).json({
+        message: "Order cancelled and refund initiated successfully",
+      });
+    } else {
+      // Chưa thanh toán / COD -> chỉ hủy + restock
+      console.log("Cancelling order without refund (unpaid or COD).");
+      order.paymentStatus = "cancelled";
+      order.shippingStatus = "cancelled";
+      order.orderTimestamps.cancellation = new Date();
+
+      // Restock (COD case)
+      const productDetails = order.products;
+      for (const item of productDetails) {
+        const inventory = await Inventory.findOne({
+          product: item.product,
+        }).session(session);
+
+        if (inventory) {
+          inventory.quantity += item.quantity;
+          inventory.lastUpdated = new Date();
+          await inventory.save({ session });
+        } else {
+          console.error(`Inventory not found for product ${item.product}`);
+          throw new Error(`Inventory not found for product ${item.product}`);
+        }
+      }
+
+      await order.save({ session });
       await session.commitTransaction();
       return res.status(200).json({ message: "Order cancelled successfully" });
     }
@@ -372,6 +391,9 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
+/**
+ * Để lại review (VD)
+ */
 exports.leaveReview = async (req, res) => {
   const { productId, rating, comment } = req.body;
 
@@ -393,6 +415,7 @@ exports.leaveReview = async (req, res) => {
       return res.status(400).json({ message: "Product not found in order" });
     }
 
+    // Giả sử có model Review
     const review = await Review.findOneAndUpdate(
       { user: req.user.id, product: productId },
       { rating, comment },
@@ -406,10 +429,9 @@ exports.leaveReview = async (req, res) => {
   }
 };
 
-// controllers/orderController.js
-
-// controllers/orderController.js
-
+/**
+ * Kiểm tra tình trạng hoàn tiền
+ */
 exports.getRefundStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -425,8 +447,6 @@ exports.getRefundStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    console.log("Order Refund Information:", order.refund);
-
     if (!order.refund || !order.refund.mRefundId) {
       console.log("Order has no refund information");
       return res
@@ -436,7 +456,7 @@ exports.getRefundStatus = async (req, res) => {
 
     // Gọi paymentService để lấy tình trạng hoàn tiền
     const refundStatusResponse = await paymentService.getRefundStatus(
-      order.refund.mRefundId // Truyền đúng mRefundId
+      order.refund.mRefundId
     );
 
     console.log("Refund Status Response:", refundStatusResponse);
@@ -454,12 +474,10 @@ exports.getRefundStatus = async (req, res) => {
         refundStatusText = "failed";
         break;
       default:
-        refundStatusText = "failed"; // Chuyển 'unknown' thành 'failed'
+        refundStatusText = "failed"; // coi 'unknown' như failed
     }
 
-    console.log("Refund Status Text:", refundStatusText);
-
-    // Update refund status in the database
+    // Update refund status in the DB
     order.refund.status = refundStatusText;
     await order.save();
 
@@ -476,10 +494,13 @@ exports.getRefundStatus = async (req, res) => {
   }
 };
 
-// New Admin Controllers
+/* ================================
+   ========== Admin Area ==========
+   ================================ */
 
-// controllers/orderController.js
-
+/**
+ * Admin lấy tất cả đơn hàng
+ */
 exports.getAllOrders = async (req, res) => {
   try {
     const { status, startDate, endDate, orderId } = req.query;
@@ -488,18 +509,12 @@ exports.getAllOrders = async (req, res) => {
       paymentStatus: { $ne: "pending" }, // Exclude orders with payment status "pending"
     };
 
-    // Lọc theo orderId nếu có
     if (orderId) {
-      // Vì orderId là ObjectId, ta sẽ thử check ObjectId hợp lệ
-      const mongoose = require("mongoose");
       if (mongoose.Types.ObjectId.isValid(orderId)) {
         query._id = orderId;
       } else {
-        // Nếu muốn tìm orderId dạng text (không phải ObjectId):
-        // query._id = { $regex: orderId, $options: "i" };
-        // Tuy nhiên, _id thường là ObjectId và không nên tìm bằng regex.
-        // Ở đây, ta chỉ tìm chính xác. Nếu không hợp lệ, trả về rỗng.
-        query._id = { $exists: false }; // Không match kết quả nào
+        // Không match kết quả nào
+        query._id = { $exists: false };
       }
     }
 
@@ -526,7 +541,9 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// Update Order Controller
+/**
+ * Admin update 1 order (VD: cập nhật shippingStatus, paymentStatus, v.v.)
+ */
 exports.updateOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -549,7 +566,6 @@ exports.updateOrder = async (req, res) => {
       updateData.shippingStatus &&
       updateData.shippingStatus !== order.shippingStatus
     ) {
-      // Validate shippingStatus value
       const validStatuses = ["processing", "shipping", "shipped", "cancelled"];
       if (!validStatuses.includes(updateData.shippingStatus)) {
         return res
@@ -557,8 +573,9 @@ exports.updateOrder = async (req, res) => {
           .json({ message: "Invalid shipping status value" });
       }
 
-      // Update shippingStatus and set corresponding timestamp
       order.shippingStatus = updateData.shippingStatus;
+
+      // Set timestamp
       if (updateData.shippingStatus === "shipping") {
         order.orderTimestamps.shipping = new Date();
       } else if (updateData.shippingStatus === "shipped") {
@@ -566,8 +583,6 @@ exports.updateOrder = async (req, res) => {
       } else if (updateData.shippingStatus === "cancelled") {
         order.orderTimestamps.cancellation = new Date();
       }
-
-      // Additional logic can be added here if needed
     }
 
     // Handle paymentStatus update
@@ -575,7 +590,6 @@ exports.updateOrder = async (req, res) => {
       updateData.paymentStatus &&
       updateData.paymentStatus !== order.paymentStatus
     ) {
-      // Validate paymentStatus value
       const validPaymentStatuses = ["unpaid", "paid", "pending", "cancelled"];
       if (!validPaymentStatuses.includes(updateData.paymentStatus)) {
         return res
@@ -583,14 +597,13 @@ exports.updateOrder = async (req, res) => {
           .json({ message: "Invalid payment status value" });
       }
 
-      // Update paymentStatus and set corresponding timestamp
       order.paymentStatus = updateData.paymentStatus;
       if (updateData.paymentStatus === "paid") {
         order.orderTimestamps.payment = new Date();
       }
     }
 
-    // Handle refund status
+    // Handle refund
     if (updateData.refund && updateData.refund.status) {
       const validRefundStatuses = ["processing", "success", "failed", "null"];
       if (!validRefundStatuses.includes(updateData.refund.status)) {
@@ -609,13 +622,12 @@ exports.updateOrder = async (req, res) => {
       }
     }
 
-    // Handle other fields if necessary
-    // For example, updating notes or other non-status fields
+    // Handle other fields (ví dụ note)
     if (updateData.note !== undefined) {
       order.note = updateData.note;
     }
 
-    // Save the updated order
+    // Save
     await order.save();
 
     res.status(200).json({ message: "Order updated successfully", order });
@@ -625,6 +637,9 @@ exports.updateOrder = async (req, res) => {
   }
 };
 
+/**
+ * Admin xoá 1 order
+ */
 exports.deleteOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -641,25 +656,3 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ message: "Error deleting order" });
   }
 };
-
-async function updateInventoryAfterRefund(order) {
-  // Get product details from the order
-  const productDetails = order.products; // Assuming 'products' chứa thông tin sản phẩm
-
-  for (const item of productDetails) {
-    // Find the product in the inventory
-    const inventory = await Inventory.findOne({ product: item.product });
-
-    if (inventory) {
-      // Increase the inventory by the quantity of the cancelled order
-      inventory.quantity += item.quantity; // Refund means we restock the products
-
-      // Update the last updated timestamp
-      inventory.lastUpdated = new Date();
-
-      await inventory.save();
-    } else {
-      console.error(`Inventory not found for product ${item.product}`);
-    }
-  }
-}

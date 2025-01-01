@@ -41,12 +41,15 @@ const ProductPage = () => {
     <Container fluid className="product-page">
       <Row>
         {/* Sidebar */}
-        <Col xs={12} md={3} lg={3} className="mb-4 ">
+        <Col xs={12} md={3} lg={3} className="mb-4">
+          {/* 
+            Bỏ prop showFilters={true}.
+            Sidebar sẽ tự xử lý logic hiển thị ẩn/hiện thông qua isSidebarVisible
+          */}
           <ProductSidebar
             onCategoryChange={handleCategoryChange}
             onFilterChange={updateFilters}
             filters={filters}
-            showFilters={true} // Ensure that filters are shown if needed
           />
         </Col>
 
