@@ -24,7 +24,7 @@ exports.createOrder = async (req, res) => {
         .json({ message: "Thông tin đơn hàng không hợp lệ." });
     }
 
-    // Đảm bảo phone là string (nhiều framework gửi phone dạng array)
+    // Lấy số điện thoại
     if (Array.isArray(shippingAddress.phone)) {
       shippingAddress.phone = shippingAddress.phone[0];
     }
@@ -159,12 +159,10 @@ exports.createOrder = async (req, res) => {
     console.error("Error creating order:", error);
     await session.abortTransaction();
     session.endSession();
-    res
-      .status(500)
-      .json({
-        message: "Có lỗi xảy ra khi tạo đơn hàng.",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Có lỗi xảy ra khi tạo đơn hàng.",
+      error: error.message,
+    });
   }
 };
 
@@ -318,7 +316,7 @@ exports.cancelOrder = async (req, res) => {
         });
       }
 
-      // (1) Cập nhật trạng thái đơn
+      //Cập nhật trạng thái đơn
       order.paymentStatus = "cancelled";
       order.shippingStatus = "cancelled";
       order.refund = {
@@ -329,7 +327,7 @@ exports.cancelOrder = async (req, res) => {
       };
       order.orderTimestamps.cancellation = new Date();
 
-      // (2) **(NEW) Restock logic** cho ZaloPay
+      //Restock logic cho ZaloPay
       const productDetails = order.products;
       for (const item of productDetails) {
         const inventory = await Inventory.findOne({
@@ -415,7 +413,6 @@ exports.leaveReview = async (req, res) => {
       return res.status(400).json({ message: "Product not found in order" });
     }
 
-    // Giả sử có model Review
     const review = await Review.findOneAndUpdate(
       { user: req.user.id, product: productId },
       { rating, comment },
@@ -493,10 +490,6 @@ exports.getRefundStatus = async (req, res) => {
     res.status(500).json({ message: "Error getting refund status" });
   }
 };
-
-/* ================================
-   ========== Admin Area ==========
-   ================================ */
 
 /**
  * Admin lấy tất cả đơn hàng
@@ -622,12 +615,10 @@ exports.updateOrder = async (req, res) => {
       }
     }
 
-    // Handle other fields (ví dụ note)
     if (updateData.note !== undefined) {
       order.note = updateData.note;
     }
 
-    // Save
     await order.save();
 
     res.status(200).json({ message: "Order updated successfully", order });

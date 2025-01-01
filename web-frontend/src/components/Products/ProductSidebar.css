@@ -12,12 +12,12 @@
 
   /* Với màn hình nhỏ, mặc định ẩn */
   transform: translateX(-100%);
-  position: fixed; /* để trượt được, tách khỏi luồng */
+  position: fixed;
   left: 0;
   top: 0;
   height: 100vh;
-  max-width: 300px; /* chiều rộng sidebar */
-  z-index: 1050; /* trên overlay 1040 một chút */
+  max-width: 300px;
+  z-index: 1050;
 }
 
 /* Khi có class .show thì hiển thị trượt ra */
@@ -25,12 +25,11 @@
   transform: translateX(0);
 }
 
-/* Ở màn hình >= 768px thì show sidebar luôn (nếu muốn). */
 @media (min-width: 768px) {
   .product-sidebar-container {
     position: sticky;
     top: 1rem;
-    transform: none; /* luôn hiển thị */
+    transform: none;
     left: auto;
     height: auto;
     max-width: 100%;
@@ -96,12 +95,8 @@
 
 .product-sidebar-category-item:hover,
 .product-sidebar-category-item.active {
-  background: linear-gradient(
-    45deg,
-    #ffffff,
-    #0056b3
-  ); /* Gradient trắng xanh, nghiêng 45 độ */
-  color: #0058fc; /* Màu chữ */
+  background: linear-gradient(45deg, #ffffff, #0056b3);
+  color: #0058fc;
 }
 
 .product-sidebar-category-image {
@@ -122,7 +117,6 @@
   margin-top: 1rem;
 }
 
-/* Filters */
 .product-sidebar-filters {
   margin-top: 2rem;
 }
@@ -159,9 +153,5 @@
 }
 
 .product-sidebar-button:hover {
-  background: linear-gradient(
-    45deg,
-    #ffffff,
-    #0056b3
-  ); /* Gradient trắng xanh, nghiêng 45 độ */
+  background: linear-gradient(45deg, #ffffff, #0056b3);
 }

@@ -13,8 +13,8 @@ import apiClient from "../../utils/api-client";
 import "./ProductList.css";
 
 function ProductList({ filters }) {
-  const [allProducts, setAllProducts] = useState([]); // All fetched products
-  const [filteredProducts, setFilteredProducts] = useState([]); // Products after backend filtering
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,7 +26,7 @@ function ProductList({ filters }) {
         setLoading(true);
         const response = await apiClient.get("/product", {
           params: {
-            // Send search, brand, category, and rating filters to the API
+            // gửi các tham số tìm kiếm lên server
             search: filters.search || "",
             brand: filters.brand || "",
             category: filters.category || "",
@@ -49,7 +49,7 @@ function ProductList({ filters }) {
   useEffect(() => {
     let tempProducts = [...allProducts];
 
-    // Client-side Price Filtering
+    // Lọc sản phẩm theo giá
     if (filters.price) {
       const [min, max] = filters.price.split("-");
       const minPrice = min ? parseInt(min, 10) : 0;

@@ -13,6 +13,7 @@ const ProductPage = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
+    // Lấy các tham số tìm kiếm từ URL và cập nhật vào state
     setFilters({
       category: searchParams.get("category") || "",
       search: searchParams.get("search") || "",
@@ -42,10 +43,6 @@ const ProductPage = () => {
       <Row>
         {/* Sidebar */}
         <Col xs={12} md={3} lg={3} className="mb-4">
-          {/* 
-            Bỏ prop showFilters={true}.
-            Sidebar sẽ tự xử lý logic hiển thị ẩn/hiện thông qua isSidebarVisible
-          */}
           <ProductSidebar
             onCategoryChange={handleCategoryChange}
             onFilterChange={updateFilters}
