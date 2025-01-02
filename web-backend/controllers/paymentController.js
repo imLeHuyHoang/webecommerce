@@ -1,6 +1,6 @@
 const CryptoJS = require("crypto-js");
 const Order = require("../models/Order");
-const zalopayConfig = require("../utils/zalopayConfig"); // Đảm bảo dòng này có mặt
+const zalopayConfig = require("../utils/zalopayConfig");
 const Cart = require("../models/Cart");
 const Inventory = require("../models/Inventory");
 

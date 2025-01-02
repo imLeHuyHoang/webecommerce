@@ -9,7 +9,7 @@ exports.createComment = async (req, res) => {
   try {
     const { comment, parentComment } = req.body;
     const productId = req.params.productId;
-    const userId = req.user._id; // lấy từ verifyToken
+    const userId = req.user._id;
 
     console.log("Creating comment:", {
       comment,
@@ -38,7 +38,7 @@ exports.createComment = async (req, res) => {
 };
 
 /**
- * Lấy danh sách bình luận cho 1 sản phẩm (dạng phẳng)
+ * Lấy danh sách bình luận cho 1 sản phẩm
  */
 exports.getProductComments = async (req, res) => {
   try {

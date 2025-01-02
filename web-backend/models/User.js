@@ -26,11 +26,7 @@ const userSchema = new mongoose.Schema({
   refreshToken: { type: String, default: null },
   createAt: { type: Date, default: Date.now },
   updateAt: { type: Date, default: Date.now },
-
-  // Thêm trường tokenVersion
   tokenVersion: { type: Number, default: 0 },
-
-  // Các trường phục vụ chức năng quên mật khẩu:
   resetPasswordCode: { type: String },
   resetPasswordExpires: { type: Date },
 });
