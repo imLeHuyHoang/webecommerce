@@ -17,8 +17,12 @@ function ProductList({ filters }) {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // State phục vụ việc phân trang
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
+
+  // Số sản phẩm hiển thị trên mỗi trang
+  const productsPerPage = 8; // Đổi từ 12 thành 8
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -63,15 +67,19 @@ function ProductList({ filters }) {
     setCurrentPage(1);
   }, [allProducts, filters.price]);
 
+  // Tính toán vị trí bắt đầu và kết thúc cho trang hiện tại
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  // Lấy ra mảng sản phẩm của trang hiện tại
   const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
 
+  // Tính tổng số trang
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
+  // Hàm xử lý đổi trang
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading) {
