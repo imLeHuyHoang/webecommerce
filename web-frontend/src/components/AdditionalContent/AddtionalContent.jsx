@@ -17,7 +17,7 @@ const AdditionalContent = () => {
           />
           <Carousel.Caption>
             <h5>Giảm giá 20% cho mùa giáng sinh</h5>
-            <p>Nhập code: SALE20</p>
+            <p>Nhập code: SALE30</p>
           </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item>

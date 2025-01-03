@@ -5,6 +5,10 @@ const moment = require("moment");
 const zalopayConfig = require("../utils/zalopayConfig");
 
 function generateAppTransId() {
+  //sinh ra mã app_trans_id ngẫu nhiên theo định dạng yyMMdd_random
+  //yymmdd là ngày tháng năm hiện tại
+  //random là 6 số cuối của timestamp
+  //app_trans_id là mã giao dịch Merchant gửi qua ZaloPay.
   const date = new Date();
   const yy = date.getFullYear().toString().slice(-2);
   const mm = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -15,19 +19,19 @@ function generateAppTransId() {
 
 exports.createOrder = async (orderInfo) => {
   const order = {
-    app_id: parseInt(zalopayConfig.appid, 10),
+    app_id: parseInt(zalopayConfig.appid, 10), //
     app_trans_id: orderInfo.appTransId,
-    app_user: orderInfo.appUserId,
-    app_time: Date.now(),
+    app_user: orderInfo.appUserId, //user-id
+    app_time: Date.now(), // thời gian tạo đơn hàng
     amount: parseInt(orderInfo.amount, 10),
     item: JSON.stringify(orderInfo.items || []),
     embed_data: JSON.stringify(orderInfo.embedData || {}),
     description: `Payment for order #${orderInfo.appTransId}`,
-    bank_code: "",
+    bank_code: "", //mã ngân hàng nhưng không cần thiết
     callback_url: zalopayConfig.callbackUrl,
     redirect_url: zalopayConfig.redirectUrl,
   };
-
+  //tạo chuỗi HMACinput để tạo mã MAC
   const hmacInput =
     order.app_id +
     "|" +
@@ -44,7 +48,7 @@ exports.createOrder = async (orderInfo) => {
     order.item;
 
   order.mac = CryptoJS.HmacSHA256(hmacInput, zalopayConfig.key1).toString();
-
+  //gọi api cho ZaloPay
   try {
     const response = await axios.post(
       zalopayConfig.createOrderUrl,
@@ -67,9 +71,9 @@ exports.createOrder = async (orderInfo) => {
     );
   }
 };
-
+//hàm xử lý thanh toán qua ZaloPay
 exports.processZaloPayPayment = async (order, productDetails) => {
-  const appTransId = generateAppTransId();
+  const appTransId = generateAppTransId(); //tạo mã appTransId
   const orderInfo = {
     appUserId: order.user.toString(),
     appTransId,
@@ -110,7 +114,7 @@ exports.refundZaloPayOrder = async (order) => {
 
     // Gọi hàm refundOrder
     const { refundResult, mRefundId } = await this.refundOrder(
-      order.payment.transactionId,
+      order.payment.transactionId, //transactionId được lưu sau khi thanh toán thành công
       parseInt(order.total, 10),
       "Order Cancellation Refund"
     );
@@ -138,8 +142,8 @@ exports.refundZaloPayOrder = async (order) => {
 };
 
 exports.refundOrder = async (
-  zpTransId,
-  amount,
+  zpTransId, // mã giao dịch nhận được sau khi thanh toán
+  amount, // số tiền cần hoàn lại
   description = "Customer Refund"
 ) => {
   const timestamp = Date.now();
