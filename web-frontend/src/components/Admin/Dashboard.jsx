@@ -15,17 +15,13 @@ const Dashboard = () => {
     <Container fluid style={{ padding: "20px", background: "#f0f2f5" }}>
       <h1 className="mb-4">Admin Dashboard</h1>
       <Row className="gy-4">
-        <Col md={4}>
+        <Col>
           <TotalProductsChart />
           <ReviewStatisticsChart />
           <TopSellingProductsChart style={{ height: "100%" }} />
-          <CustomerStatisticsChart />
         </Col>
-        <Col md={4}>
-          <ProductsByCategoryChart className="mb-4 flex-grow-1" />
-          <MonthlyStatisticsChart />
-        </Col>
-        <Col md={4} className="d-flex flex-column">
+
+        <Col className="d-flex flex-column">
           <OrderStatusChart className="flex-grow-1" />
         </Col>
       </Row>

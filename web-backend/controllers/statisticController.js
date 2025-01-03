@@ -64,7 +64,6 @@ exports.getProductsByCategory = async (req, res) => {
 
 /**
  * Lấy thống kê số lượng đơn hàng theo trạng thái.
- * Chúng ta sẽ tách biệt rõ ràng các điều kiện.
  * - unconfirmed: paymentStatus = "pending" hoặc shippingStatus = "processing"
  * - preparing: shippingStatus = "shipping"
  * - shipped: shippingStatus = "shipped"

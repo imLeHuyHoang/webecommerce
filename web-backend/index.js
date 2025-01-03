@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const morgan = require("morgan"); // Logging
-require("./db/connectDB"); // Connect to MongoDB
+const morgan = require("morgan");
+require("./db/connectDB");
 const cronJobs = require("./services/cronJobs");
 require("dotenv").config();
 
