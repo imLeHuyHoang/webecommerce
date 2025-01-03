@@ -32,7 +32,7 @@ const CustomerStatisticsChart = () => {
   }, []);
 
   if (!dataChart) return <p>Loading...</p>;
-
+  console.log(dataChart);
   return (
     <div style={{ background: "#fff", padding: "20px", borderRadius: "8px" }}>
       <h3>Khách hàng đăng ký mới</h3>

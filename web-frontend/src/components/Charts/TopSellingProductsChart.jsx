@@ -15,6 +15,7 @@ const TopSellingProductsChart = () => {
   }, []);
 
   if (!topProducts.length) return <p>Loading...</p>;
+  console.log(topProducts);
 
   return (
     <div style={{ background: "#fff", padding: "20px", borderRadius: "8px" }}>

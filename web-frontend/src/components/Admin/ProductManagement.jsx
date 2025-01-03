@@ -47,7 +47,7 @@ const ProductManagement = () => {
                   <svg className="bi me-2" width="16" height="16">
                     <use xlinkHref="#grid"></use>
                   </svg>
-                  Manage Products
+                  Quản lý Sản phẩm
                 </a>
               </li>
               <li>
@@ -60,7 +60,7 @@ const ProductManagement = () => {
                   <svg className="bi me-2" width="16" height="16">
                     <use xlinkHref="#table"></use>
                   </svg>
-                  Manage Categories
+                  Quản lý Danh mục
                 </a>
               </li>
               <li>
@@ -73,7 +73,7 @@ const ProductManagement = () => {
                   <svg className="bi me-2" width="16" height="16">
                     <use xlinkHref="#speedometer2"></use>
                   </svg>
-                  Manage Attributes
+                  Quản lý Thuộc tính
                 </a>
               </li>
               <li>
@@ -86,7 +86,7 @@ const ProductManagement = () => {
                   <svg className="bi me-2" width="16" height="16">
                     <use xlinkHref="#people-circle"></use>
                   </svg>
-                  Manage Inventory
+                  Quản lý Kho hàng
                 </a>
               </li>
               <li>
@@ -99,7 +99,7 @@ const ProductManagement = () => {
                   <svg className="bi me-2" width="16" height="16">
                     <use xlinkHref="#people-circle"></use>
                   </svg>
-                  Manage Discounts
+                  Quản lý Giảm giá
                 </a>
               </li>
             </ul>
@@ -112,17 +112,17 @@ const ProductManagement = () => {
               >
                 <li>
                   <a className="dropdown-item" href="#">
-                    New project...
+                    Dự án mới...
                   </a>
                 </li>
                 <li>
                   <a className="dropdown-item" href="#">
-                    Settings
+                    Cài đặt
                   </a>
                 </li>
                 <li>
                   <a className="dropdown-item" href="#">
-                    Profile
+                    Hồ sơ
                   </a>
                 </li>
                 <li>
@@ -130,7 +130,7 @@ const ProductManagement = () => {
                 </li>
                 <li>
                   <a className="dropdown-item" href="#">
-                    Sign out
+                    Đăng xuất
                   </a>
                 </li>
               </ul>
