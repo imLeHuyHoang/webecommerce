@@ -2,11 +2,8 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import TotalProductsChart from "../Charts/TotalProductsChart";
-import ProductsByCategoryChart from "../Charts/ProductsByCategoryChart";
 import OrderStatusChart from "../Charts/OrderStatusChart";
-import MonthlyStatisticsChart from "../Charts/MonthlyStatisticsChart";
 import ReviewStatisticsChart from "../Charts/ReviewStatisticsChart";
-import CustomerStatisticsChart from "../Charts/CustomerStatisticsChart";
 import TopSellingProductsChart from "../Charts/TopSellingProductsChart";
 import "../../utils/chartSetup";
 

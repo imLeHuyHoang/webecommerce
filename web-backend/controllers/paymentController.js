@@ -106,3 +106,62 @@ exports.paymentCallback = async (req, res) => {
     res.sendStatus(500);
   }
 };
+exports.handleZaloPayRedirect = async (req, res) => {
+  try {
+    const {
+      appid,
+      apptransid,
+      pmcid,
+      bankcode,
+      amount,
+      discountamount,
+      status,
+      checksum,
+    } = req.query;
+
+    // Tính HMAC
+    const dataString = [
+      appid,
+      apptransid,
+      pmcid || "",
+      bankcode || "",
+      amount || "",
+      discountamount || "",
+      status,
+    ].join("|");
+
+    const ourChecksum = CryptoJS.HmacSHA256(
+      dataString,
+      zalopayConfig.key2
+    ).toString();
+
+    if (ourChecksum !== checksum) {
+      return res
+        .status(400)
+        .send("<h2>Checksum mismatch - Redirect invalid</h2>");
+    }
+
+    if (parseInt(status, 10) === 1) {
+      // Thanh toán thành công
+      const order = await Order.findOne({ "payment.appTransId": apptransid });
+      if (!order) {
+        return res.status(200).send(`
+          <h2>Thanh toán thành công (ZaloPay) - Không tìm thấy order trong DB</h2>
+        `);
+      }
+      return res.status(200).send(`
+        <h2>Thanh toán thành công (ZaloPay)</h2>
+        <p>OrderID: ${order._id}</p>
+        <p>Payment Status: ${order.paymentStatus}</p>
+      `);
+    } else {
+      // Thất bại
+      return res.status(200).send(`<h2>Giao dịch thất bại / hủy</h2>`);
+    }
+  } catch (error) {
+    console.error("Error in handleZaloPayRedirect:", error);
+    return res
+      .status(500)
+      .send(`<h2>Internal error:</h2><p>${error.message}</p>`);
+  }
+};

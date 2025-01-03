@@ -1,5 +1,4 @@
 // utils/zalopayConfig.js
-
 module.exports = {
   appid: 2554,
   key1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn",
@@ -9,7 +8,7 @@ module.exports = {
   getRefundStatusUrl:
     "https://sandbox.zalopay.com.vn/v001/tpe/getpartialrefundstatus",
   callbackUrl:
-    "https://dad5-2001-ee0-41c1-4589-5c4-ec17-359d-aad8.ngrok-free.app/api/payment/callback",
+    "http://app-alb-1531356742.ap-southeast-1.elb.amazonaws.com/api/payment/callback",
   redirectUrl:
-    "http://tech-store-alb-1327880098.ap-southeast-1.elb.amazonaws.com",
+    "http://app-alb-1531356742.ap-southeast-1.elb.amazonaws.com/api/payment/redirect",
 };

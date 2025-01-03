@@ -13,7 +13,7 @@ const User = require("../models/User");
  * - cancelled: (shippingStatus = "cancelled" hoặc paymentStatus = "cancelled")
  */
 
-// Hàm lấy năm hiện tại (dùng cho thống kê nếu không truyền vào)
+// Hàm lấy năm hiện tại
 function getCurrentYear() {
   return new Date().getFullYear();
 }
@@ -37,7 +37,7 @@ exports.getTotalProducts = async (req, res) => {
 exports.getProductsByCategory = async (req, res) => {
   try {
     const data = await Product.aggregate([
-      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $group: { _id: "$category", count: { $sum: 1 } } }, // nhóm các sản phẩm theo category, tạo id là category và đếm số sản phẩm
       {
         $lookup: {
           from: "categories",
