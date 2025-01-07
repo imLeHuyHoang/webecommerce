@@ -76,9 +76,6 @@ app.use("/products", express.static(__dirname + "/upload/products"));
 // Initialize cron jobs
 cronJobs;
 
-// Additional health check
-
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res
@@ -87,6 +84,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
+
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
 });

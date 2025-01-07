@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useAuthAdmin } from "../../context/AuthAdminContext";
-import { useCart } from "../../context/CartContext"; // <-- CHỈNH SỬA
+import { useCart } from "../../context/CartContext";
 import "./Navbar.css";
 import LinkWithIcon from "./LinkWithIcon";
 
@@ -14,7 +14,6 @@ function Navbar() {
   const { authAdmin, logoutAdmin } = useAuthAdmin();
   const { admin, isLoading } = authAdmin;
 
-  // **CHỈNH SỬA**: Lấy cartCount, resetCartCount (hoặc updateCart)
   const { cartCount, resetCartCount } = useCart();
 
   const navigate = useNavigate();

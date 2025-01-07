@@ -88,7 +88,6 @@ exports.createCategory = async (req, res) => {
         })
       : [];
 
-    // Cập nhật model
     newCategory.images = images;
     await newCategory.save();
 
@@ -101,7 +100,6 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-// --- ĐIỂM ĐÃ SỬA TRONG HÀM updateCategory ---
 exports.updateCategory = async (req, res) => {
   try {
     const { name, descriptions } = req.body;
@@ -150,7 +148,7 @@ exports.updateCategory = async (req, res) => {
               throw new Error(`File not found: ${file.filename}`);
             }
           })
-        : category.images; // <--- Giữ nguyên ảnh cũ nếu không có file mới
+        : category.images;
 
     // Update category
     category.name = name || category.name;

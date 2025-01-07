@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Toast } from "react-bootstrap";
 import PropTypes from "prop-types";
-import "./ToastNotification.css"; // Để thêm các kiểu tùy chỉnh
+import "./ToastNotification.css";
 
 const ToastNotification = ({ message, show, onClose, variant, actions }) => {
   const [showToast, setShowToast] = useState(show);
@@ -13,7 +13,6 @@ const ToastNotification = ({ message, show, onClose, variant, actions }) => {
   const validVariants = ["success", "danger", "warning", "info"]; //variants: định nghĩa là các loại thông báo hợp lệ
   const sanitizedVariant = validVariants.includes(variant) ? variant : "info"; // Mặc định là 'info' nếu variant không hợp lệ
 
-  // Xác định biểu tượng và màu sắc dựa trên variant
   const getVariantDetails = (type) => {
     switch (type) {
       case "success":

@@ -16,7 +16,7 @@ const AdditionalContent = () => {
             alt="Promotion 1"
           />
           <Carousel.Caption>
-            <h5>Giảm giá 20% cho mùa giáng sinh</h5>
+            <h5>Giảm giá 30% cho mùa giáng sinh</h5>
             <p>Nhập code: SALE30</p>
           </Carousel.Caption>
         </Carousel.Item>

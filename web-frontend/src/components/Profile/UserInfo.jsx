@@ -1,7 +1,7 @@
 // src/components/Profile/UserInfo.jsx
 
 import React, { useState } from "react";
-import UserInfoForm from "../shared/UserInforForm"; // Đảm bảo đường dẫn đúng
+import UserInfoForm from "../shared/UserInforForm";
 
 const UserInfo = ({ user, onSaveUser, loading }) => {
   const [isEditing, setIsEditing] = useState(false);

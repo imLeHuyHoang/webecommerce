@@ -20,7 +20,6 @@ const AdminLogin = () => {
     try {
       const response = await apiClient.post("/user/loginadmin", formData);
       const { accessToken, user } = response.data;
-      // loginAdmin() nên truyền vào user
       loginAdmin(user);
       localStorage.setItem("adminAccessToken", accessToken);
       console.log("Admin logged in:", user);

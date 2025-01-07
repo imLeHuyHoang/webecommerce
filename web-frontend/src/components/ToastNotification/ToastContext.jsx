@@ -2,17 +2,16 @@
 
 import React, { createContext, useState, useCallback } from "react";
 import ToastNotification from "./ToastNotification";
-import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is imported
-import "./ToastStyles.css"; // For any additional custom styles
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./ToastStyles.css";
 
 export const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
-  // Function to add a new toast
   const addToast = useCallback((message, variant = "info", actions = []) => {
-    const id = Date.now() + Math.random(); // More unique ID
+    const id = Date.now() + Math.random();
     setToasts((prevToasts) => [
       ...prevToasts,
       { id, message, variant, actions },

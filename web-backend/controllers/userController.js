@@ -29,9 +29,9 @@ const generateTokens = (user) => {
 // Cấu hình cookie cho Refresh Token
 const getCookieConfig = () => {
   return {
-    httpOnly: true, // Chỉ có server mới có thể đọc được cookie
-    secure: false, // Cho phép gửi cookie qua HTTP
-    sameSite: "lax", // Giảm thiểu rủi ro CSRF
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày tính bằng mili giây
   };

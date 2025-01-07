@@ -12,15 +12,11 @@ const Logout = () => {
   useEffect(() => {
     const handleLogout = async () => {
       try {
-        // Gọi API logout server-side nếu có (không bắt buộc).
-        // await apiClient.post("/user/logout");
-
-        // Đăng xuất user thường
         await logout();
         // Đăng xuất admin
         logoutAdmin();
 
-        // Xóa hết token/key trong localStorage (quan trọng nhất)
+        // Xóa hết token/key trong localStorage
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("adminAccessToken");

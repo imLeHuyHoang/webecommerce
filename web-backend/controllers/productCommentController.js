@@ -97,9 +97,6 @@ exports.updateComment = async (req, res) => {
       existingComment.user._id.toString() === req.user._id.toString();
     const isAdmin = req.user.roles.includes("admin");
 
-    // => CHỈ chủ sở hữu HOẶC admin => Mới sửa
-    // (Ở đây, tùy bạn: admin có thể sửa luôn hay không. Mình cho admin chỉ xóa, còn sửa
-    //  thì vẫn cần là chủ => isOwner. Sửa tùy logic.)
     if (!isOwner) {
       return res
         .status(403)

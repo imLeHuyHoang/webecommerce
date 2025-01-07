@@ -7,6 +7,7 @@ const TopSellingProductsChart = () => {
 
   useEffect(() => {
     apiClient
+
       .get("/statistic/top-selling-products")
       .then((res) => {
         setTopProducts(res.data.topSellingProducts);

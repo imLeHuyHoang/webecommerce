@@ -15,7 +15,6 @@ import { ToastContext } from "../ToastNotification/ToastContext";
 import { useAuth } from "../../context/AuthContext";
 
 function ServicesAndTestimonials() {
-  // States for Testimonials
   const [comments, setComments] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showModal, setShowModal] = useState(false);
@@ -30,7 +29,7 @@ function ServicesAndTestimonials() {
   // Detect screen size
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 767.98); // Bootstrap's mobile breakpoint
+      setIsMobile(window.innerWidth <= 767.98);
     };
 
     handleResize(); // Set initial state

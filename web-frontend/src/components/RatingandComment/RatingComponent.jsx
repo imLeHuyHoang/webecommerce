@@ -18,7 +18,6 @@ const RatingComponent = ({ productId }) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Lấy user từ localStorage (nếu có)
     const storedUserStr = localStorage.getItem("user");
     if (storedUserStr) {
       const userObj = JSON.parse(storedUserStr);

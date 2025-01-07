@@ -2,7 +2,7 @@
 const getImageBaseUrl = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   if (apiBaseUrl.endsWith("/api")) {
-    return apiBaseUrl.slice(0, -4); // Loại bỏ "/api"
+    return apiBaseUrl.slice(0, -4);
   }
   return apiBaseUrl;
 };

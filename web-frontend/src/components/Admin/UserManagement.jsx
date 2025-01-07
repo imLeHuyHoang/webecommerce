@@ -46,12 +46,10 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Access token from local storage or context
   const accessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch users from backend

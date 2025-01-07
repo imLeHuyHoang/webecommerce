@@ -12,7 +12,7 @@ import {
   Image,
 } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import apiClient from "../../../utils/api-client"; // <-- kiểm tra file này coi có interceptor không
+import apiClient from "../../../utils/api-client";
 import { useCart } from "../../../context/CartContext";
 import ToastNotification from "../../ToastNotification/ToastNotification";
 import RatingComponent from "../../RatingandComment/RatingComponent";
@@ -268,11 +268,8 @@ const SingleProductPage = () => {
 
               {/* Nút Thêm vào giỏ + Chi tiết kỹ thuật */}
               <div className="d-flex mb-3 add-and-attributes">
-                {/* 
-                  Option 1: Sử dụng variant, 
-                  nhưng nếu bị override .btn-primary, 
-                  bạn cần !important CSS hoặc selector cụ thể 
-                */}
+                {/*
+                 */}
                 <Button
                   variant={product.stock > 0 ? "primary" : "secondary"}
                   onClick={() => addToCart(product._id, quantity)}

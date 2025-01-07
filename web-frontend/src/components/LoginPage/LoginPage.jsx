@@ -5,7 +5,6 @@ import apiClient from "../../utils/api-client";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import "./LoginPage.css";
 
-// **CHỈNH SỬA**: import useCart để gọi updateCart
 import { useCart } from "../../context/CartContext";
 
 const Login = () => {
@@ -14,7 +13,6 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // **CHỈNH SỬA**: Lấy updateCart từ CartContext
   const { updateCart } = useCart();
 
   const handleChange = (e) => {
@@ -35,7 +33,6 @@ const Login = () => {
       // Gọi hàm login từ AuthContext
       login(user, accessToken);
 
-      // **CHỈNH SỬA**: Sau khi login, gọi updateCart() để đồng bộ giỏ hàng
       await updateCart();
 
       navigate("/");
@@ -61,7 +58,6 @@ const Login = () => {
 
       login(user, accessToken);
 
-      // **CHỈNH SỬA**: Đồng bộ cartCount ngay sau khi login google
       await updateCart();
 
       navigate("/");

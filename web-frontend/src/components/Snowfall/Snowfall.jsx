@@ -22,7 +22,7 @@ const Snowfall = () => {
         const size =
           Math.random() * (SNOWFLAKE_SIZE.max - SNOWFLAKE_SIZE.min) +
           SNOWFLAKE_SIZE.min;
-        const left = Math.random() * 100; // Percentage for horizontal position
+        const left = Math.random() * 100;
         const duration =
           Math.random() * (FALL_SPEED.max - FALL_SPEED.min) + FALL_SPEED.min;
         const horizontalDrift =

@@ -159,7 +159,6 @@ const CartPage = () => {
     }
   };
 
-  // ------------ Tính toán hiển thị -------------
   // 1. Lấy giá tổng từ backend (đã trừ discount)
   const getTotalPrice = () => {
     // cart.totalAmount = Giá cuối cùng sau khi backend đã tính discount
@@ -184,10 +183,6 @@ const CartPage = () => {
 
     // Discount cho cả giỏ
     if (cart.discountCode) {
-      // Để tính "hiển thị" discount code giỏ hàng,
-      // ta tính: discount.value (hoặc phần trăm) áp trên total cart BEFORE discount.
-      // Nếu backend đã gộp discount product + cart, ta chỉ hiển thị tham khảo.
-
       const cartTotalBeforeDiscount = cart.products.reduce((sum, item) => {
         return sum + item.price * item.quantity;
       }, 0);
@@ -233,7 +228,6 @@ const CartPage = () => {
       ) {
         navigate("/checkout", { state: { cartItems: cart.products } });
       } else {
-        // Trường hợp message khác => có thể do server trả cảnh báo
         addToast(
           response.data.message || "Không thể chuyển sang thanh toán",
           "danger"
@@ -259,7 +253,6 @@ const CartPage = () => {
     }
   };
 
-  // ------------- Render -------------
   return (
     <div className="cart-page">
       <Container className="cart-container my-5">

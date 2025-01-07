@@ -6,7 +6,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./SignupPage.css";
 import apiClient from "../../utils/api-client";
 
-// Định nghĩa schema đăng ký sử dụng Zod
 const signupSchema = z.object({
   name: z.string().min(1, "Tên là bắt buộc"),
   email: z.string().email("Địa chỉ email không hợp lệ"),
@@ -38,7 +37,6 @@ const SignUp = () => {
     }
 
     return () => {
-      // Hủy bỏ timeout nếu component bị unmount hoặc người dùng bấm nút trước khi timeout
       if (timer) clearTimeout(timer);
     };
   }, [isSuccess, navigate]);

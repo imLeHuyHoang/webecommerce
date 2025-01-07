@@ -2,7 +2,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 
-// Import toàn bộ các biểu đồ bạn có
 import TotalProductsChart from "../Charts/TotalProductsChart";
 import OrderStatusChart from "../Charts/OrderStatusChart";
 import ReviewStatisticsChart from "../Charts/ReviewStatisticsChart";
@@ -11,8 +10,6 @@ import CustomerStatisticsChart from "../Charts/CustomerStatisticsChart";
 import MonthlyStatisticsChart from "../Charts/MonthlyStatisticsChart";
 import ProductsByCategoryChart from "../Charts/ProductsByCategoryChart";
 
-// Lưu ý: nếu bạn có setup riêng cho Chart.js (như chartSetup.js),
-// hãy chắc chắn file này được import trước (nếu cần)
 import "../../utils/chartSetup";
 
 const Dashboard = () => {

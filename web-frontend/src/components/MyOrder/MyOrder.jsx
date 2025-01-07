@@ -14,8 +14,6 @@ function MyOrders() {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
-
-  // Đặt filterStatus mặc định là "processing"
   const [filterStatus, setFilterStatus] = useState("processing");
 
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -31,11 +29,8 @@ function MyOrders() {
   }, [auth.user]);
 
   useEffect(() => {
-    // Filter orders based on search term and status
     const filtered = orders.filter((order) => {
       const matchesSearch = order._id.includes(searchTerm);
-      // Nếu filterStatus là "processing" thì chỉ hiển thị đơn "processing"
-      // Nếu filterStatus = "" (Tất cả), thì bỏ qua
       const matchesStatus = filterStatus
         ? order.shippingStatus === filterStatus
         : true;
@@ -62,7 +57,7 @@ function MyOrders() {
       const response = await apiClient.get(`/order/${orderId}`);
       setSelectedOrder(response.data);
       setShowModal(true);
-      setRefundCheckResult(null); // Reset previous refund status
+      setRefundCheckResult(null);
     } catch (error) {
       console.error("Error fetching order details:", error);
     }
@@ -85,7 +80,6 @@ function MyOrders() {
       setShowCancelModal(false);
       fetchOrders();
 
-      // Fetch the updated order details to include refund information
       const updatedOrderResponse = await apiClient.get(
         `/order/${orderIdToCancel}`
       );
@@ -142,24 +136,19 @@ function MyOrders() {
     }
   };
 
-  // =============== ( Mới Thêm ) ===============
-  // Xử lý user bấm "Tôi đã nhận được hàng"
   const handleMarkAsReceived = async (orderId) => {
     try {
-      // Gọi API chuyển trạng thái sang shipped
       await apiClient.patch(`/order/admin/${orderId}`, {
         shippingStatus: "shipped",
       });
 
       alert("Cảm ơn bạn! Đơn hàng đã được đánh dấu là đã nhận.");
-      // Gọi lại fetchOrders() để cập nhật danh sách
       fetchOrders();
     } catch (error) {
       console.error("Error marking order as received:", error);
       alert("Không thể cập nhật trạng thái đơn hàng. Vui lòng thử lại!");
     }
   };
-  // =============== ( Hết Mới Thêm ) ===============
 
   if (!auth.user) {
     return (

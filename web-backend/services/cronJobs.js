@@ -32,7 +32,7 @@ cron.schedule("*/5 * * * *", async () => {
 });
 
 // Cron job 2: Tự động chuyển đơn hàng từ "shipping" sang "shipped" sau 7 ngày
-// Ví dụ: chạy 1 lần/ngày lúc 00:00
+
 cron.schedule("0 0 * * *", async () => {
   try {
     const now = new Date();
@@ -52,7 +52,7 @@ cron.schedule("0 0 * * *", async () => {
 
       for (const order of ordersToAutoShip) {
         order.shippingStatus = "shipped";
-        order.orderTimestamps.delivery = new Date(); // Gán mốc "đã giao" (tương tự delivered)
+        order.orderTimestamps.delivery = new Date();
         await order.save();
         console.log(`Order ${order._id} auto-updated to "shipped".`);
       }

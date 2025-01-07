@@ -31,7 +31,6 @@ const ManageOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchOrders = async (params = {}) => {
@@ -134,7 +133,6 @@ const ManageOrders = () => {
     }
   };
 
-  // Xác nhận nhiều đơn hàng
   const handleConfirmMultipleOrders = async () => {
     if (
       !window.confirm(
@@ -166,8 +164,6 @@ const ManageOrders = () => {
     applyFilters();
   };
 
-  // =============== ( Mới thêm ) ===============
-  // Admin bấm "Đã giao hàng" -> chuyển shippingStatus = "shipped"
   const handleMarkAsShipped = async (orderId) => {
     if (!window.confirm("Xác nhận đã giao hàng?")) return;
 
@@ -198,7 +194,6 @@ const ManageOrders = () => {
       setUpdatingOrderId(null);
     }
   };
-  // =============== ( Hết mới thêm ) ===============
 
   const getPaymentStatusClasses = (status) => {
     switch (status.toLowerCase()) {

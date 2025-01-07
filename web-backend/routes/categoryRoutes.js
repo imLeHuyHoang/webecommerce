@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const categoryController = require("../controllers/categoryController");
 const { uploadCategory } = require("../middleware/uploadMiddleware");
-const authAdmin = require("../middleware/authAdmin"); // Import middleware authAdmin
+const authAdmin = require("../middleware/authAdmin");
 
 // Category routes
 /**

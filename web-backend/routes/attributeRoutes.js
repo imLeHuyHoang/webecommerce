@@ -3,7 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const attributeController = require("../controllers/attributeController");
-const authAdmin = require("../middleware/authAdmin"); // Import middleware authAdmin
+const authAdmin = require("../middleware/authAdmin");
 
 /**
  * @route   GET /api/attributes

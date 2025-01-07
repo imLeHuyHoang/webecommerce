@@ -1,7 +1,7 @@
 // routes/shopComments.js
 const express = require("express");
 const { verifyToken } = require("../middleware/auth");
-const authAdmin = require("../middleware/authAdmin"); // middleware kiểm tra Admin
+const authAdmin = require("../middleware/authAdmin");
 const shopCommentController = require("../controllers/shopCommentController");
 
 const router = express.Router();

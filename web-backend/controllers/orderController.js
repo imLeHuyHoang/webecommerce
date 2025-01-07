@@ -535,26 +535,23 @@ exports.getAllOrders = async (req, res) => {
 };
 
 /**
- * Admin update 1 order (VD: cập nhật shippingStatus, paymentStatus, v.v.)
+ * Admin update 1 order
  */
 exports.updateOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const updateData = req.body;
 
-    // Validate the orderId
     if (!mongoose.Types.ObjectId.isValid(orderId)) {
       return res.status(400).json({ message: "Invalid order ID" });
     }
 
-    // Find the order by ID
     const order = await Order.findById(orderId);
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Handle shippingStatus update
     if (
       updateData.shippingStatus &&
       updateData.shippingStatus !== order.shippingStatus
@@ -578,7 +575,6 @@ exports.updateOrder = async (req, res) => {
       }
     }
 
-    // Handle paymentStatus update
     if (
       updateData.paymentStatus &&
       updateData.paymentStatus !== order.paymentStatus

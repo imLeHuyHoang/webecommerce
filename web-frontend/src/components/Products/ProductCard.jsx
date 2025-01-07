@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 import apiClient from "../../utils/api-client";
 import { useCart } from "../../context/CartContext";
 import { ToastContext } from "../ToastNotification/ToastContext";
-import { getProductImageUrl } from "../../utils/image-helper"; // Import helper
+import { getProductImageUrl } from "../../utils/image-helper";
 import "./ProductCard.css";
 
 function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
@@ -39,7 +39,6 @@ function ProductCard({ id, title, price, stock, rating, reviewCount, image }) {
     </Tooltip>
   );
 
-  // Sử dụng hàm helper để xây dựng URL hình ảnh
   const imageUrl = getProductImageUrl(image);
 
   return (

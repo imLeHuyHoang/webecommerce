@@ -70,7 +70,6 @@ const CheckoutPage = () => {
     fetchCartData();
   }, [navigate, addToast]);
 
-  // Đồng bộ user => checkoutFormData + default address
   useEffect(() => {
     if (user) {
       setCheckoutFormData({

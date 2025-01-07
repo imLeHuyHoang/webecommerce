@@ -7,7 +7,6 @@ import { z } from "zod";
 const categorySchema = z.object({
   name: z.string().min(1, "Name is required"),
   descriptions: z.string().optional(),
-  // Ở đây mình không ép buộc 'images' = array, mà cho optional
   images: z.array(z.any()).optional(),
 });
 
@@ -30,7 +29,6 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
     }
   }, [category]);
 
-  // --- ĐIỂM ĐÃ SỬA ---
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -38,10 +36,8 @@ const CategoryForm = ({ category, onSuccess, onCancel }) => {
       if (files.length > 1) {
         setImageError("Category chỉ cần 1 ảnh.");
       } else if (files.length === 0) {
-        // Không chọn ảnh -> Giữ nguyên formData.images
         setImageError("");
       } else {
-        // Chọn đúng 1 ảnh -> setFormData.images = files
         setImageError("");
         setFormData({ ...formData, images: Array.from(files) });
       }

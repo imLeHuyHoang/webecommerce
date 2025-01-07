@@ -18,7 +18,6 @@ exports.createShopComment = async (req, res) => {
 
     await newComment.save();
 
-    // Populate the author field with user details (e.g., name)
     await newComment.populate("author", "name");
 
     res.status(201).json(newComment);
@@ -28,12 +27,11 @@ exports.createShopComment = async (req, res) => {
   }
 };
 
-// Get all shop comments
 exports.getShopComments = async (req, res) => {
   try {
     const comments = await ShopComment.find()
-      .populate("author", "name") // Populate author details
-      .sort({ createdAt: -1 }); // Newest first
+      .populate("author", "name")
+      .sort({ createdAt: -1 });
 
     res.status(200).json(comments);
   } catch (error) {
