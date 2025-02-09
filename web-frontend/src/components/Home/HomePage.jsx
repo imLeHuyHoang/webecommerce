@@ -11,7 +11,7 @@ const HomePage = () => {
     <div className="Home-page-container">
       {/* Hero Section */}
       <HeroSection
-        title="Chào mừng đến với Tech Store"
+        title="Welcome to Tech Store"
         subtitle="Cung cấp các sản phẩm công nghệ hàng đầu với chất lượng và giá thành tốt nhất thị trường"
         link="/product"
         image={imgBackground}

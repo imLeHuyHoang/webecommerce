@@ -15,7 +15,7 @@ function FeatureProduct() {
         const response = await apiClient.get("/product");
         const data = response.data;
         if (data && data.length > 0) {
-          const randomProducts = data.slice(0, 4); // Chọn 4 sản phẩm đầu tiên
+          const randomProducts = data.slice(0, 5); // Chọn 4 sản phẩm đầu tiên
           setRandomProducts(randomProducts);
         }
       } catch (error) {
@@ -44,7 +44,7 @@ function FeatureProduct() {
       </Container>
     );
   }
-
+  console.log(randomProducts);
   return (
     <section className="featured-product">
       <Container className="featured-product-container">
