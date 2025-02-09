@@ -92,9 +92,31 @@ The system is divided into several layers:
 
 ---
 
-### DEMO:
+### Some pictures showing the actual interface
 
-![alt text](./web-frontend/src/assets/image-5.png)
+<!-- ![alt text](./web-frontend/src/assets/image-5.png)
 ![alt text](./web-frontend/src/assets/image-1.png)
 ![alt text](./web-frontend/src/assets/image-2.png)
 ![alt text](./web-frontend/src/assets/image-3.png)
+
+![alt text](./web-frontend/src/assets/image-7.png)
+![alt text](./web-frontend/src/assets/image-8.png)
+![alt text](./web-frontend/src/assets/image-6.png)
+![alt text](./web-frontend/src/assets/image-4.png) -->
+
+<p align="center">
+  <img src="./web-frontend/src/assets/image-5.png" alt="alt text" width="45%" />
+  <img src="./web-frontend/src/assets/image-1.png" alt="alt text" width="45%" />
+</p>
+<p align="center">
+  <img src="./web-frontend/src/assets/image-2.png" alt="alt text" width="45%" />
+  <img src="./web-frontend/src/assets/image-3.png" alt="alt text" width="45%" />
+</p>
+<p align="center">
+  <img src="./web-frontend/src/assets/image-7.png" alt="alt text" width="45%" />
+  <img src="./web-frontend/src/assets/image-8.png" alt="alt text" width="45%" />
+</p>
+<p align="center">
+  <img src="./web-frontend/src/assets/image-6.png" alt="alt text" width="45%" />
+  <img src="./web-frontend/src/assets/image-4.png" alt="alt text" width="45%" />
+</p>
